@@ -11,16 +11,17 @@ CREATE TABLE departments (
 CREATE TABLE course_categories (
     category_id INTEGER PRIMARY KEY,
     category_code TEXT NOT NULL UNIQUE,
-    category_name TEXT NOT NULL UNIQUE
+    category_name TEXT NOT NULL
 );
 
 CREATE TABLE professors (
     professor_id INTEGER PRIMARY KEY,
     department_id INTEGER REFERENCES departments(department_id),
-    professor_code TEXT NOT NULL UNIQUE,
+    professor_code TEXT NOT NULL,
     name TEXT NOT NULL,
     email TEXT,
-    office TEXT
+    office TEXT,
+    UNIQUE (professor_code, name)
 );
 
 CREATE TABLE students (
@@ -45,6 +46,7 @@ CREATE TABLE course_offerings (
     offering_id INTEGER PRIMARY KEY,
     course_code TEXT NOT NULL REFERENCES courses(course_code),
     course_name TEXT NOT NULL,
+    credits INTEGER NOT NULL CHECK (credits >= 0),
     target_year INTEGER,
     year INTEGER NOT NULL,
     semester TEXT NOT NULL,
@@ -52,7 +54,8 @@ CREATE TABLE course_offerings (
     campus TEXT,
     capacity INTEGER CHECK (capacity >= 0 OR capacity IS NULL),
     industry_required INTEGER NOT NULL CHECK (industry_required IN (0, 1)),
-    english_type TEXT NOT NULL CHECK (english_type IN ('NONE', 'PARTIAL', 'FULL')),
+    english_type TEXT NOT NULL
+        CHECK (english_type IN ('NONE', 'PARTIAL', 'FULL', 'SECOND_FOREIGN_LANGUAGE')),
     delivery_mode TEXT NOT NULL
         CHECK (delivery_mode IN ('OFFLINE', 'ONLINE', 'HYBRID', 'TBD')),
     schedule_status TEXT NOT NULL

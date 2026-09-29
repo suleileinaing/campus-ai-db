@@ -6,6 +6,7 @@ from __future__ import annotations
 import argparse
 import csv
 import re
+import subprocess
 import sys
 import time
 from datetime import datetime, timezone
@@ -90,6 +91,17 @@ def parse_args() -> argparse.Namespace:
     )
     parser.add_argument("--timeout", type=float, default=30.0)
     parser.add_argument("--delay", type=float, default=1.0)
+    parser.add_argument(
+        "--resume",
+        action="store_true",
+        help="keep existing output rows and skip syllabi already extracted",
+    )
+    parser.add_argument(
+        "--checkpoint-every",
+        type=int,
+        default=100,
+        help="save progress after this many requests (default: 100)",
+    )
     return parser.parse_args()
 
 
@@ -102,6 +114,12 @@ def validate_args(args: argparse.Namespace) -> None:
         raise SystemExit("--timeout must be greater than zero")
     if args.delay < 0:
         raise SystemExit("--delay must be zero or greater")
+    if args.checkpoint_every <= 0:
+        raise SystemExit("--checkpoint-every must be greater than zero")
+
+
+def clean_value(value: object) -> str:
+    return "" if value is None else str(value).strip()
 
 
 def clean_text(element) -> str:
@@ -544,10 +562,34 @@ def fetch_html(url: str, timeout: float) -> str:
             "Referer": "https://sugang.khu.ac.kr/",
         },
     )
-    with urlopen(request, timeout=timeout) as response:
-        raw = response.read()
-        charset = response.headers.get_content_charset() or "utf-8"
-    return raw.decode(charset, errors="replace")
+    try:
+        with urlopen(request, timeout=timeout) as response:
+            raw = response.read()
+            charset = response.headers.get_content_charset() or "utf-8"
+        return raw.decode(charset, errors="replace")
+    except URLError as error:
+        if "CERTIFICATE_VERIFY_FAILED" not in str(error):
+            raise
+
+    # On some macOS Python installations, urllib cannot use the same trusted
+    # certificate chain as the system. curl keeps TLS verification enabled and
+    # uses the macOS trust configuration.
+    try:
+        result = subprocess.run(
+            [
+                "curl", "--location", "--fail", "--silent", "--show-error",
+                "--max-time", str(timeout),
+                "--user-agent", USER_AGENT,
+                "--referer", "https://sugang.khu.ac.kr/",
+                url,
+            ],
+            check=True,
+            capture_output=True,
+            timeout=timeout + 5,
+        )
+    except (subprocess.CalledProcessError, subprocess.TimeoutExpired) as error:
+        raise OSError(f"curl fallback failed: {error}") from error
+    return result.stdout.decode("utf-8", errors="replace")
 
 
 def write_csv_atomic(path: Path, fieldnames: list[str], rows: list[dict]) -> None:
@@ -560,9 +602,47 @@ def write_csv_atomic(path: Path, fieldnames: list[str], rows: list[dict]) -> Non
     temporary.replace(path)
 
 
+def read_csv_if_exists(path: Path) -> list[dict[str, str]]:
+    if not path.is_file():
+        return []
+    with path.open(encoding="utf-8-sig", newline="") as file:
+        return list(csv.DictReader(file))
+
+
 def assign_ids(rows: list[dict], id_field: str) -> None:
     for index, row in enumerate(rows, 1):
         row[id_field] = index
+
+
+def save_outputs(
+    output_dir: Path,
+    details: list[dict],
+    prerequisites: list[dict],
+    evaluations: list[dict],
+    textbooks: list[dict],
+    weekly_plans: list[dict],
+    report: list[dict],
+) -> None:
+    assign_ids(prerequisites, "prerequisite_id")
+    assign_ids(evaluations, "evaluation_id")
+    assign_ids(textbooks, "textbook_id")
+    assign_ids(weekly_plans, "weekly_plan_id")
+    write_csv_atomic(output_dir / "syllabus_details.csv", DETAIL_FIELDS, details)
+    write_csv_atomic(
+        output_dir / "syllabus_prerequisites.csv",
+        PREREQUISITE_FIELDS,
+        prerequisites,
+    )
+    write_csv_atomic(
+        output_dir / "syllabus_evaluations.csv", EVALUATION_FIELDS, evaluations
+    )
+    write_csv_atomic(
+        output_dir / "syllabus_textbooks.csv", TEXTBOOK_FIELDS, textbooks
+    )
+    write_csv_atomic(
+        output_dir / "syllabus_weekly_plans.csv", WEEKLY_PLAN_FIELDS, weekly_plans
+    )
+    write_csv_atomic(output_dir / "extraction_report.csv", REPORT_FIELDS, report)
 
 
 def main() -> int:
@@ -571,8 +651,6 @@ def main() -> int:
     candidates = load_candidates(args)
     if not candidates:
         raise SystemExit("No syllabus links match the selected filters")
-    selected = candidates if args.all else evenly_spaced_sample(candidates, args.limit)
-    print(f"Extracting {len(selected)} of {len(candidates)} matching syllabi")
 
     details: list[dict] = []
     prerequisites: list[dict] = []
@@ -580,6 +658,42 @@ def main() -> int:
     textbooks: list[dict] = []
     weekly_plans: list[dict] = []
     report: list[dict] = []
+    if args.resume:
+        details = read_csv_if_exists(args.output_dir / "syllabus_details.csv")
+        prerequisites = read_csv_if_exists(
+            args.output_dir / "syllabus_prerequisites.csv"
+        )
+        evaluations = read_csv_if_exists(
+            args.output_dir / "syllabus_evaluations.csv"
+        )
+        textbooks = read_csv_if_exists(args.output_dir / "syllabus_textbooks.csv")
+        weekly_plans = read_csv_if_exists(
+            args.output_dir / "syllabus_weekly_plans.csv"
+        )
+        report = read_csv_if_exists(args.output_dir / "extraction_report.csv")
+        completed_ids = {
+            clean_value(row.get("syllabus_id"))
+            for row in report
+            if clean_value(row.get("status")) == "extracted"
+        }
+        candidates = [
+            row
+            for row in candidates
+            if clean_value(row.get("syllabus_id")) not in completed_ids
+        ]
+        print(f"Resume: keeping {len(completed_ids)} extracted syllabi")
+        if not candidates:
+            print("Nothing to extract: every matching syllabus is already complete")
+            return 0
+
+    selected = candidates if args.all else evenly_spaced_sample(candidates, args.limit)
+    print(f"Extracting {len(selected)} of {len(candidates)} matching syllabi")
+    selected_ids = {clean_value(row.get("syllabus_id")) for row in selected}
+    report = [
+        row
+        for row in report
+        if clean_value(row.get("syllabus_id")) not in selected_ids
+    ]
 
     for index, row in enumerate(selected, 1):
         report_row = {
@@ -610,25 +724,29 @@ def main() -> int:
         else:
             print(f"[{index}/{len(selected)}] syllabus {row['syllabus_id']}: extracted")
         report.append(report_row)
+        if index % args.checkpoint_every == 0:
+            save_outputs(
+                args.output_dir,
+                details,
+                prerequisites,
+                evaluations,
+                textbooks,
+                weekly_plans,
+                report,
+            )
+            print(f"Checkpoint saved after {index} requests")
         if index < len(selected) and args.delay:
             time.sleep(args.delay)
 
-    assign_ids(prerequisites, "prerequisite_id")
-    assign_ids(evaluations, "evaluation_id")
-    assign_ids(textbooks, "textbook_id")
-    assign_ids(weekly_plans, "weekly_plan_id")
-    write_csv_atomic(args.output_dir / "syllabus_details.csv", DETAIL_FIELDS, details)
-    write_csv_atomic(
-        args.output_dir / "syllabus_prerequisites.csv", PREREQUISITE_FIELDS, prerequisites
+    save_outputs(
+        args.output_dir,
+        details,
+        prerequisites,
+        evaluations,
+        textbooks,
+        weekly_plans,
+        report,
     )
-    write_csv_atomic(
-        args.output_dir / "syllabus_evaluations.csv", EVALUATION_FIELDS, evaluations
-    )
-    write_csv_atomic(args.output_dir / "syllabus_textbooks.csv", TEXTBOOK_FIELDS, textbooks)
-    write_csv_atomic(
-        args.output_dir / "syllabus_weekly_plans.csv", WEEKLY_PLAN_FIELDS, weekly_plans
-    )
-    write_csv_atomic(args.output_dir / "extraction_report.csv", REPORT_FIELDS, report)
 
     failed = sum(row["status"] == "failed" for row in report)
     print(f"Extracted syllabi: {len(details)}")

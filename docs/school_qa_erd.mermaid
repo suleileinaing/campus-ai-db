@@ -51,8 +51,8 @@ erDiagram
     professors {
         int professor_id PK
         int department_id FK "NULL=소속 미상"
-        string professor_code UK "학교 교강사 코드"
-        string name
+        string professor_code "학교 교강사 코드"
+        string name "professor_code와 함께 UK"
         string email
         string office
     }
@@ -76,6 +76,7 @@ erDiagram
         int offering_id PK
         string course_code FK
         string course_name "해당 학기 과목명"
+        int credits "해당 학기 학점"
         int target_year
         int year "★수강년도 기준점"
         string semester
@@ -83,7 +84,7 @@ erDiagram
         string campus
         int capacity
         bool industry_required "산학필수 여부"
-        string english_type "NONE/PARTIAL/FULL"
+        string english_type "NONE/PARTIAL/FULL/SECOND_FOREIGN_LANGUAGE"
         string delivery_mode "OFFLINE/ONLINE/HYBRID/TBD"
         string schedule_status "SCHEDULED/ASYNCHRONOUS/INTENSIVE/ROOM_ONLY/TBD"
         string schedule_note "비정형 시간표 원문"

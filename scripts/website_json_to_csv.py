@@ -10,7 +10,14 @@ from urllib.parse import urlencode
 
 PROJECT_DIR = Path(__file__).resolve().parent.parent
 INPUT_DIR = PROJECT_DIR / "raw_data" / "course_lists"
-OUTPUT_DIR = PROJECT_DIR / "processed_data" / "website_tables"
+SOURCE_DIRS = (
+    INPUT_DIR / "software_convergence",
+    INPUT_DIR / "general_courses",
+    INPUT_DIR / "natural_science",
+)
+MASTER_TABLES_DIR = PROJECT_DIR / "processed_data" / "website_tables"
+SIMULATED_TABLES_DIR = PROJECT_DIR / "processed_data" / "simulated"
+OUTPUT_DIR = MASTER_TABLES_DIR
 
 FILE_PATTERN = re.compile(
     r"^(?P<year>\d{4})-(?P<semester>[^_]+)_(?P<major>[^_]+)_raw\.json$"
@@ -41,6 +48,7 @@ ENGLISH_TYPE_NAMES = {
     "": "NONE",
     "영어(부분)": "PARTIAL",
     "영어": "FULL",
+    "제2외국어": "SECOND_FOREIGN_LANGUAGE",
 }
 
 TERM_CODES = {
@@ -64,7 +72,12 @@ CATEGORY_NAMES = {
     "11": ("전공", "전공기초"),
     "12": ("전공", "전공공통"),
     "13": ("기타", "공통필수"),
+    "14": ("교양", "필수교과"),
+    "15": ("교양", "배분이수교과"),
+    "16": ("교양", "기초교과"),
+    "17": ("교양", "자유이수"),
     "20": ("교직", "교직전선"),
+    "27": ("기타", "미확인 코드 27"),
     "41": ("기타", "선수과목"),
     "43": ("기타", "논문지도과목"),
     "61": ("기타", "외국어대체"),
@@ -82,6 +95,9 @@ CATEGORY_DEFINITIONS = [
     {"category_id": 7, "category_code": "08", "category_name": "자유선택"},
     {"category_id": 8, "category_code": "24", "category_name": "미확인 코드 24"},
     {"category_id": 9, "category_code": "25", "category_name": "미확인 코드 25"},
+    {"category_id": 10, "category_code": "06", "category_name": "교직"},
+    {"category_id": 11, "category_code": "14", "category_name": "필수교과"},
+    {"category_id": 12, "category_code": "27", "category_name": "미확인 코드 27"},
 ]
 CATEGORY_ID_BY_CODE = {
     row["category_code"]: row["category_id"] for row in CATEGORY_DEFINITIONS
@@ -111,10 +127,28 @@ DEPARTMENT_CODE_ALIASES = {
     "A07333": "A10627",
 }
 
+PROFESSOR_NAME_ALIASES = {
+    ("018824", "Togasaki Yuichi"): "도가사키 유이치",
+    ("057441", "Brown Hyon Chol"): "김현철",
+}
+
 
 def clean(value) -> str:
     """Return a trimmed string for nullable website values."""
     return "" if value is None else str(value).strip()
+
+
+def read_existing_csv(path: Path) -> list[dict]:
+    """Read an existing master/simulated CSV when it is available."""
+    if not path.is_file():
+        return []
+    with path.open(encoding="utf-8-sig", newline="") as file:
+        return list(csv.DictReader(file))
+
+
+def max_existing_id(rows: list[dict], column: str) -> int:
+    values = [int(row[column]) for row in rows if clean(row.get(column))]
+    return max(values, default=0)
 
 
 def normalize_department_code(value) -> str:
@@ -129,29 +163,39 @@ def professor_identity(row: dict) -> tuple[str, str] | None:
     name = clean(row.get("teach_na"))
     if not code or code.upper() == "NONE" or name in {"", ".", ".."}:
         return None
+    name = PROFESSOR_NAME_ALIASES.get((code, name), name)
     return code, name
 
 
 def read_source_files() -> list[tuple[Path, int, str, str, list[dict]]]:
     sources = []
-    for path in sorted(INPUT_DIR.glob("*_raw.json")):
-        match = FILE_PATTERN.match(path.name)
-        if not match:
-            print(f"Warning: skipped unexpected filename: {path.name}")
-            continue
+    for source_dir in SOURCE_DIRS:
+        if not source_dir.is_dir():
+            raise FileNotFoundError(f"Source directory not found: {source_dir}")
 
-        with path.open(encoding="utf-8") as file:
-            payload = json.load(file)
-        rows = payload.get("rows")
-        if not isinstance(rows, list):
-            raise ValueError(f"{path.name}: top-level 'rows' must be an array")
+        for path in sorted(source_dir.glob("*_raw.json")):
+            source_name = path.relative_to(INPUT_DIR)
+            match = FILE_PATTERN.match(path.name)
+            if not match:
+                print(f"Warning: skipped unexpected filename: {source_name}")
+                continue
 
-        year = int(match.group("year"))
-        semester = match.group("semester")
-        major = match.group("major")
-        if semester not in TERM_CODES:
-            raise ValueError(f"{path.name}: unsupported semester label: {semester}")
-        sources.append((path, year, semester, major, rows))
+            with path.open(encoding="utf-8") as file:
+                payload = json.load(file)
+            rows = payload.get("rows")
+            if not isinstance(rows, list):
+                raise ValueError(
+                    f"{source_name}: top-level 'rows' must be an array"
+                )
+
+            year = int(match.group("year"))
+            semester = match.group("semester")
+            major = match.group("major")
+            if semester not in TERM_CODES:
+                raise ValueError(
+                    f"{source_name}: unsupported semester label: {semester}"
+                )
+            sources.append((path, year, semester, major, rows))
     return sources
 
 
@@ -227,6 +271,7 @@ def parse_class_times(
         if (
             "온라인" in entry
             or entry in {"- ()", "미정"}
+            or "집중수업" in entry
             or DAY_WITHOUT_TIME_PATTERN.match(entry)
             or "SW예비대학" in entry
             or "sw예비대학" in entry
@@ -276,6 +321,9 @@ def determine_schedule_status(grouped_rows: list[tuple]) -> str:
         for _, _, _, _, row in grouped_rows
         for entry in timetable_entries(row.get("timetable"))
     }
+
+    if any("집중수업" in entry for entry in entries):
+        return "INTENSIVE"
 
     if any(
         TIME_WITHOUT_DAY_PATTERN.match(entry)
@@ -334,6 +382,8 @@ def determine_english_type(grouped_rows: list[tuple]) -> str:
         return "FULL"
     if "PARTIAL" in normalized:
         return "PARTIAL"
+    if "SECOND_FOREIGN_LANGUAGE" in normalized:
+        return "SECOND_FOREIGN_LANGUAGE"
     return "NONE"
 
 
@@ -372,6 +422,54 @@ def main() -> None:
         for row in rows:
             all_records.append((path, year, semester, major, row))
 
+    existing_departments = read_existing_csv(MASTER_TABLES_DIR / "departments.csv")
+    existing_professors = read_existing_csv(MASTER_TABLES_DIR / "professors.csv")
+    simulated_professors = read_existing_csv(
+        SIMULATED_TABLES_DIR / "simulated_professors.csv"
+    )
+    existing_offerings = read_existing_csv(
+        MASTER_TABLES_DIR / "course_offerings.csv"
+    )
+    simulated_offerings = read_existing_csv(
+        SIMULATED_TABLES_DIR / "general_course_offerings.csv"
+    )
+    existing_offering_categories = read_existing_csv(
+        MASTER_TABLES_DIR / "course_offering_categories.csv"
+    )
+    simulated_offering_categories = read_existing_csv(
+        SIMULATED_TABLES_DIR / "general_course_offering_categories.csv"
+    )
+    existing_time_slots = read_existing_csv(MASTER_TABLES_DIR / "time_slots.csv")
+    simulated_time_slots = read_existing_csv(
+        SIMULATED_TABLES_DIR / "simulated_time_slots.csv"
+    )
+    existing_class_times = read_existing_csv(MASTER_TABLES_DIR / "class_times.csv")
+    simulated_class_times = read_existing_csv(
+        SIMULATED_TABLES_DIR / "simulated_class_times.csv"
+    )
+    existing_syllabi = read_existing_csv(MASTER_TABLES_DIR / "syllabi.csv")
+
+    existing_department_by_code = {
+        clean(row["code"]): row for row in existing_departments
+    }
+    collected_department_metadata = {}
+    for report_path in INPUT_DIR.glob("*/collection_report.json"):
+        with report_path.open(encoding="utf-8") as file:
+            report = json.load(file)
+        college_name = clean(report.get("college_name"))
+        for job in report.get("jobs", []):
+            code = normalize_department_code(job.get("major_code"))
+            full_name = clean(job.get("major_name"))
+            if not code or not full_name:
+                continue
+            relative_name = full_name
+            if college_name and relative_name.startswith(college_name):
+                relative_name = relative_name[len(college_name):].strip()
+            collected_department_metadata[code] = (
+                relative_name or full_name,
+                college_name,
+            )
+
     department_codes = sorted(
         {
             normalize_department_code(code)
@@ -380,27 +478,72 @@ def main() -> None:
             if code
         }
     )
-    department_ids = {code: index for index, code in enumerate(department_codes, 1)}
+    department_ids = {
+        clean(row["code"]): int(row["department_id"])
+        for row in existing_departments
+    }
+    next_department_id = max_existing_id(existing_departments, "department_id") + 1
+    for code in department_codes:
+        if code not in department_ids:
+            department_ids[code] = next_department_id
+            next_department_id += 1
 
-    professor_codes = sorted(
+    professor_keys = sorted(
         {
-            identity[0]
+            identity
             for _, _, _, _, row in all_records
             if (identity := professor_identity(row)) is not None
         }
     )
-    professor_ids = {code: index for index, code in enumerate(professor_codes, 1)}
+    existing_professor_by_identity = {
+        (
+            clean(row["professor_code"]),
+            PROFESSOR_NAME_ALIASES.get(
+                (clean(row["professor_code"]), clean(row["name"])),
+                clean(row["name"]),
+            ),
+        ): row
+        for row in existing_professors
+    }
+    professor_ids = {
+        identity: int(row["professor_id"])
+        for identity, row in existing_professor_by_identity.items()
+    }
+    next_professor_id = max(
+        max_existing_id(existing_professors, "professor_id"),
+        max_existing_id(simulated_professors, "professor_id"),
+    ) + 1
+    for identity in professor_keys:
+        if identity not in professor_ids:
+            professor_ids[identity] = next_professor_id
+            next_professor_id += 1
+
+    professor_names_by_code = {}
+    for professor_code, professor_name in professor_keys:
+        professor_names_by_code.setdefault(professor_code, set()).add(professor_name)
+    for professor_code, names in sorted(professor_names_by_code.items()):
+        if len(names) > 1:
+            warnings.append(
+                f"Professor code {professor_code} is used by distinct names: "
+                f"{sorted(names)!r}; stored as separate professor records"
+            )
 
     departments = []
     for code in department_codes:
-        department_name, college_name = DEPARTMENT_METADATA.get(code, ("", ""))
+        existing_department = existing_department_by_code.get(code, {})
+        department_name = clean(existing_department.get("name"))
+        college_name = clean(existing_department.get("college"))
+        if not department_name and code in DEPARTMENT_METADATA:
+            department_name, college_name = DEPARTMENT_METADATA[code]
+        if not department_name and code in collected_department_metadata:
+            department_name, college_name = collected_department_metadata[code]
         departments.append(
             {
                 "department_id": department_ids[code],
                 "code": code,
                 "name": department_name,
                 "college": college_name,
-                "has_track": "",
+                "has_track": clean(existing_department.get("has_track")),
             }
         )
 
@@ -423,10 +566,34 @@ def main() -> None:
     class_times = []
     syllabi = []
 
-    next_offering_id = 1
-    next_class_time_id = 1
-    next_syllabus_id = 1
-    next_offering_category_id = 1
+    existing_offering_ids = {
+        (
+            clean(row["year"]),
+            clean(row["semester"]),
+            clean(row["course_code"]),
+            clean(row["section"]),
+        ): int(row["offering_id"])
+        for row in existing_offerings
+    }
+    next_offering_id = max(
+        max_existing_id(existing_offerings, "offering_id"),
+        max_existing_id(simulated_offerings, "offering_id"),
+    ) + 1
+    existing_offering_category_ids = {
+        (int(row["offering_id"]), clean(row.get("department_id"))): int(
+            row["offering_category_id"]
+        )
+        for row in existing_offering_categories
+    }
+    next_offering_category_id = max(
+        max_existing_id(existing_offering_categories, "offering_category_id"),
+        max_existing_id(simulated_offering_categories, "offering_category_id"),
+    ) + 1
+    existing_syllabus_ids = {
+        int(row["offering_id"]): int(row["syllabus_id"])
+        for row in existing_syllabi
+    }
+    next_syllabus_id = max_existing_id(existing_syllabi, "syllabus_id") + 1
 
     for offering_key in sorted(offering_groups):
         grouped_rows = offering_groups[offering_key]
@@ -455,7 +622,20 @@ def main() -> None:
         if not course_code:
             warnings.append(f"{path.name}: skipped row without subjt_cd: {row!r}")
             continue
-        offering_professor_codes = set()
+
+        section = parse_section(row)
+        stable_offering_key = (
+            str(year),
+            semester,
+            course_code,
+            section,
+        )
+        offering_id = existing_offering_ids.get(stable_offering_key)
+        if offering_id is None:
+            offering_id = next_offering_id
+            next_offering_id += 1
+
+        offering_professor_keys = set()
         for _, _, _, source_major, source_row in grouped_rows:
             identity = professor_identity(source_row)
             if identity is None:
@@ -464,28 +644,23 @@ def main() -> None:
             source_department_code = normalize_department_code(
                 clean(source_row.get("class_cd")) or source_major
             )
-            previous = professor_data.get(professor_code)
+            existing_professor = existing_professor_by_identity.get(identity, {})
             current = {
-                "professor_id": professor_ids[professor_code],
+                "professor_id": professor_ids[identity],
                 "department_id": department_ids[source_department_code],
                 "professor_code": professor_code,
                 "name": professor_name,
-                "email": "",
-                "office": "",
+                "email": clean(existing_professor.get("email")),
+                "office": clean(existing_professor.get("office")),
             }
-            if previous and previous["name"] != professor_name:
-                warnings.append(
-                    f"Professor code {professor_code} has multiple names: "
-                    f"{previous['name']!r}, {professor_name!r}"
-                )
-            professor_data.setdefault(professor_code, current)
-            offering_professor_codes.add(professor_code)
+            professor_data.setdefault(identity, current)
+            offering_professor_keys.add(identity)
 
-        for professor_code in sorted(offering_professor_codes):
+        for professor_key in sorted(offering_professor_keys):
             offering_professors.append(
                 {
-                    "offering_id": next_offering_id,
-                    "professor_id": professor_ids[professor_code],
+                    "offering_id": offering_id,
+                    "professor_id": professor_ids[professor_key],
                 }
             )
 
@@ -496,34 +671,25 @@ def main() -> None:
         }
         canonical_course_name = min(course_names, key=lambda name: (len(name), name))
 
+        offering_credits = parse_credits(row.get("unit_num"))
         current_course = {
             "course_code": course_code,
             "department_id": department_ids[department_code],
             "current_name": canonical_course_name,
-            "credits": parse_credits(row.get("unit_num")),
+            "credits": offering_credits,
         }
-        previous_course = course_data.get(course_code)
-        if (
-            previous_course
-            and previous_course["credits"] != current_course["credits"]
-        ):
-            warnings.append(
-                f"Course {course_code} has conflicting credit values: "
-                f"{previous_course['credits']} vs {current_course['credits']}"
-            )
         course_data[course_code] = current_course
 
-        offering_id = next_offering_id
-        next_offering_id += 1
         offerings.append(
             {
                 "offering_id": offering_id,
                 "course_code": course_code,
                 "course_name": canonical_course_name,
+                "credits": offering_credits,
                 "target_year": clean(row.get("lect_grade")),
                 "year": year,
                 "semester": semester,
-                "section": parse_section(row),
+                "section": section,
                 "campus": clean(row.get("campus_nm")),
                 "capacity": row.get("asign_pcnt", ""),
                 "industry_required": int(is_industry_required(grouped_rows)),
@@ -563,16 +729,25 @@ def main() -> None:
                 if clean(source_row.get("subjt_name"))
             }
             display_name = max(display_names, key=lambda name: (len(name), name))
+            offering_category_key = (
+                offering_id,
+                str(department_ids[source_major]),
+            )
+            offering_category_id = existing_offering_category_ids.get(
+                offering_category_key
+            )
+            if offering_category_id is None:
+                offering_category_id = next_offering_category_id
+                next_offering_category_id += 1
             offering_categories.append(
                 {
-                    "offering_category_id": next_offering_category_id,
+                    "offering_category_id": offering_category_id,
                     "offering_id": offering_id,
                     "department_id": department_ids[source_major],
                     "category_id": CATEGORY_ID_BY_CODE[source_category_code],
                     "display_name": display_name,
                 }
             )
-            next_offering_category_id += 1
 
         meeting_keys = set()
         unparsed_entries = set()
@@ -607,7 +782,7 @@ def main() -> None:
         for day, start_time, end_time, room_code in sorted(meeting_keys):
             class_times.append(
                 {
-                    "class_time_id": next_class_time_id,
+                    "class_time_id": "",
                     "offering_id": offering_id,
                     "day": day,
                     "start_time": start_time,
@@ -615,11 +790,14 @@ def main() -> None:
                     "room_code": room_code,
                 }
             )
-            next_class_time_id += 1
 
+        syllabus_id = existing_syllabus_ids.get(offering_id)
+        if syllabus_id is None:
+            syllabus_id = next_syllabus_id
+            next_syllabus_id += 1
         syllabi.append(
             {
-                "syllabus_id": next_syllabus_id,
+                "syllabus_id": syllabus_id,
                 "offering_id": offering_id,
                 "source_url": make_syllabus_url(row, year, semester),
                 "objectives": "",
@@ -628,7 +806,6 @@ def main() -> None:
                 "weekly_plan": "",
             }
         )
-        next_syllabus_id += 1
 
     time_slot_keys = sorted(
         {
@@ -642,9 +819,19 @@ def main() -> None:
     )
 
     time_slot_ids = {
-        slot: index
-        for index, slot in enumerate(time_slot_keys, 1)
+        (clean(row["day"]), clean(row["start_time"]), clean(row["end_time"])): int(
+            row["time_slot_id"]
+        )
+        for row in existing_time_slots
     }
+    next_time_slot_id = max(
+        max_existing_id(existing_time_slots, "time_slot_id"),
+        max_existing_id(simulated_time_slots, "time_slot_id"),
+    ) + 1
+    for slot in time_slot_keys:
+        if slot not in time_slot_ids:
+            time_slot_ids[slot] = next_time_slot_id
+            next_time_slot_id += 1
 
     time_slots = [
         {
@@ -656,21 +843,44 @@ def main() -> None:
         for slot in time_slot_keys
     ]
     
-    normalized_class_times = [
-    {
-        "class_time_id": index,
-        "offering_id": meeting["offering_id"],
-        "time_slot_id": time_slot_ids[
+    existing_class_time_ids = {
+        (
+            int(row["offering_id"]),
+            int(row["time_slot_id"]),
+            clean(row.get("room_code")),
+        ): int(row["class_time_id"])
+        for row in existing_class_times
+    }
+    next_class_time_id = max(
+        max_existing_id(existing_class_times, "class_time_id"),
+        max_existing_id(simulated_class_times, "class_time_id"),
+    ) + 1
+    normalized_class_times = []
+    for meeting in class_times:
+        time_slot_id = time_slot_ids[
             (
                 meeting["day"],
                 meeting["start_time"],
                 meeting["end_time"],
             )
-        ],
-        "room_code": meeting["room_code"],
-    }
-    for index, meeting in enumerate(class_times, 1)
-    ]
+        ]
+        class_time_key = (
+            meeting["offering_id"],
+            time_slot_id,
+            clean(meeting["room_code"]),
+        )
+        class_time_id = existing_class_time_ids.get(class_time_key)
+        if class_time_id is None:
+            class_time_id = next_class_time_id
+            next_class_time_id += 1
+        normalized_class_times.append(
+            {
+                "class_time_id": class_time_id,
+                "offering_id": meeting["offering_id"],
+                "time_slot_id": time_slot_id,
+                "room_code": meeting["room_code"],
+            }
+        )
 
     write_csv(
         "departments.csv",
@@ -680,7 +890,7 @@ def main() -> None:
     write_csv(
         "professors.csv",
         ["professor_id", "department_id", "professor_code", "name", "email", "office"],
-        [professor_data[code] for code in sorted(professor_data)],
+        [professor_data[identity] for identity in sorted(professor_data)],
     )
     write_csv(
         "courses.csv",
@@ -698,6 +908,7 @@ def main() -> None:
             "offering_id",
             "course_code",
             "course_name",
+            "credits",
             "target_year",
             "year",
             "semester",

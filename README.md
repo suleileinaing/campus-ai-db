@@ -65,7 +65,9 @@ CAMPUS AI Database/
 | `time_slots` | 요일·시작시간·종료시간의 중복 제거 사전 | 동일 시간대를 재사용 |
 | `class_times` | 개설강좌의 시간대와 강의실 | 한 강좌에 여러 요일 가능 |
 
-`course_offerings.english_type`은 `NONE`, `PARTIAL`, `FULL` 중 하나이며, `industry_required`는 산학필수 여부를 `0/1`로 저장한다. 온라인·집중수업 등은 `delivery_mode`, `schedule_status`, `schedule_note`로 표현한다.
+`course_offerings.credits`는 해당 학기 당시의 학점을 보존한다. `english_type`은 `NONE`, `PARTIAL`, `FULL`, `SECOND_FOREIGN_LANGUAGE` 중 하나이며, `industry_required`는 산학필수 여부를 `0/1`로 저장한다. 온라인·집중수업 등은 `delivery_mode`, `schedule_status`, `schedule_note`로 표현한다.
+
+교강사 코드는 시기에 따라 서로 다른 이름에 사용된 사례가 있어 `professors`는 `professor_code` 하나가 아니라 `(professor_code, name)` 조합을 고유 기준으로 사용한다.
 
 ### 수강이력
 
@@ -128,7 +130,7 @@ CAMPUS AI Database/
 | `professors` | `professor_id`, `department_id`, `professor_code`, `name`, `email`*(출처 확인 필요)*, `office` |
 | `students` | `student_id`, `name`, `department_id`, `track`, `admission_year`, `status`, `extra_track_type`, `extra_track_name` |
 | `courses` | `course_code`, `department_id`, `current_name`, `credits` |
-| `course_offerings` | `offering_id`, `course_code`, `course_name`, `target_year`, `year`, `semester`, `section`, `campus`, `capacity`, `industry_required`, `english_type`, `delivery_mode`, `schedule_status`, `schedule_note` |
+| `course_offerings` | `offering_id`, `course_code`, `course_name`, `credits`, `target_year`, `year`, `semester`, `section`, `campus`, `capacity`, `industry_required`, `english_type`, `delivery_mode`, `schedule_status`, `schedule_note` |
 | `offering_professors` | `offering_id`, `professor_id` |
 | `course_offering_categories` | `offering_category_id`, `offering_id`, `department_id`*(학생의 전공)*, `category_id`, `display_name` |
 | `time_slots` | `time_slot_id`, `day`, `start_time`, `end_time` |
@@ -152,9 +154,10 @@ PK/FK, 자료형 및 제약조건은 `database/schema.sql`, 테이블 관계는 
 
 ### 실제 공개 데이터
 
-- 2020~2026년 소프트웨어융합대학 강좌와 개설정보
+- 2020~2026년 소프트웨어융합대학, 후마니타스 교양 및 자연계열 강좌·개설정보
 - 교수·수업시간·강의실·이수구분
-- 1,837개 강의계획서 링크 및 추출 정보
+- 10,718개 실제 개설강좌의 강의계획서 링크
+- 이 중 1,837개 소프트웨어융합대학 강의계획서의 상세 추출 정보
 - 강의계획서의 교재, 평가방법, 주차별 계획, 선수과목
 - 2022~2026년 CS/AI/SWCON 공식 졸업요건
 
@@ -162,12 +165,12 @@ PK/FK, 자료형 및 제약조건은 `database/schema.sql`, 테이블 관계는 
 
 - `students`, `enrollments`
 - 일부 교수 및 팀티칭 연결 보조 데이터
-- 현재 버전의 교양 과목과 교양 개설강좌
+- 학생 수강이력 테스트용 임시 교양 과목과 교양 개설강좌
 - 공식 근거가 아직 확정되지 않은 일부 대체 충족 방법
 
-현재 교양 과목은 개인화 질의 테스트를 위해 simulated data를 사용한다. 컬럼과 PK/FK 구조는 실제 데이터와 동일하게 맞췄으므로, 후마니타스칼리지의 실제 공개 강좌를 수집한 뒤 같은 키 구조로 교체한다. 전공 강좌는 시뮬레이션하지 않고 수강신청 사이트의 실제 개설강좌를 사용한다.
+실제 후마니타스 교양 개설강좌는 master table에 수집되어 있다. 다만 기존 시뮬레이션 학생의 수강이력은 임시 교양 과목코드와 개설강좌를 계속 참조하므로, 해당 simulated rows도 개인화 질의 테스트용으로 함께 유지한다. 전공 강좌는 시뮬레이션하지 않고 수강신청 사이트의 실제 개설강좌를 사용한다.
 
-현재 `syllabi` 및 관련 강의계획서 테이블은 소프트웨어융합대학 전공 개설강좌를 중심으로 구성되어 있으며, 시뮬레이션 교양 과목의 강의계획서는 아직 추가하지 않았다. 향후 후마니타스칼리지의 실제 교양 과목·개설강좌를 수집한 뒤 실제 `offering_id`에 맞춰 교양 강의계획서 링크, 상세정보, 교재, 주차별 계획을 추가한다. 따라서 현재 교양 과목에서 syllabus가 조회되지 않는 것은 실제 강의계획서가 없다는 뜻이 아니라 **아직 수집·연결하지 않았다는 뜻**이다.
+`processed_data/website_tables/syllabi.csv`에는 실제 강좌 10,718개의 강의계획서 링크가 있다. 현재 SQLite DB의 `syllabi` 및 관련 상세 테이블에는 먼저 추출한 소프트웨어융합대학 1,837개가 들어 있다. 후마니타스 교양 및 자연계열 강의계획서 상세정보는 추출 작업이 진행 중이다. 따라서 해당 강좌에서 syllabus 상세정보가 조회되지 않는 것은 강의계획서가 없다는 뜻이 아니라 **링크는 수집했지만 상세 추출이 아직 완료되지 않았다는 뜻**이다.
 
 ## 개인정보 및 조회 권한
 
@@ -217,9 +220,9 @@ Gold question dataset과 Text2SQL 구현·평가는 현재 다른 팀원의 담�
 
 | 항목 | 행 수 |
 |---|---:|
-| 강좌 개설 | 1,933 |
+| 강좌 개설 | 10,814 |
 | 강의계획서 | 1,837 |
-| 수업시간 | 2,987 |
+| 수업시간 | 18,587 |
 | 선수과목 조건 | 416 |
 | 주차별 계획 | 28,880 |
 | 졸업요건 세트 | 15 |
