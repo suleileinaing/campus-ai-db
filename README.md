@@ -1,232 +1,120 @@
-# CAMPUS AI 통합 데이터베이스
+Code number:
 
-이 폴더는 팀원들이 동일한 스키마와 키를 사용하도록 공유하는 **단일 기준 데이터 패키지**이다. 자연어 질의를 SQL로 변환하는 Text2SQL 코드와 정답 질의셋은 이 폴더의 `database/campus_ai.db` 및 `database/schema.sql`을 기준으로 작성한다.
+A07308 : 2020-1, College of Software Department of Computer Science and Engineering - Computer Science and Engineering
 
-## 빠른 시작
+### 졸업요건 원본과 데이터 출처 구분
 
-프로젝트 루트에서 다음 명령을 실행한다.
+졸업요건에 사용한 교육과정 PDF 원본은 `raw_data/graduation_requirements/`에 보관한다. 파일명은 적용 연도와 학과 범위를 확인할 수 있도록 정리하였다.
 
-```bash
-python3 scripts/test_database_queries.py
-```
+- `2022_software_convergence_college_curriculum.pdf`: 2022년 컴퓨터공학과, 인공지능학과, 소프트웨어융합학과
+- `2023_computer_science_curriculum.pdf`: 2023년 컴퓨터공학과
+- `2023_artificial_intelligence_curriculum.pdf`: 2023년 인공지능학과
+- `2023_software_convergence_curriculum.pdf`: 2023년 소프트웨어융합학과
+- `2024_software_convergence_college_curriculum.pdf`: 2024년 세 학과 통합 자료
+- `2024_computer_science_curriculum.pdf`: 2024년 컴퓨터공학과 별도 자료(통합 자료 교차 검증용)
+- `2025_software_convergence_college_curriculum.pdf`: 2025년 세 학과 통합 자료
+- `2026_software_convergence_college_curriculum.pdf`: 2026년 세 학과 통합 자료
 
-CSV에서 SQLite DB를 다시 만들려면 다음을 실행한다.
+PDF에서 직접 확인한 총 이수학점, 이수구분별 최소학점, 지정과목 및 기타 졸업조건은 `processed_data/database_tables/`의 실제 공개 데이터로 관리한다. 학생·수강내역과 아직 공식 근거로 확정하지 않은 대체 충족 방법은 `processed_data/simulated/`에 유지한다.
 
-```bash
-python3 scripts/build_database.py
-python3 scripts/test_database_queries.py
-```
+교양 이수구분(category 4 `필수교과`, 5 `배분이수`, 6 `자유이수`)의 최소학점은 현재 팀원이 작성한 시뮬레이션 데이터를 사용한다. 공식 전공 졸업요건과 출처가 섞이지 않도록 `processed_data/simulated/simulated_general_requirement_categories.csv`에 분리했으며, 모든 졸업요건 세트에 `필수교과 17학점`, `배분이수 9학점(3개 영역·영역당 3학점)`, `자유이수 3학점`을 임시 적용한다. 후마니타스 공식 교육과정 자료를 확인한 뒤 실제 학번별 기준으로 교체해야 한다.
 
-현재 검증 결과는 다음과 같다.
+현재 통합 DB에는 2022~2026학번의 컴퓨터공학과(CS), 인공지능학과(AI), 소프트웨어융합학과(SWCON) 공식 졸업요건 15세트가 들어 있다. 각 세트의 총 이수학점, 전공기초·전공필수·전공선택 최소학점 및 PDF에 명시된 기타 조건을 저장하며, `scripts/build_official_graduation_requirements.py`로 다시 생성할 수 있다. 지정과목은 PDF에서 과목 단위로 정규화가 완료된 학과·연도만 저장하며, 행이 없다는 사실을 "필수과목 없음"으로 해석하면 안 된다. 세부 정규화 범위는 `validation_report/graduation_requirement_coverage.csv`에서 확인한다.
 
-- SQLite integrity check: PASS
-- Foreign-key check: PASS
-- 수강내역과 실제 개설강좌의 과목코드 일치 검사: PASS
-- 대표 SQL 질의: 11/11 PASS
-- 졸업요건: CS/AI/SWCON 각 2022~2026학번, 총 15세트
+현재는 출처와 적용 연도를 명확히 검증하기 위해 졸업요건을 학과·학번별 한 행씩 유지한다. 향후 모든 연도의 `requirement_courses` 지정과목 정규화가 완료되면 총학점, 이수구분별 최소학점, 지정과목 및 기타 조건이 모두 같은 연속 학번 구간을 확인하여 `cohort_start`와 `cohort_end` 범위 한 행으로 통합할 수 있다. 총학점만 같다는 이유로 서로 다른 교육과정을 합치지 않는다.
 
-## 폴더 구성
+- PDF에 명시된 `산학필수`, `전공영어강좌`, `SW교육`, `졸업논문`, `TOPIK`, 추가 전공 이수 조건은 실제 `requirement_others` 데이터로 취급한다.
+- 프로젝트가 가정한 대체과목, 외부성적 또는 임의의 충족 방법만 `requirement_fulfillment_options` 시뮬레이션 데이터로 취급한다.
+- 시뮬레이션 충족 방법을 사용할 때는 대응하는 실제 `graduation_requirements.requirement_id` 또는 `requirement_others.requirement_other_id`와 일치시켜야 한다.
+- 폴더 위치는 데이터의 출처를 구분하기 위한 것이며, SQLite로 적재한 후에는 PK/FK 관계로 무결성을 검증한다.
 
-```text
-CAMPUS AI Database/
-├── database/
-│   ├── campus_ai.db              # 팀에서 조회할 통합 SQLite DB
-│   ├── schema.sql                # 테이블, 제약조건, 인덱스 정의
-│   └── sample_queries.sql        # 대표 SQL 예시
-├── processed_data/
-│   ├── website_tables/           # 수강신청 사이트 기반 실제 공개 데이터
-│   ├── database_tables/          # 강의계획서·졸업요건 정제 데이터
-│   └── simulated/                # 학생/수강이력 및 임시 교양 데이터
-├── raw_data/                     # 원본 공개 데이터와 근거 문서
-├── scripts/                      # 수집·변환·DB 구축·검증 코드
-├── validation_report/            # 추출 및 정합성 검증 결과
-└── docs/school_qa_erd.mermaid    # 통합 ERD
-```
 
-## 테이블 설명
+### 동일한 강의계획서 내용을 공유하는 여러 분반은 향후 콘텐츠 해시 기반 중복 제거를 통해 공통 syllabus content로 분리할 수 있다.  
 
-### 학과·교수·학생
+### 평가항목은 강의계획서마다 고정된 6개 유형으로 구성되어 있어, 질의 단순화와 성적 계산 편의를 위해 syllabi 테이블의 개별 수치 및 설명 컬럼으로 비정규화하였다.  
 
-| 테이블 | 설명 | 데이터 성격 |
-|---|---|---|
-| `departments` | 학과/전공 및 후마니타스 영역 코드 | 공개 데이터 |
-| `professors` | 교수 코드, 이름, 소속, 연구실 | 공개 데이터 중심; 일부 simulated professor 포함 |
-| `students` | 학번, 학과, 트랙, 입학연도, 상태 | 시뮬레이션·비공개 취급 |
+### 강의계획서 정제 규칙
 
-### 과목·개설강좌
+- 영어강좌 여부의 최종값은 `course_offerings.english_type`의 `NONE`, `PARTIAL`, `FULL`을 사용한다. 강의계획서 HTML 값은 최종 테이블에 중복 저장하지 않고 `validation_report/english_type_validation.csv`에서 비교·검증한다.
+- 홈페이지는 `personal_homepage`와 `course_homepage`로 분리한다.
+- 상담시간은 표현 방식이 다양하므로 `consultation_time` 원문을 유지한다.
+- 수업유형과 수업방법은 각각 `class_types_json`, `teaching_methods_json` JSON 배열로 저장한다.
 
-| 테이블 | 설명 | 주요 관계 |
-|---|---|---|
-| `courses` | 과목코드별 기준 과목명, 학점, 개설학과 | `course_code`가 PK |
-| `course_offerings` | 연도·학기·분반별 실제 개설강좌 | 하나의 `course`에 여러 개설강좌 |
-| `offering_professors` | 개설강좌와 담당 교수 연결; 팀티칭 지원 | 다대다 연결 테이블 |
-| `course_categories` | 전공기초·전공필수·전공선택·교양 등의 코드 사전 | category 기준 테이블 |
-| `course_offering_categories` | 학생 학과 기준으로 달라질 수 있는 개설강좌 이수구분 | 공통 분류는 `department_id=NULL` |
-| `time_slots` | 요일·시작시간·종료시간의 중복 제거 사전 | 동일 시간대를 재사용 |
-| `class_times` | 개설강좌의 시간대와 강의실 | 한 강좌에 여러 요일 가능 |
+### 시뮬레이션 교양과목의 후마니타스 소속 매핑
 
-`course_offerings.credits`는 해당 학기 당시의 학점을 보존한다. `english_type`은 `NONE`, `PARTIAL`, `FULL`, `SECOND_FOREIGN_LANGUAGE` 중 하나이며, `industry_required`는 산학필수 여부를 `0/1`로 저장한다. 온라인·집중수업 등은 `delivery_mode`, `schedule_status`, `schedule_note`로 표현한다.
+`processed_data/simulated/general_courses.csv`의 교양과목은 실제 학생 데이터가 아니라 개인화 질의 테스트를 위한 시뮬레이션 데이터이다. `department_id`는 2026년 수강신청 사이트의 후마니타스칼리지교육과정(국제) 공개 조직 코드와 시뮬레이션 과목 코드·과목명을 기준으로 다음과 같이 추정하여 연결하였다.
 
-교강사 코드는 시기에 따라 서로 다른 이름에 사용된 사례가 있어 `professors`는 `professor_code` 하나가 아니라 `(professor_code, name)` 조합을 고유 기준으로 사용한다.
+- `GD110x` → 23 (배분이수교과 생명,우주,인간)
+- `GD120x` → 24 (배분이수교과 분석,추론,논리)
+- `GD130x` → 25 (배분이수교과 상징,문화,소통)
+- `GD140x` → 26 (배분이수교과 사회,공동체,평화)
+- `GD150x` → 27 (배분이수교과 지능,정보,미래)
+- `GF1005` → 19 (자유이수교과 체육), 기타 `GF` → 18 (자유이수교과 자유이수 기타)
+- `HC1201` → 20 (필수교과 영어), `HC11xx` → 21 (필수교과 글쓰기), `HC10xx` → 22 (필수교과 문명전개의지구적문맥)
+- `SW1001`, `SW1002` → 29 (자유이수교과 SW)
 
-### 수강이력
+이 매핑은 시뮬레이션용 추정값이며, 실제 후마니타스 강좌 데이터를 수집한 뒤 실제 공개 데이터로 교체해야 한다. `scripts/assign_simulated_general_departments.py`를 실행하면 이 규칙을 다시 적용할 수 있다.
 
-| 테이블 | 설명 | 데이터 성격 |
-|---|---|---|
-| `enrollments` | 학생별 수강 과목, 성적, 완료 상태, 재수강 여부 | 시뮬레이션 |
+학생과 수강이력 자체는 개인화 질의 테스트를 위한 시뮬레이션 데이터이다. 다만 수강이력의 교양 `offering_id`와 `course_code`는 2020~2026년 수강신청 사이트에서 수집한 실제 개설강좌를 참조하도록 교체하였다. 교체 시 동일 연도·학기·이수구분 안에서 고정 seed(`20260929`)로 배정하고 학생별 동일 개설강좌 중복을 방지한다. 결과는 `processed_data/simulated/enrollment_replacement_map.csv`에서 확인할 수 있으며 `scripts/replace_simulated_general_enrollments.py`로 재현할 수 있다. 전공 수강이력도 실제 개설강좌를 참조한다.
 
-수강이력은 가상 과목 ID가 아니라 가능한 경우 실제 수집한 `course_offerings.offering_id`에 연결했다. 현재 교양 수강이력 일부는 임시 simulated 교양 개설강좌를 참조한다.
+사용되지 않는 simulated general offering, class time, professor 연결 데이터는 제거하였다. `general_courses.csv`에는 simulated requirement fulfillment option이 참조하는 legacy code `HC1201` 한 행만 남아 있다. 현재 `enrollments.csv`의 모든 `offering_id`는 수강신청 사이트에서 수집한 실제 개설강좌를 참조한다.
 
-### 강의계획서
+현재 `syllabi` 및 관련 강의계획서 테이블에는 소프트웨어융합대학 전공 개설강좌의 강의계획서가 중심으로 저장되어 있으며, 시뮬레이션 교양 과목의 강의계획서는 아직 포함하지 않았다. 향후 후마니타스칼리지의 실제 교양 과목·개설강좌를 수집한 뒤 해당 `offering_id`를 기준으로 교양 강의계획서 링크, 상세정보, 교재, 주차별 계획 등을 추가할 예정이다. 따라서 현재 DB에서 교양 과목의 syllabus가 조회되지 않는 것을 "강의계획서 없음"으로 해석하면 안 된다.
 
-| 테이블 | 설명 |
-|---|---|
-| `syllabi` | 강의계획서 URL, 수업개요·목표·방법·과제·평가비율 등 |
-| `syllabus_textbooks` | 강의계획서별 교재; `sequence`는 교재 표시 순서 |
-| `syllabus_weekly_plans` | 1~16주차별 날짜, 주제, 비고 |
-| `syllabus_chunks` | 향후 RAG 검색용 텍스트 조각과 embedding; 현재 비어 있을 수 있음 |
+### 현재 역할 범위
 
-내용을 공유하는 여러 분반은 현재 개설강좌별 syllabus row를 가지며, 향후 content hash로 공통 콘텐츠를 분리할 수 있다.
-
-평가항목은 질의와 성적 계산을 단순화하기 위해 `syllabi`의 중간고사·기말고사·과제·발표·출석·기타 percentage/detail 컬럼으로 저장했다. 홈페이지는 `personal_homepage`와 `course_homepage`로 분리하고, 수업유형과 수업방법은 JSON 배열로 유지한다.
+이 저장소에서 담당한 범위는 2020~2026년 소프트웨어융합대학 공개 강좌·강의계획서 조사 및 DB화, 공식 졸업요건 통합, 개인화 질의 예시 작성이다. `[질문 / 대상 학생 ID / 정답 SQL / 정답 값]` 형식의 gold question dataset 구축과 ChatKHU API 기반 Text2SQL 구현·평가는 다른 팀원의 담당 범위이므로 여기서는 구현하지 않는다.
 
 ### Text2SQL과 syllabus chunks 사용 범위
 
-현재 `syllabus_chunks`는 향후 RAG 기능을 위해 스키마만 준비되어 있고 데이터는 아직 없다.
+현재 `syllabus_chunks` 테이블은 향후 RAG 기능을 위해 스키마만 준비되어 있으며 데이터는 아직 없다. 이것은 gold question dataset 작성과 Text2SQL 구현을 시작하는 데 문제가 되지 않는다. 학점, 수업시간, 선수과목, 교재, 평가비율, 주차별 계획, 졸업요건처럼 이미 정형 테이블에 저장된 정보는 자연어 질문을 SQL로 변환하여 조회한다.
 
- Gold dataset에 의미 검색이 필요한 서술형 질문을 포함하거나 서비스가 해당 질문까지 답해야 하는 시점에 syllabus 원문을 chunking하고 embedding을 생성한다.
+- **Text2SQL:** 정형 데이터로 답할 수 있는 질문에 사용한다. 예: 남은 졸업학점, 산학필수 과목, 선수과목, 특정 시간대 강좌, 교재 및 평가비율 조회.
+- **RAG (`syllabus_chunks`):** 긴 강의계획서 원문에서 의미 기반 검색이나 설명·추천이 필요한 질문에 사용한다. 예: 프로젝트 중심 수업 추천, 노트북 필요 여부, 과제 내용 요약, 관심 분야와 관련된 수업 추천.
+- **개인화 답변:** 필요하면 학생·수강이력의 SQL 결과와 syllabus RAG 검색 결과를 결합한다.
 
-### 선수과목
+따라서 2단계 gold question dataset과 3단계 Text2SQL은 우선 정형 질의로 진행할 수 있다. Gold dataset에 의미 검색이 필요한 서술형 질문을 포함하거나 통합 AI가 해당 질문까지 답해야 할 때 syllabus 원문을 chunking하고 embedding을 생성한다.
 
-| 테이블 | 설명 |
-|---|---|
-| `course_prerequisites` | 대상 과목의 선수/권장과목, 적용 학번 범위, 최소 성적, AND/OR 그룹 |
-| `prerequisite_sources` | 선수과목 정보와 근거 강의계획서 연결 |
+### Validation report
 
-같은 선수과목 조건이 여러 강의계획서에 반복되어도 조건은 한 번만 저장하고, 여러 근거 syllabus를 `prerequisite_sources`로 연결한다. 따라서 학생에게 답변할 때 조건뿐 아니라 출처 URL도 제시할 수 있다.
+`validation_report/`는 데이터베이스 테이블이 아니라 수집·변환 결과를 확인하기 위한 검증 자료이다.
 
-### 졸업요건
+- `english_type_validation.csv`: 수강신청 사이트와 강의계획서의 영어강좌 구분이 일치하는지 비교한다. 총 1,837건 중 1,832건이 일치하고, 5건은 사이트에서 `PARTIAL`이지만 강의계획서 값이 비어 있어 `CONFLICT`로 표시했다. 최종 DB는 수강신청 사이트 값을 사용한다.
+- `graduation_requirement_coverage.csv`: 학과·학번별 졸업요건과 지정과목의 정규화 완료 여부를 표시한다. `not_yet_normalized`는 필수과목이 없다는 뜻이 아니라 아직 과목 단위 변환이 끝나지 않았다는 뜻이다.
 
-| 테이블 | 설명 |
-|---|---|
-| `graduation_requirements` | 학과·트랙·입학연도별 총 졸업학점 |
-| `requirement_categories` | 전공기초·전공필수·전공선택 등 이수구분별 최소학점 |
-| `requirement_courses` | 해당 교육과정에서 지정된 필수 과목 |
-| `requirement_others` | 산학필수, 영어강좌, SW교육, 졸업논문, 다전공 등의 조건 |
-| `requirement_fulfillment_options` | 과목 대체·마이크로디그리 등 충족 방법; 현재 시뮬레이션 |
+### 배분이수 영역과 학과 코드 사용 원칙
 
-2022~2026년 컴퓨터공학과(CS), 인공지능학과(AI), 소프트웨어융합학과(SWCON)의 공식 PDF를 근거로 총 15개 졸업요건 세트를 저장했다. 총학점·이수구분별 최소학점·기타 조건은 공식 데이터이다. `requirement_courses`는 PDF에서 과목 단위 정규화가 완료된 학과·연도만 포함하므로, 행이 없다는 것을 "필수과목 없음"으로 해석하면 안 된다. 범위는 `validation_report/graduation_requirement_coverage.csv`에서 확인한다. [남음 과목들은 추후 추가될 예정이다]
+경희대학교 수강신청 사이트의 공개 조직 메타데이터에서는 후마니타스 배분이수 영역을 학과/전공 코드와 동일한 구조로 제공한다. 예를 들어 `생명,우주,인간`, `분석,추론,논리`, `상징,문화,소통`, `사회,공동체,평화`, `지능,정보,미래`는 각각 별도의 조직 코드와 `departments.department_id`를 가진다. 따라서 이 프로젝트에서는 별도의 `areas` 및 `course_areas` 테이블을 만들지 않고, 배분이수 과목의 `courses.department_id`를 해당 배분이수 영역 식별자로 함께 사용한다.
 
-교양 이수구분(category 4 `필수교과`, 5 `배분이수`, 6 `자유이수`)은 현재 시뮬레이션 데이터를 사용한다. `processed_data/simulated/simulated_general_requirement_categories.csv`에 분리하여 모든 졸업요건 세트에 `필수교과 17학점`, `배분이수 9학점(3개 영역·영역당 3학점)`, `자유이수 3학점`을 임시 적용했으며, 향후 후마니타스 공식 학번별 기준으로 교체한다.
+졸업요건의 배분이수 충족 여부는 다음 조건을 모두 확인한다.
 
-현재는 출처와 적용 연도를 명확히 검증하기 위해 졸업요건을 학과·학번별 한 행씩 유지한다. 향후 모든 연도의 지정과목 정규화가 완료되면 총학점, 이수구분별 최소학점, 지정과목 및 기타 조건이 모두 같은 연속 학번 구간을 확인하여 `cohort_start`와 `cohort_end` 범위 한 행으로 통합할 수 있다. 총학점만 같은 경우에는 동일한 졸업요건으로 간주하지 않는다.
+- `course_offering_categories.category_id`가 배분이수 category를 가리키는 이수 과목만 대상으로 한다.
+- 이수한 배분이수 과목의 총 학점이 `requirement_categories.min_credits` 이상이어야 한다.
+- 학점이 `per_area_min_credits` 이상인 서로 다른 `courses.department_id`의 수가 `min_areas` 이상이어야 한다.
 
-## 전체 테이블 구조
+현재 시뮬레이션 졸업요건의 `min_credits = 9`, `min_areas = 3`, `per_area_min_credits = 3`은 서로 다른 배분이수 영역 세 곳에서 각 3학점 이상, 총 9학점 이상을 이수해야 한다는 의미이다. 이 방식은 배분이수 과목 하나가 수강신청 사이트에서 하나의 후마니타스 영역/학과 코드에 속한다는 현재 데이터 조건을 전제로 한다.
 
-| 테이블 | 컬럼 |
-|---|---|
-| `departments` | `department_id`, `code`, `name`, `college`, `has_track `*(출처 확인 필요)* |
-| `course_categories` | `category_id`, `category_code`, `category_name` |
-| `professors` | `professor_id`, `department_id`, `professor_code`, `name`, `email`*(출처 확인 필요)*, `office` |
-| `students` | `student_id`, `name`, `department_id`, `track`, `admission_year`, `status`, `extra_track_type`, `extra_track_name` |
-| `courses` | `course_code`, `department_id`, `current_name`, `credits` |
-| `course_offerings` | `offering_id`, `course_code`, `course_name`, `credits`, `target_year`, `year`, `semester`, `section`, `campus`, `capacity`, `industry_required`, `english_type`, `delivery_mode`, `schedule_status`, `schedule_note` |
-| `offering_professors` | `offering_id`, `professor_id` |
-| `course_offering_categories` | `offering_category_id`, `offering_id`, `department_id`*(학생의 전공)*, `category_id`, `display_name` |
-| `time_slots` | `time_slot_id`, `day`, `start_time`, `end_time` |
-| `class_times` | `class_time_id`, `offering_id`, `time_slot_id`, `room_code` |
-| `enrollments` | `enrollment_id`, `student_id`, `offering_id`, `course_code`, `category_id`, `grade`, `status`, `is_retake`, `retaken` |
-| `syllabi` | `syllabus_id`, `offering_id`, `source_url`, `professor_office`, `personal_homepage`, `course_homepage`, `consultation_time`, `overview`, `objectives`, `operation_modes`, `operation_note`, `class_types_json`, `class_type_note`, `teaching_methods_json`, `teaching_method_note`, `additional_materials`, `other_weekly_content`, `assignments`, `course_notices`, `midterm_percentage`, `midterm_detail`, `final_exam_percentage`, `final_exam_detail`, `assignment_percentage`, `assignment_detail`, `presentation_percentage`, `presentation_detail`, `attendance_percentage`, `attendance_detail`, `other_percentage`, `other_detail`, `extracted_at_utc` |
-| `syllabus_chunks` | `chunk_id`, `syllabus_id`, `content`, `embedding`, `metadata` |
-| `course_prerequisites` | `prerequisite_id`, `course_code`, `prerequisite_course_code`, `prerequisite_name`, `prerequisite_type`, `cohort_start`, `cohort_end`, `abeek_applicable`, `prerequisite_group`, `minimum_grade_code`, `minimum_required_count` |
-| `prerequisite_sources` | `prerequisite_id`, `source_syllabus_id` |
-| `syllabus_textbooks` | `textbook_id`, `syllabus_id`, `sequence`, `title`, `author`, `publisher`, `publication_year`, `isbn`, `note` |
-| `syllabus_weekly_plans` | `weekly_plan_id`, `syllabus_id`, `week`, `date_range`, `topic_content`, `note` |
-| `graduation_requirements` | `requirement_id`, `department_id`, `track`, `cohort_start`, `cohort_end`, `total_credits` |
-| `requirement_categories` | `requirement_category_id`, `requirement_id`, `category_id`, `min_credits`, `min_areas`, `per_area_min_credits` |
-| `requirement_courses` | `requirement_course_id`, `requirement_id`, `course_code`, `category_id` |
-| `requirement_others` | `requirement_other_id`, `requirement_id`, `type`, `condition` |
-| `requirement_fulfillment_options` | `fulfillment_option_id`, `target_type`, `target_course_code`, `target_other_id`, `method`, `detail_json` |
+### 학생 개인정보 접근 제어 원칙
 
-PK/FK, 자료형 및 제약조건은 `database/schema.sql`, 테이블 관계는 `docs/school_qa_erd.mermaid`에서 확인할 수 있다.
+강좌, 강의계획서, 교육과정 등 공개 학사 데이터와 달리 `students` 및 `enrollments`는 비공개 개인정보로 취급한다. 실제 서비스에서는 로그인한 학생이 자신의 정보만 조회할 수 있도록 백엔드에서 인증 및 권한 검사를 수행해야 한다. SQLite 데이터베이스 자체만으로는 사용자별 행 단위 접근 제어가 제공되지 않으므로, 데이터베이스 파일을 클라이언트나 ChatGPT API에 직접 노출하지 않는다.
 
-## 실제 데이터와 시뮬레이션 데이터
+- 로그인 후 검증된 세션 또는 토큰에서 `student_id`를 가져온다.
+- 요청 URL이나 사용자 입력으로 전달된 `student_id`를 조회 권한의 근거로 사용하지 않는다.
+- `/students/{student_id}/enrollments`보다 `/me/enrollments`, `/me/profile`, `/me/graduation-progress` 형태의 API를 사용한다.
+- 모든 학생 개인화 SQL에는 백엔드가 확인한 `student_id` 조건을 적용한다.
+- ChatGPT API에는 질문에 필요한 최소한의 조회 결과만 전달하고 학생 테이블 전체를 보내지 않는다.
+- 학생용 권한과 관리자용 권한을 분리하고, 비밀번호 원문은 저장하지 않으며 안전한 password hash만 저장한다.
+- 현재 `processed_data/simulated/students.csv`와 `processed_data/simulated/enrollments.csv`는 기능 검증을 위한 시뮬레이션 데이터이며 실제 학생 개인정보가 아니다.
 
-### 실제 공개 데이터
+예를 들어 로그인한 학생의 수강내역은 다음과 같이 백엔드에서 매개변수화된 SQL로 조회한다. 여기서 `?` 값은 사용자가 직접 입력한 학번이 아니라 인증된 세션에서 얻은 `student_id`이다.
 
-- 2020~2026년 소프트웨어융합대학, 후마니타스 교양 및 자연계열 강좌·개설정보
-- 교수·수업시간·강의실·이수구분
-- 10,718개 실제 개설강좌의 강의계획서 링크
-- 이 중 1,837개 소프트웨어융합대학 강의계획서의 상세 추출 정보
-- 강의계획서의 교재, 평가방법, 주차별 계획, 선수과목
-- 2022~2026년 CS/AI/SWCON 공식 졸업요건
-
-### 시뮬레이션 데이터
-
-- `students`, `enrollments`
-- 일부 교수 및 팀티칭 연결 보조 데이터
-- 학생 수강이력 테스트용 임시 교양 과목과 교양 개설강좌
-- 공식 근거가 아직 확정되지 않은 일부 대체 충족 방법
-
-실제 후마니타스 교양 개설강좌는 master table에 수집되어 있다. 다만 기존 시뮬레이션 학생의 수강이력은 임시 교양 과목코드와 개설강좌를 계속 참조하므로, 해당 simulated rows도 개인화 질의 테스트용으로 함께 유지한다. 전공 강좌는 시뮬레이션하지 않고 수강신청 사이트의 실제 개설강좌를 사용한다.
-
-`processed_data/website_tables/syllabi.csv`에는 실제 강좌 10,718개의 강의계획서 링크가 있다. 현재 SQLite DB의 `syllabi` 및 관련 상세 테이블에는 먼저 추출한 소프트웨어융합대학 1,837개가 들어 있다. 후마니타스 교양 및 자연계열 강의계획서 상세정보는 추출 작업이 진행 중이다. 따라서 해당 강좌에서 syllabus 상세정보가 조회되지 않는 것은 강의계획서가 없다는 뜻이 아니라 **링크는 수집했지만 상세 추출이 아직 완료되지 않았다는 뜻**이다.
-
-## 개인정보 및 조회 권한
-
-`students`와 `enrollments`는 현재 가상 데이터이지만 실제 서비스에서는 개인정보로 취급한다.
-
-- DB 파일을 브라우저나 ChatGPT API에 직접 노출하지 않는다.
-- 실제 서비스에서는 백엔드의 로그인 세션을 통해 학생 본인 여부를 확인해야 한다.
-## 데이터 수정 시 참고사항
-
-- 테이블을 연결할 때는 기존 master CSV와 DB의 PK/FK를 기준으로 한다.
-- CSV를 변경한 경우 `build_database.py`로 DB를 다시 생성한다.
-- 실제 데이터와 simulated data의 출처를 구분하여 관리한다.
-- 실제 학생 및 수강이력 데이터는 개인정보로 취급한다.
-
-## Validation report
-
-`validation_report/`는 DB에 적재되는 테이블이 아니라 수집·변환 결과를 확인하기 위한 검증 자료이다.
-
-- `english_type_validation.csv`: 수강신청 사이트와 강의계획서의 영어강좌 구분을 비교한다. 1,837건 중 1,832건이 일치하며, 5건은 사이트가 `PARTIAL`이고 강의계획서 값이 비어 있어 `CONFLICT`로 표시했다. 최종 DB는 수강신청 사이트 값을 사용한다.
-- `graduation_requirement_coverage.csv`: 학과·학번별 졸업요건과 지정과목의 정규화 완료 여부를 보여준다. `not_yet_normalized`는 필수과목이 없다는 의미가 아니다.
-
-## 다음 단계
-
-### 현재 완료된 범위
-
-- 공개 강좌 및 강의계획서 수집·정제·DB화
-- 공식 졸업요건 통합
-- 공통 PK/FK 기반 단일 SQLite DB 구축
-- 대표 SQL 및 integrity test 작성
-- 개인화 질의 예시 작성
-
-### 다음 단계
-
-1. simulated 교양 강좌를 실제 후마니타스 공개 데이터로 교체한다.
-2. 실제 교양 개설강좌의 강의계획서와 교재·주차별 계획을 수집하여 연결한다.
-3. 아직 과목 단위로 정규화되지 않은 졸업요건 지정과목을 PDF에서 추가 추출한다.
-4. 전체 조건이 같은 연속 학번의 졸업요건을 `cohort_start`~`cohort_end` 범위로 통합한다.
-5. `[질문 / 대상 학생 ID / 정답 SQL / 정답 값]` 형식으로 gold question dataset을 만든다.
-6. ChatKHU API 기반 Text2SQL을 구현하고 gold SQL 결과와 비교한다.
-7. 로그인 사용자 본인에게만 학생·수강이력 조회를 허용하는 backend authorization을 구현한다.
-8. 강의계획서 chunk와 embedding을 생성하여 설명형 질문에 RAG를 결합한다.
-9. 데이터 갱신일과 출처 URL을 관리하고 학기별 증분 수집을 자동화한다.
-
-Gold question dataset과 Text2SQL 구현·평가는 현재 다른 팀원의 담당 범위이다. 이 작업은 반드시 본 폴더의 `schema.sql`과 `campus_ai.db`를 기준으로 진행한다.
-
-## 현재 DB 규모
-
-| 항목 | 행 수 |
-|---|---:|
-| 강좌 개설 | 10,814 |
-| 강의계획서 | 1,837 |
-| 수업시간 | 18,587 |
-| 선수과목 조건 | 416 |
-| 주차별 계획 | 28,880 |
-| 졸업요건 세트 | 15 |
-| 시뮬레이션 학생 | 44 |
-| 시뮬레이션 수강이력 | 1,188 |
-
-행 수는 CSV를 다시 생성하거나 실제 교양 데이터를 추가하면 변경될 수 있다.
+```sql
+SELECT
+    e.course_code,
+    c.current_name,
+    e.grade,
+    e.status
+FROM enrollments AS e
+JOIN courses AS c ON c.course_code = e.course_code
+WHERE e.student_id = ?;
+```

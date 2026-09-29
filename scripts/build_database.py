@@ -18,30 +18,23 @@ WEBSITE_TABLES = PROJECT_DIR / "processed_data" / "website_tables"
 DATABASE_TABLES = PROJECT_DIR / "processed_data" / "database_tables"
 SIMULATED_TABLES = PROJECT_DIR / "processed_data" / "simulated"
 
-# Repeated table names mean append. Generated simulated IDs do not overlap the
-# public-data IDs, so both sources can coexist in the same normalized tables.
+# Repeated table names mean append. Student records and enrollment histories
+# are simulated, but every enrollment references a real public course offering.
 IMPORTS = [
     ("departments", WEBSITE_TABLES / "departments.csv"),
     ("course_categories", WEBSITE_TABLES / "course_categories.csv"),
     ("professors", WEBSITE_TABLES / "professors.csv"),
-    ("professors", SIMULATED_TABLES / "simulated_professors.csv"),
     ("students", SIMULATED_TABLES / "students.csv"),
     ("courses", WEBSITE_TABLES / "courses.csv"),
     ("courses", DATABASE_TABLES / "supplemental_courses.csv"),
+    # HC1201 remains as a supplemental simulated course because one simulated
+    # fulfillment option still references this legacy requirement code.
     ("courses", SIMULATED_TABLES / "general_courses.csv"),
     ("course_offerings", WEBSITE_TABLES / "course_offerings.csv"),
-    ("course_offerings", SIMULATED_TABLES / "general_course_offerings.csv"),
     ("offering_professors", WEBSITE_TABLES / "offering_professors.csv"),
-    ("offering_professors", SIMULATED_TABLES / "simulated_offering_professors.csv"),
     ("course_offering_categories", WEBSITE_TABLES / "course_offering_categories.csv"),
-    (
-        "course_offering_categories",
-        SIMULATED_TABLES / "general_course_offering_categories.csv",
-    ),
     ("time_slots", WEBSITE_TABLES / "time_slots.csv"),
-    ("time_slots", SIMULATED_TABLES / "simulated_time_slots.csv"),
     ("class_times", WEBSITE_TABLES / "class_times.csv"),
-    ("class_times", SIMULATED_TABLES / "simulated_class_times.csv"),
     ("syllabi", DATABASE_TABLES / "syllabi.csv"),
     ("course_prerequisites", DATABASE_TABLES / "course_prerequisites.csv"),
     ("prerequisite_sources", DATABASE_TABLES / "prerequisite_sources.csv"),
