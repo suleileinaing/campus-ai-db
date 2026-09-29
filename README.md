@@ -40,24 +40,11 @@ PDF에서 직접 확인한 총 이수학점, 이수구분별 최소학점, 지�
 - 상담시간은 표현 방식이 다양하므로 `consultation_time` 원문을 유지한다.
 - 수업유형과 수업방법은 각각 `class_types_json`, `teaching_methods_json` JSON 배열로 저장한다.
 
-### 시뮬레이션 교양과목의 후마니타스 소속 매핑
+### 시뮬레이션 학생 데이터와 실제 강좌 연결
 
-`processed_data/simulated/general_courses.csv`의 교양과목은 실제 학생 데이터가 아니라 개인화 질의 테스트를 위한 시뮬레이션 데이터이다. `department_id`는 2026년 수강신청 사이트의 후마니타스칼리지교육과정(국제) 공개 조직 코드와 시뮬레이션 과목 코드·과목명을 기준으로 다음과 같이 추정하여 연결하였다.
+학생과 수강이력 자체는 개인화 질의 테스트를 위한 시뮬레이션 데이터이다. 전공과 교양 수강이력의 `offering_id`와 `course_code`는 모두 2020~2026년 수강신청 사이트에서 수집한 실제 개설강좌를 참조한다. 기존 simulated 교양 수강이력은 동일 연도·학기·이수구분 안에서 고정 seed(`20260929`)로 실제 강좌에 배정했으며, 결과는 `processed_data/simulated/enrollment_replacement_map.csv`에 기록하였다.
 
-- `GD110x` → 23 (배분이수교과 생명,우주,인간)
-- `GD120x` → 24 (배분이수교과 분석,추론,논리)
-- `GD130x` → 25 (배분이수교과 상징,문화,소통)
-- `GD140x` → 26 (배분이수교과 사회,공동체,평화)
-- `GD150x` → 27 (배분이수교과 지능,정보,미래)
-- `GF1005` → 19 (자유이수교과 체육), 기타 `GF` → 18 (자유이수교과 자유이수 기타)
-- `HC1201` → 20 (필수교과 영어), `HC11xx` → 21 (필수교과 글쓰기), `HC10xx` → 22 (필수교과 문명전개의지구적문맥)
-- `SW1001`, `SW1002` → 29 (자유이수교과 SW)
-
-이 매핑은 시뮬레이션용 추정값이며, 실제 후마니타스 강좌 데이터를 수집한 뒤 실제 공개 데이터로 교체해야 한다. `scripts/assign_simulated_general_departments.py`를 실행하면 이 규칙을 다시 적용할 수 있다.
-
-학생과 수강이력 자체는 개인화 질의 테스트를 위한 시뮬레이션 데이터이다. 다만 수강이력의 교양 `offering_id`와 `course_code`는 2020~2026년 수강신청 사이트에서 수집한 실제 개설강좌를 참조하도록 교체하였다. 교체 시 동일 연도·학기·이수구분 안에서 고정 seed(`20260929`)로 배정하고 학생별 동일 개설강좌 중복을 방지한다. 결과는 `processed_data/simulated/enrollment_replacement_map.csv`에서 확인할 수 있으며 `scripts/replace_simulated_general_enrollments.py`로 재현할 수 있다. 전공 수강이력도 실제 개설강좌를 참조한다.
-
-사용되지 않는 simulated general offering, class time, professor 연결 데이터는 제거하였다. `general_courses.csv`에는 simulated requirement fulfillment option이 참조하는 legacy code `HC1201` 한 행만 남아 있다. 현재 `enrollments.csv`의 모든 `offering_id`는 수강신청 사이트에서 수집한 실제 개설강좌를 참조한다.
+사용되지 않는 simulated course, offering, class time, professor 연결 데이터는 제거하였다. 대학영어의 legacy code `HC1201`도 실제 공개 과목코드 `GEC1403`으로 교체하였다.
 
 현재 `syllabi` 및 관련 강의계획서 테이블에는 소프트웨어융합대학 전공 개설강좌의 강의계획서가 중심으로 저장되어 있으며, 시뮬레이션 교양 과목의 강의계획서는 아직 포함하지 않았다. 향후 후마니타스칼리지의 실제 교양 과목·개설강좌를 수집한 뒤 해당 `offering_id`를 기준으로 교양 강의계획서 링크, 상세정보, 교재, 주차별 계획 등을 추가할 예정이다. 따라서 현재 DB에서 교양 과목의 syllabus가 조회되지 않는 것을 "강의계획서 없음"으로 해석하면 안 된다.
 

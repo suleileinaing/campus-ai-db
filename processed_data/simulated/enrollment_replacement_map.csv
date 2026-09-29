@@ -1,7 +1,7 @@
 ﻿source_course_code,source_course_name,source_offering_id,source_year,source_semester,target_course_code,target_course_name,target_offering_id,target_year,target_semester,target_category_id,affected_enrollment_count,duplicate_risk_count,replacement_reason
 HC1003,빅뱅에서문명까지,1838,2022,2,GEC1105,성찰과표현,5502,2022,2,4,9,0,deterministic random assignment; same year/semester/category; seed=20260929
 HC1101,성찰과표현,1839,2022,2,GEC0103,빅뱅에서문명까지,5359,2022,2,11,8,0,deterministic random assignment; same year/semester/category; seed=20260929
-HC1201,대학영어,1840,2022,2,GEC1105,성찰과표현,5491,2022,2,4,8,0,deterministic random assignment; same year/semester/category; seed=20260929
+HC1201,대학영어,1840,2022,2,GEC1403,대학영어,5533,2022,2,4,8,0,exact real-course match for legacy HC1201
 HC1001,인간의가치탐색,1841,2022,2,GEC1102,인간의가치탐색,5415,2022,2,11,8,0,deterministic random assignment; same year/semester/category; seed=20260929
 HC1002,세계와시민,1842,2023,1,GEC0103,빅뱅에서문명까지,6063,2023,1,11,3,0,deterministic random assignment; same year/semester/category; seed=20260929
 HC1102,주제연구,1843,2023,2,GEC1102,인간의가치탐색,6629,2023,2,11,10,0,deterministic random assignment; same year/semester/category; seed=20260929
@@ -15,19 +15,19 @@ GD1102,생명과학의세계,1850,2025,2,GED1965,마녀사냥:그광기의역사
 SW1002,기초코딩,1851,2025,2,GEE1980,소프트웨어개발자를위한C프로그래밍,9517,2025,2,6,4,0,deterministic random assignment; same year/semester/category; seed=20260929
 SW1001,컴퓨팅사고,1852,2025,2,GEE1661,행복한여가를위한야외활동,9495,2025,2,6,5,0,deterministic random assignment; same year/semester/category; seed=20260929
 GF1002,창업과도전,1853,2025,2,GEE1344,앱인벤터로배우는코딩세상,9465,2025,2,6,2,0,deterministic random assignment; same year/semester/category; seed=20260929
-HC1201,대학영어,1854,2023,2,GEC1403,대학영어,6766,2023,2,4,9,0,deterministic random assignment; same year/semester/category; seed=20260929
+HC1201,대학영어,1854,2023,2,GEC1403,대학영어,6782,2023,2,4,9,0,exact real-course match for legacy HC1201
 HC1101,성찰과표현,1855,2023,2,GEC0103,빅뱅에서문명까지,6624,2023,2,11,7,0,deterministic random assignment; same year/semester/category; seed=20260929
 HC1002,세계와시민,1856,2023,2,GEC1105,성찰과표현,6730,2023,2,4,7,0,deterministic random assignment; same year/semester/category; seed=20260929
 HC1003,빅뱅에서문명까지,1857,2023,2,GEC1102,인간의가치탐색,6661,2023,2,11,9,0,deterministic random assignment; same year/semester/category; seed=20260929
 HC1001,인간의가치탐색,1858,2024,1,GEC1102,인간의가치탐색,7353,2024,1,11,4,0,deterministic random assignment; same year/semester/category; seed=20260929
 HC1102,주제연구,1859,2024,2,GEC1105,성찰과표현,8011,2024,2,4,8,0,deterministic random assignment; same year/semester/category; seed=20260929
-HC1201,대학영어,1860,2025,2,GEC2001,주제연구,9323,2025,2,4,8,0,deterministic random assignment; same year/semester/category; seed=20260929
+HC1201,대학영어,1860,2025,2,GEC1403,대학영어,9271,2025,2,4,8,0,exact real-course match for legacy HC1201
 HC1101,성찰과표현,1861,2025,2,GEC1104,세계와시민,9202,2025,2,11,8,0,deterministic random assignment; same year/semester/category; seed=20260929
 HC1003,빅뱅에서문명까지,1862,2025,2,GEC1104,세계와시민,9200,2025,2,11,10,0,deterministic random assignment; same year/semester/category; seed=20260929
 HC1001,인간의가치탐색,1863,2025,2,GEC1102,인간의가치탐색,9159,2025,2,11,8,0,deterministic random assignment; same year/semester/category; seed=20260929
 HC1002,세계와시민,1864,2026,1,GEC1403,대학영어,9921,2026,1,4,3,0,deterministic random assignment; same year/semester/category; seed=20260929
 HC1102,주제연구,1865,2026,1,GEC1105,성찰과표현,9914,2026,1,4,5,0,deterministic random assignment; same year/semester/category; seed=20260929
-HC1201,대학영어,1866,2024,2,GEC1102,인간의가치탐색,7919,2024,2,11,10,0,deterministic random assignment; same year/semester/category; seed=20260929
+HC1201,대학영어,1866,2024,2,GEC1403,대학영어,8034,2024,2,4,10,0,exact real-course match for legacy HC1201
 HC1101,성찰과표현,1867,2024,2,GEC1105,성찰과표현,8003,2024,2,4,8,0,deterministic random assignment; same year/semester/category; seed=20260929
 HC1002,세계와시민,1868,2024,2,GEC1104,세계와시민,7932,2024,2,11,8,0,deterministic random assignment; same year/semester/category; seed=20260929
 HC1003,빅뱅에서문명까지,1869,2024,2,GEC2001,주제연구,8090,2024,2,4,8,0,deterministic random assignment; same year/semester/category; seed=20260929
@@ -35,7 +35,7 @@ HC1001,인간의가치탐색,1870,2025,1,GEC2001,주제연구,8718,2025,1,4,2,0,
 HC1102,주제연구,1871,2025,2,GEC1104,세계와시민,9205,2025,2,11,7,0,deterministic random assignment; same year/semester/category; seed=20260929
 HC1001,인간의가치탐색,1872,2024,2,GEC1105,성찰과표현,8015,2024,2,4,7,0,deterministic random assignment; same year/semester/category; seed=20260929
 HC1002,세계와시민,1873,2025,2,GEC1105,성찰과표현,9236,2025,2,4,8,0,deterministic random assignment; same year/semester/category; seed=20260929
-HC1201,대학영어,1874,2026,1,GEC1104,세계와시민,9838,2026,1,11,4,0,deterministic random assignment; same year/semester/category; seed=20260929
+HC1201,대학영어,1874,2026,1,GEC1403,대학영어,9930,2026,1,4,4,0,exact real-course match for legacy HC1201
 HC1001,인간의가치탐색,1875,2023,2,GEC1102,인간의가치탐색,6628,2023,2,11,8,0,deterministic random assignment; same year/semester/category; seed=20260929
 HC1002,세계와시민,1876,2024,1,GEC1105,성찰과표현,7449,2024,1,4,5,0,deterministic random assignment; same year/semester/category; seed=20260929
 GD1303,미디어와소통,1877,2025,2,GED11042,"미래,기술,경영",9341,2025,2,5,2,0,deterministic random assignment; same year/semester/category; seed=20260929
@@ -55,11 +55,11 @@ HC1003,빅뱅에서문명까지,1890,2025,1,GEC1403,대학영어,8700,2025,1,4,3
 GD1501,소프트웨어적사유,1891,2025,2,GED11016,운동과건강,9328,2025,2,5,1,0,deterministic random assignment; same year/semester/category; seed=20260929
 GD1103,인간과유전,1892,2025,2,GED1987,문명감염그리고진화,9418,2025,2,5,1,0,deterministic random assignment; same year/semester/category; seed=20260929
 HC1101,성찰과표현,1893,2024,1,GEC1403,대학영어,7454,2024,1,4,5,0,deterministic random assignment; same year/semester/category; seed=20260929
-HC1201,대학영어,1894,2024,1,GEC1105,성찰과표현,7417,2024,1,4,1,0,deterministic random assignment; same year/semester/category; seed=20260929
+HC1201,대학영어,1894,2024,1,GEC1403,대학영어,7467,2024,1,4,1,0,exact real-course match for legacy HC1201
 GD1202,수리적사고,1895,2024,2,GED1663,시민생활과법,8156,2024,2,5,3,0,deterministic random assignment; same year/semester/category; seed=20260929
 GD1503,데이터와사회,1896,2024,2,GED1240,우주:별을잊은그대에게,8124,2024,2,5,3,0,deterministic random assignment; same year/semester/category; seed=20260929
 HC1001,인간의가치탐색,1897,2026,1,GEC1105,성찰과표현,9885,2026,1,4,1,0,deterministic random assignment; same year/semester/category; seed=20260929
-HC1201,대학영어,1898,2025,1,GEC1104,세계와시민,8588,2025,1,11,1,0,deterministic random assignment; same year/semester/category; seed=20260929
+HC1201,대학영어,1898,2025,1,GEC1403,대학영어,8699,2025,1,4,1,0,exact real-course match for legacy HC1201
 GD1203,통계와사회,1899,2025,2,GED1215,원자의춤,9355,2025,2,5,1,0,deterministic random assignment; same year/semester/category; seed=20260929
 GD1303,미디어와소통,1900,2024,2,GED1217,인간과생활속의로봇,8120,2024,2,5,1,0,deterministic random assignment; same year/semester/category; seed=20260929
 GD1201,논리와비판적사고,1901,2025,1,GED1337,불교와정신분석학,8793,2025,1,5,2,0,deterministic random assignment; same year/semester/category; seed=20260929
@@ -76,7 +76,7 @@ HC1101,성찰과표현,1911,2023,1,GEC0103,빅뱅에서문명까지,6056,2023,1,
 GD1502,미래사회와기술,1912,2023,2,GED1301,가면의축제:동서양연희의문명사,6862,2023,2,5,2,0,deterministic random assignment; same year/semester/category; seed=20260929
 GF1002,창업과도전,1913,2024,2,GEE11037,합창의재발견,8199,2024,2,6,1,0,deterministic random assignment; same year/semester/category; seed=20260929
 SW1002,기초코딩,1914,2025,1,GEE1952,전공탐색및기업가정신세미나,8954,2025,1,6,2,0,deterministic random assignment; same year/semester/category; seed=20260929
-HC1201,대학영어,1915,2023,1,GEC1104,세계와시민,6149,2023,1,11,2,0,deterministic random assignment; same year/semester/category; seed=20260929
+HC1201,대학영어,1915,2023,1,GEC1403,대학영어,6241,2023,1,4,2,0,exact real-course match for legacy HC1201
 GD1203,통계와사회,1916,2024,2,GED1466,기술혁신과전략의융합,8141,2024,2,5,1,0,deterministic random assignment; same year/semester/category; seed=20260929
 GD1301,예술의이해,1917,2024,2,GED1502,SF영화의상상력:미래의평화와윤리,8144,2024,2,5,3,0,deterministic random assignment; same year/semester/category; seed=20260929
 GF1006,글로벌리더십,1918,2025,2,GEE1671,운동과체중관리,9498,2025,2,6,1,0,deterministic random assignment; same year/semester/category; seed=20260929

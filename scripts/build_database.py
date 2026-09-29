@@ -27,9 +27,6 @@ IMPORTS = [
     ("students", SIMULATED_TABLES / "students.csv"),
     ("courses", WEBSITE_TABLES / "courses.csv"),
     ("courses", DATABASE_TABLES / "supplemental_courses.csv"),
-    # HC1201 remains as a supplemental simulated course because one simulated
-    # fulfillment option still references this legacy requirement code.
-    ("courses", SIMULATED_TABLES / "general_courses.csv"),
     ("course_offerings", WEBSITE_TABLES / "course_offerings.csv"),
     ("offering_professors", WEBSITE_TABLES / "offering_professors.csv"),
     ("course_offering_categories", WEBSITE_TABLES / "course_offering_categories.csv"),

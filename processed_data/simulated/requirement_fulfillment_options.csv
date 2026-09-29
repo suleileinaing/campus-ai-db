@@ -1,6 +1,6 @@
 ﻿fulfillment_option_id,target_type,target_course_code,target_other_id,method,detail_json
-1,COURSE,HC1201,,과목이수,"{""course_code"":""HC1201""}"
-2,COURSE,HC1201,,대체과목,"{""note"":""외국인학생: 한국어1/2·한국어의이해1/2 중 1과목""}"
+1,COURSE,GEC1403,,과목이수,"{""course_code"":""GEC1403""}"
+2,COURSE,GEC1403,,대체과목,"{""note"":""외국인학생: 한국어1/2·한국어의이해1/2 중 1과목""}"
 3,COURSE,AMTH1009,,대체과목,"{""note"":""서울캠 미적분학및연습1/2 중 1과목""}"
 4,COURSE,AMTH1004,,대체과목,"{""note"":""서울캠 선형대수학1/2 중 1과목""}"
 5,OTHER,,22,마이크로디그리,"{""options"":[""인공지능이론"",""인공지능실전"",""온디바이스AI"",""지능형데이터"",""AI헬스케어"",""딥엑스"",""알체라"",""카카오헬스케어""]}"
