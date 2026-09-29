@@ -1,0 +1,28 @@
+# macOS
+.DS_Store
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+
+# Secrets
+.env
+.env.*
+!.env.example
+*.key
+*.pem
+
+# IDE
+.vscode/
+.idea/
+
+# SQLite temporary files
+*.db-shm
+*.db-wal
+*.db-journal
+
+# Temporary files
+*.tmp
+*.log

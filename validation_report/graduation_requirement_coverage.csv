@@ -1,0 +1,16 @@
+﻿requirement_id,department_id,department,cohort_year,summary_status,required_course_status,source_directory
+1,12,인공지능학과,2022,verified_from_official_pdf,normalized,raw_data/graduation_requirements
+2,12,인공지능학과,2023,verified_from_official_pdf,normalized,raw_data/graduation_requirements
+3,12,인공지능학과,2024,verified_from_official_pdf,normalized,raw_data/graduation_requirements
+4,12,인공지능학과,2025,verified_from_official_pdf,normalized,raw_data/graduation_requirements
+5,12,인공지능학과,2026,verified_from_official_pdf,normalized,raw_data/graduation_requirements
+6,8,소프트웨어융합학과,2022,verified_from_official_pdf,not_yet_normalized,raw_data/graduation_requirements
+7,8,소프트웨어융합학과,2023,verified_from_official_pdf,normalized,raw_data/graduation_requirements
+8,8,소프트웨어융합학과,2024,verified_from_official_pdf,not_yet_normalized,raw_data/graduation_requirements
+9,8,소프트웨어융합학과,2025,verified_from_official_pdf,not_yet_normalized,raw_data/graduation_requirements
+10,8,소프트웨어융합학과,2026,verified_from_official_pdf,not_yet_normalized,raw_data/graduation_requirements
+11,11,컴퓨터공학과,2022,verified_from_official_pdf,not_yet_normalized,raw_data/graduation_requirements
+12,11,컴퓨터공학과,2023,verified_from_official_pdf,not_yet_normalized,raw_data/graduation_requirements
+13,11,컴퓨터공학과,2024,verified_from_official_pdf,not_yet_normalized,raw_data/graduation_requirements
+14,11,컴퓨터공학과,2025,verified_from_official_pdf,not_yet_normalized,raw_data/graduation_requirements
+15,11,컴퓨터공학과,2026,verified_from_official_pdf,not_yet_normalized,raw_data/graduation_requirements

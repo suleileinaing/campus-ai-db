@@ -1,0 +1,32 @@
+{
+  "rows": [
+    {
+      "all_apply": 15,
+      "hope_cnt": 0,
+      "timetable": "13:00-15:45 ()",
+      "asign_pcnt": 40,
+      "eng_yn_nm": "",
+      "comm_limit": 40,
+      "bigo": "'고급객체지향프로그래밍'또는'객체지향프로그래밍'수강이력이 있는 학생만 수강가능 / 학점교류수강불가 / 비대면수업 / e-campus 강의예정(변경시 사전공지예정) ",
+      "lect_grade": "",
+      "subjt_cd": "CSE103",
+      "campus_nm": "국제",
+      "delay_dt": "",
+      "comm_inwon": "",
+      "field_gb": "24",
+      "lecture_cd": "CSE10300",
+      "teach_na": "이호진",
+      "unit_num": "  3.0",
+      "subjt_name": "객체지향프로그래밍",
+      "class_cd": "A07308",
+      "haksu_code": "",
+      "params": "A07308@CSE10300@CSE103@24@3.0",
+      "teach_cd": "020623",
+      "wait_remain": 0,
+      "lecture_cd_disp": "CSE103-00",
+      "remain": 25,
+      "rowid": 1,
+      "hope_yebi_cnt": 0
+    }
+  ]
+}

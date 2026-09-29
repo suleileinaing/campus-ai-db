@@ -1,0 +1,242 @@
+erDiagram
+    %% ===== 학사 정형 핵심 =====
+    departments o|--o{ professors : "소속(NULL=미상)"
+    departments ||--o{ students : "소속"
+    departments ||--o{ courses : "개설학과"
+    departments ||--o{ graduation_requirements : "졸업요건"
+
+    courses ||--o{ course_offerings : "학기별 개설"
+    professors ||--o{ offering_professors : "담당"
+    course_offerings ||--o{ offering_professors : "담당 교수"
+    course_offerings ||--o{ enrollments : "수강"
+    courses ||--o{ enrollments : "수강과목 검증"
+    course_offerings ||--o{ class_times : "수업시간"
+    time_slots ||--o{ class_times : "시간대"
+    students ||--o{ enrollments : "수강"
+
+    %% ===== 강의계획서 (RAG) =====
+    course_offerings ||--o| syllabi : "강의계획서"
+    syllabi ||--o{ syllabus_chunks : "RAG 청크"
+    syllabi ||--o{ syllabus_textbooks : "교재"
+    syllabi ||--o{ syllabus_weekly_plans : "주차별 계획"
+
+    %% ===== 이수구분 사전 =====
+    course_offerings ||--o{ course_offering_categories : "학과별 이수구분"
+    departments o|--o{ course_offering_categories : "학생 학과(NULL=전체)"
+    course_categories ||--o{ course_offering_categories : "이수구분"
+    course_categories ||--o{ enrollments : "최종 확정 이수구분"
+    course_categories ||--o{ requirement_categories : "최소학점 구분"
+    course_categories ||--o{ requirement_courses : "지정과목 구분"
+
+    %% ===== 졸업요건 (학번 종속) =====
+    graduation_requirements ||--o{ requirement_categories : "구분별 최소학점"
+    graduation_requirements ||--o{ requirement_courses : "지정과목"
+    courses ||--o{ requirement_courses : "지정과목"
+    graduation_requirements ||--o{ requirement_others : "기타 졸업요건"
+    courses o|--o{ requirement_fulfillment_options : "과목 충족대안"
+    requirement_others o|--o{ requirement_fulfillment_options : "기타요건 충족대안"
+
+    %% ===== 선수과목 =====
+    courses ||--o{ course_prerequisites : "선수과목"
+    course_prerequisites ||--o{ prerequisite_sources : "근거"
+    syllabi ||--o{ prerequisite_sources : "source"
+
+    departments {
+        int department_id PK
+        string code UK "안 바뀌는 짧은 코드"
+        string name "표시용, 개명 가능"
+        string college
+        bool has_track "트랙제 학과 여부"
+    }
+    professors {
+        int professor_id PK
+        int department_id FK "NULL=소속 미상"
+        string professor_code UK "학교 교강사 코드"
+        string name
+        string email
+        string office
+    }
+    students {
+        int student_id PK
+        int department_id FK
+        string name
+        string track "트랙없으면 공통"
+        int admission_year "학번(cohort)"
+        string status "재학/휴학/졸업/제적"
+        string extra_track_type "다전공/부전공/마이크로디그리 등"
+        string extra_track_name
+    }
+    courses {
+        string course_code PK
+        int department_id FK "현재 개설 학과"
+        string current_name "현재 과목명"
+        int credits
+    }
+    course_offerings {
+        int offering_id PK
+        string course_code FK
+        string course_name "해당 학기 과목명"
+        int target_year
+        int year "★수강년도 기준점"
+        string semester
+        string section "분반"
+        string campus
+        int capacity
+        bool industry_required "산학필수 여부"
+        string english_type "NONE/PARTIAL/FULL"
+        string delivery_mode "OFFLINE/ONLINE/HYBRID/TBD"
+        string schedule_status "SCHEDULED/ASYNCHRONOUS/INTENSIVE/ROOM_ONLY/TBD"
+        string schedule_note "비정형 시간표 원문"
+    }
+    offering_professors {
+        int offering_id PK, FK
+        int professor_id PK, FK
+    }
+    course_offering_categories {
+        int offering_category_id PK
+        int offering_id FK
+        int department_id FK "학생 학과/조회 전공, NULL=전체"
+        int category_id FK
+        string display_name "학과별 표시 과목명"
+    }
+    course_categories {
+        int category_id PK
+        string category_code UK "학교 원본/통합 이수구분 코드"
+        string category_name UK
+    }
+    time_slots {
+        int time_slot_id PK
+        string day "요일"
+        string start_time "시작시간"
+        string end_time "종료시간"
+    }
+    class_times {
+        int class_time_id PK
+        int offering_id FK
+        int time_slot_id FK
+        string room_code
+    }
+    enrollments {
+        int enrollment_id PK
+        int student_id FK
+        int offering_id FK
+        string course_code FK "offering과 일치 검증용"
+        int category_id FK "★최종 확정 이수구분"
+        string grade
+        string status "완료/미이수/재수강전"
+        bool is_retake
+        bool retaken
+    }
+    syllabi {
+        int syllabus_id PK
+        int offering_id FK
+        string source_url "lectPlan URL"
+        string professor_office
+        string personal_homepage
+        string course_homepage
+        string consultation_time
+        string overview "수업개요"
+        string objectives "수업목표"
+        string operation_modes
+        string operation_note
+        json class_types_json "controlled-value array"
+        string class_type_note
+        json teaching_methods_json "controlled-value array"
+        string teaching_method_note
+        string additional_materials
+        string other_weekly_content
+        string assignments
+        string course_notices
+        float midterm_percentage
+        string midterm_detail
+        float final_exam_percentage
+        string final_exam_detail
+        float assignment_percentage
+        string assignment_detail
+        float presentation_percentage
+        string presentation_detail
+        float attendance_percentage
+        string attendance_detail
+        float other_percentage
+        string other_detail
+        datetime extracted_at_utc
+    }
+    syllabus_textbooks {
+        int textbook_id PK
+        int syllabus_id FK
+        int sequence
+        string title
+        string author
+        string publisher
+        string publication_year
+        string isbn
+        string note
+    }
+    syllabus_weekly_plans {
+        int weekly_plan_id PK
+        int syllabus_id FK
+        int week
+        string date_range
+        string topic_content
+        string note
+    }
+    syllabus_chunks {
+        int chunk_id PK
+        int syllabus_id FK
+        string content "원문 조각"
+        vector embedding
+        json metadata "주차 등"
+    }
+    graduation_requirements {
+        int requirement_id PK
+        int department_id FK
+        string track "공통 or 트랙명"
+        int cohort_start "★적용 시작 학번"
+        int cohort_end
+        int total_credits "총 이수학점"
+    }
+    requirement_categories {
+        int requirement_category_id PK
+        int requirement_id FK
+        int category_id FK
+        int min_credits "최소 이수학점"
+        int min_areas "배분이수 최소 학과/영역수(NULL=무관)"
+        int per_area_min_credits "학과/영역당 최소학점"
+    }
+    requirement_courses {
+        int requirement_course_id PK
+        int requirement_id FK
+        string course_code FK
+        int category_id FK "이 요건에서의 이수구분"
+    }
+    requirement_others {
+        int requirement_other_id PK
+        int requirement_id FK
+        string type "산학필수/전공영어강좌/SW교육/졸업논문/다전공등"
+        string condition "원문 조건"
+    }
+    requirement_fulfillment_options {
+        int fulfillment_option_id PK
+        string target_type "COURSE/OTHER"
+        string target_course_code FK "COURSE일 때 사용"
+        int target_other_id FK "OTHER일 때 사용"
+        string method "과목이수/외부성적/대체과목"
+        json detail_json "대체조건/선택지"
+    }
+    course_prerequisites {
+        int prerequisite_id PK
+        string course_code FK "target course"
+        string prerequisite_course_code "코드 없으면 NULL"
+        string prerequisite_name
+        string prerequisite_type "REQUIRED/RECOMMENDED"
+        int cohort_start "적용 시작 학번" 
+        int cohort_end "적용 종료 학번" 
+        bool abeek_applicable
+        string prerequisite_group
+        string minimum_grade_code
+        int minimum_required_count
+    }
+    prerequisite_sources {
+        int prerequisite_id PK, FK
+        int source_syllabus_id FK
+    }

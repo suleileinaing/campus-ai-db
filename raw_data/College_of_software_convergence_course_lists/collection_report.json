@@ -1,0 +1,733 @@
+{
+  "started_at_utc": "2026-09-22T06:38:04.829254+00:00",
+  "college_code": "A07340",
+  "college_name": "소프트웨어융합대학",
+  "years": [
+    2020,
+    2021,
+    2022,
+    2023,
+    2024,
+    2025,
+    2026
+  ],
+  "terms": [
+    "1",
+    "2",
+    "summer",
+    "winter"
+  ],
+  "dry_run": false,
+  "refresh": false,
+  "jobs": [
+    {
+      "year": 2020,
+      "term": "1",
+      "term_code": "10",
+      "major_code": "A07308",
+      "major_name": "소프트웨어융합대학 컴퓨터공학과 컴퓨터공학",
+      "path": "raw_data/course_lists/2020-1_A07308_raw.json",
+      "status": "skipped_existing"
+    },
+    {
+      "year": 2020,
+      "term": "1",
+      "term_code": "10",
+      "major_code": "A07333",
+      "major_name": "소프트웨어융합대학 컴퓨터공학과",
+      "path": "raw_data/course_lists/2020-1_A07333_raw.json",
+      "row_count": 2,
+      "status": "downloaded"
+    },
+    {
+      "year": 2020,
+      "term": "1",
+      "term_code": "10",
+      "major_code": "A07337",
+      "major_name": "소프트웨어융합대학 소프트웨어융합학과 소프트웨어융합학",
+      "path": "raw_data/course_lists/2020-1_A07337_raw.json",
+      "row_count": 69,
+      "status": "downloaded"
+    },
+    {
+      "year": 2020,
+      "term": "2",
+      "term_code": "20",
+      "major_code": "A07308",
+      "major_name": "소프트웨어융합대학 컴퓨터공학과 컴퓨터공학",
+      "path": "raw_data/course_lists/2020-2_A07308_raw.json",
+      "row_count": 54,
+      "status": "downloaded"
+    },
+    {
+      "year": 2020,
+      "term": "2",
+      "term_code": "20",
+      "major_code": "A07337",
+      "major_name": "소프트웨어융합대학 소프트웨어융합학과 소프트웨어융합학",
+      "path": "raw_data/course_lists/2020-2_A07337_raw.json",
+      "row_count": 74,
+      "status": "downloaded"
+    },
+    {
+      "year": 2020,
+      "term": "summer",
+      "term_code": "15",
+      "major_code": "A07308",
+      "major_name": "소프트웨어융합대학 컴퓨터공학과 컴퓨터공학",
+      "path": "raw_data/course_lists/2020-summer_A07308_raw.json",
+      "row_count": 1,
+      "status": "downloaded"
+    },
+    {
+      "year": 2020,
+      "term": "summer",
+      "term_code": "15",
+      "major_code": "A07337",
+      "major_name": "소프트웨어융합대학 소프트웨어융합학과 소프트웨어융합학",
+      "path": "raw_data/course_lists/2020-summer_A07337_raw.json",
+      "row_count": 1,
+      "status": "downloaded"
+    },
+    {
+      "year": 2020,
+      "term": "winter",
+      "term_code": "25",
+      "major_code": "A07308",
+      "major_name": "소프트웨어융합대학 컴퓨터공학과 컴퓨터공학",
+      "path": "raw_data/course_lists/2020-winter_A07308_raw.json",
+      "row_count": 1,
+      "status": "downloaded"
+    },
+    {
+      "year": 2020,
+      "term": "winter",
+      "term_code": "25",
+      "major_code": "A07337",
+      "major_name": "소프트웨어융합대학 소프트웨어융합학과 소프트웨어융합학",
+      "path": "raw_data/course_lists/2020-winter_A07337_raw.json",
+      "row_count": 1,
+      "status": "downloaded"
+    },
+    {
+      "year": 2021,
+      "term": "1",
+      "term_code": "10",
+      "major_code": "A07308",
+      "major_name": "소프트웨어융합대학 컴퓨터공학과 컴퓨터공학",
+      "path": "raw_data/course_lists/2021-1_A07308_raw.json",
+      "row_count": 66,
+      "status": "downloaded"
+    },
+    {
+      "year": 2021,
+      "term": "1",
+      "term_code": "10",
+      "major_code": "A07333",
+      "major_name": "소프트웨어융합대학 컴퓨터공학과",
+      "path": "raw_data/course_lists/2021-1_A07333_raw.json",
+      "row_count": 2,
+      "status": "downloaded"
+    },
+    {
+      "year": 2021,
+      "term": "1",
+      "term_code": "10",
+      "major_code": "A07337",
+      "major_name": "소프트웨어융합대학 소프트웨어융합학과 소프트웨어융합학",
+      "path": "raw_data/course_lists/2021-1_A07337_raw.json",
+      "row_count": 78,
+      "status": "downloaded"
+    },
+    {
+      "year": 2021,
+      "term": "2",
+      "term_code": "20",
+      "major_code": "A07308",
+      "major_name": "소프트웨어융합대학 컴퓨터공학과 컴퓨터공학",
+      "path": "raw_data/course_lists/2021-2_A07308_raw.json",
+      "row_count": 60,
+      "status": "downloaded"
+    },
+    {
+      "year": 2021,
+      "term": "2",
+      "term_code": "20",
+      "major_code": "A07337",
+      "major_name": "소프트웨어융합대학 소프트웨어융합학과 소프트웨어융합학",
+      "path": "raw_data/course_lists/2021-2_A07337_raw.json",
+      "row_count": 80,
+      "status": "downloaded"
+    },
+    {
+      "year": 2021,
+      "term": "summer",
+      "term_code": "15",
+      "major_code": "A07308",
+      "major_name": "소프트웨어융합대학 컴퓨터공학과 컴퓨터공학",
+      "path": "raw_data/course_lists/2021-summer_A07308_raw.json",
+      "row_count": 1,
+      "status": "downloaded"
+    },
+    {
+      "year": 2021,
+      "term": "summer",
+      "term_code": "15",
+      "major_code": "A07337",
+      "major_name": "소프트웨어융합대학 소프트웨어융합학과 소프트웨어융합학",
+      "path": "raw_data/course_lists/2021-summer_A07337_raw.json",
+      "row_count": 1,
+      "status": "downloaded"
+    },
+    {
+      "year": 2021,
+      "term": "winter",
+      "term_code": "25",
+      "major_code": "A07308",
+      "major_name": "소프트웨어융합대학 컴퓨터공학과 컴퓨터공학",
+      "path": "raw_data/course_lists/2021-winter_A07308_raw.json",
+      "row_count": 1,
+      "status": "downloaded"
+    },
+    {
+      "year": 2021,
+      "term": "winter",
+      "term_code": "25",
+      "major_code": "A07337",
+      "major_name": "소프트웨어융합대학 소프트웨어융합학과 소프트웨어융합학",
+      "path": "raw_data/course_lists/2021-winter_A07337_raw.json",
+      "row_count": 1,
+      "status": "downloaded"
+    },
+    {
+      "year": 2022,
+      "term": "1",
+      "term_code": "10",
+      "major_code": "A07308",
+      "major_name": "소프트웨어융합대학 컴퓨터공학과 컴퓨터공학",
+      "path": "raw_data/course_lists/2022-1_A07308_raw.json",
+      "row_count": 22,
+      "status": "downloaded"
+    },
+    {
+      "year": 2022,
+      "term": "1",
+      "term_code": "10",
+      "major_code": "A07337",
+      "major_name": "소프트웨어융합대학 소프트웨어융합학과 소프트웨어융합학",
+      "path": "raw_data/course_lists/2022-1_A07337_raw.json",
+      "row_count": 83,
+      "status": "downloaded"
+    },
+    {
+      "year": 2022,
+      "term": "1",
+      "term_code": "10",
+      "major_code": "A10627",
+      "major_name": "소프트웨어융합대학 컴퓨터공학부 컴퓨터공학과",
+      "path": "raw_data/course_lists/2022-1_A10627_raw.json",
+      "row_count": 66,
+      "status": "downloaded"
+    },
+    {
+      "year": 2022,
+      "term": "1",
+      "term_code": "10",
+      "major_code": "A10628",
+      "major_name": "소프트웨어융합대학 컴퓨터공학부 인공지능학과",
+      "path": "raw_data/course_lists/2022-1_A10628_raw.json",
+      "row_count": 38,
+      "status": "downloaded"
+    },
+    {
+      "year": 2022,
+      "term": "2",
+      "term_code": "20",
+      "major_code": "A07337",
+      "major_name": "소프트웨어융합대학 소프트웨어융합학과 소프트웨어융합학",
+      "path": "raw_data/course_lists/2022-2_A07337_raw.json",
+      "row_count": 80,
+      "status": "downloaded"
+    },
+    {
+      "year": 2022,
+      "term": "2",
+      "term_code": "20",
+      "major_code": "A10627",
+      "major_name": "소프트웨어융합대학 컴퓨터공학부 컴퓨터공학과",
+      "path": "raw_data/course_lists/2022-2_A10627_raw.json",
+      "row_count": 63,
+      "status": "downloaded"
+    },
+    {
+      "year": 2022,
+      "term": "2",
+      "term_code": "20",
+      "major_code": "A10628",
+      "major_name": "소프트웨어융합대학 컴퓨터공학부 인공지능학과",
+      "path": "raw_data/course_lists/2022-2_A10628_raw.json",
+      "row_count": 31,
+      "status": "downloaded"
+    },
+    {
+      "year": 2022,
+      "term": "summer",
+      "term_code": "15",
+      "major_code": "A07337",
+      "major_name": "소프트웨어융합대학 소프트웨어융합학과 소프트웨어융합학",
+      "path": "raw_data/course_lists/2022-summer_A07337_raw.json",
+      "row_count": 2,
+      "status": "downloaded"
+    },
+    {
+      "year": 2022,
+      "term": "summer",
+      "term_code": "15",
+      "major_code": "A10627",
+      "major_name": "소프트웨어융합대학 컴퓨터공학부 컴퓨터공학과",
+      "path": "raw_data/course_lists/2022-summer_A10627_raw.json",
+      "row_count": 1,
+      "status": "downloaded"
+    },
+    {
+      "year": 2022,
+      "term": "winter",
+      "term_code": "25",
+      "major_code": "A07337",
+      "major_name": "소프트웨어융합대학 소프트웨어융합학과 소프트웨어융합학",
+      "path": "raw_data/course_lists/2022-winter_A07337_raw.json",
+      "row_count": 2,
+      "status": "downloaded"
+    },
+    {
+      "year": 2022,
+      "term": "winter",
+      "term_code": "25",
+      "major_code": "A10627",
+      "major_name": "소프트웨어융합대학 컴퓨터공학부 컴퓨터공학과",
+      "path": "raw_data/course_lists/2022-winter_A10627_raw.json",
+      "row_count": 1,
+      "status": "downloaded"
+    },
+    {
+      "year": 2023,
+      "term": "1",
+      "term_code": "10",
+      "major_code": "A07308",
+      "major_name": "소프트웨어융합대학 컴퓨터공학과 컴퓨터공학",
+      "path": "raw_data/course_lists/2023-1_A07308_raw.json",
+      "row_count": 0,
+      "status": "empty"
+    },
+    {
+      "year": 2023,
+      "term": "1",
+      "term_code": "10",
+      "major_code": "A07337",
+      "major_name": "소프트웨어융합대학 소프트웨어융합학과 소프트웨어융합학",
+      "path": "raw_data/course_lists/2023-1_A07337_raw.json",
+      "row_count": 99,
+      "status": "downloaded"
+    },
+    {
+      "year": 2023,
+      "term": "1",
+      "term_code": "10",
+      "major_code": "A10627",
+      "major_name": "소프트웨어융합대학 컴퓨터공학부 컴퓨터공학과",
+      "path": "raw_data/course_lists/2023-1_A10627_raw.json",
+      "row_count": 102,
+      "status": "downloaded"
+    },
+    {
+      "year": 2023,
+      "term": "1",
+      "term_code": "10",
+      "major_code": "A10628",
+      "major_name": "소프트웨어융합대학 컴퓨터공학부 인공지능학과",
+      "path": "raw_data/course_lists/2023-1_A10628_raw.json",
+      "row_count": 44,
+      "status": "downloaded"
+    },
+    {
+      "year": 2023,
+      "term": "2",
+      "term_code": "20",
+      "major_code": "A07337",
+      "major_name": "소프트웨어융합대학 소프트웨어융합학과 소프트웨어융합학",
+      "path": "raw_data/course_lists/2023-2_A07337_raw.json",
+      "row_count": 103,
+      "status": "downloaded"
+    },
+    {
+      "year": 2023,
+      "term": "2",
+      "term_code": "20",
+      "major_code": "A10627",
+      "major_name": "소프트웨어융합대학 컴퓨터공학부 컴퓨터공학과",
+      "path": "raw_data/course_lists/2023-2_A10627_raw.json",
+      "row_count": 92,
+      "status": "downloaded"
+    },
+    {
+      "year": 2023,
+      "term": "2",
+      "term_code": "20",
+      "major_code": "A10628",
+      "major_name": "소프트웨어융합대학 컴퓨터공학부 인공지능학과",
+      "path": "raw_data/course_lists/2023-2_A10628_raw.json",
+      "row_count": 32,
+      "status": "downloaded"
+    },
+    {
+      "year": 2023,
+      "term": "summer",
+      "term_code": "15",
+      "major_code": "A07337",
+      "major_name": "소프트웨어융합대학 소프트웨어융합학과 소프트웨어융합학",
+      "path": "raw_data/course_lists/2023-summer_A07337_raw.json",
+      "row_count": 2,
+      "status": "downloaded"
+    },
+    {
+      "year": 2023,
+      "term": "summer",
+      "term_code": "15",
+      "major_code": "A10627",
+      "major_name": "소프트웨어융합대학 컴퓨터공학부 컴퓨터공학과",
+      "path": "raw_data/course_lists/2023-summer_A10627_raw.json",
+      "row_count": 2,
+      "status": "downloaded"
+    },
+    {
+      "year": 2023,
+      "term": "winter",
+      "term_code": "25",
+      "major_code": "A07337",
+      "major_name": "소프트웨어융합대학 소프트웨어융합학과 소프트웨어융합학",
+      "path": "raw_data/course_lists/2023-winter_A07337_raw.json",
+      "row_count": 2,
+      "status": "downloaded"
+    },
+    {
+      "year": 2023,
+      "term": "winter",
+      "term_code": "25",
+      "major_code": "A10627",
+      "major_name": "소프트웨어융합대학 컴퓨터공학부 컴퓨터공학과",
+      "path": "raw_data/course_lists/2023-winter_A10627_raw.json",
+      "row_count": 2,
+      "status": "downloaded"
+    },
+    {
+      "year": 2024,
+      "term": "1",
+      "term_code": "10",
+      "major_code": "A07337",
+      "major_name": "소프트웨어융합대학 소프트웨어융합학과 소프트웨어융합학",
+      "path": "raw_data/course_lists/2024-1_A07337_raw.json",
+      "row_count": 116,
+      "status": "downloaded"
+    },
+    {
+      "year": 2024,
+      "term": "1",
+      "term_code": "10",
+      "major_code": "A10626",
+      "major_name": "소프트웨어융합대학 컴퓨터공학부",
+      "path": "raw_data/course_lists/2024-1_A10626_raw.json",
+      "row_count": 2,
+      "status": "downloaded"
+    },
+    {
+      "year": 2024,
+      "term": "1",
+      "term_code": "10",
+      "major_code": "A10627",
+      "major_name": "소프트웨어융합대학 컴퓨터공학부 컴퓨터공학과",
+      "path": "raw_data/course_lists/2024-1_A10627_raw.json",
+      "row_count": 113,
+      "status": "downloaded"
+    },
+    {
+      "year": 2024,
+      "term": "1",
+      "term_code": "10",
+      "major_code": "A10628",
+      "major_name": "소프트웨어융합대학 컴퓨터공학부 인공지능학과",
+      "path": "raw_data/course_lists/2024-1_A10628_raw.json",
+      "row_count": 45,
+      "status": "downloaded"
+    },
+    {
+      "year": 2024,
+      "term": "2",
+      "term_code": "20",
+      "major_code": "A07337",
+      "major_name": "소프트웨어융합대학 소프트웨어융합학과 소프트웨어융합학",
+      "path": "raw_data/course_lists/2024-2_A07337_raw.json",
+      "row_count": 115,
+      "status": "downloaded"
+    },
+    {
+      "year": 2024,
+      "term": "2",
+      "term_code": "20",
+      "major_code": "A10627",
+      "major_name": "소프트웨어융합대학 컴퓨터공학부 컴퓨터공학과",
+      "path": "raw_data/course_lists/2024-2_A10627_raw.json",
+      "row_count": 106,
+      "status": "downloaded"
+    },
+    {
+      "year": 2024,
+      "term": "2",
+      "term_code": "20",
+      "major_code": "A10628",
+      "major_name": "소프트웨어융합대학 컴퓨터공학부 인공지능학과",
+      "path": "raw_data/course_lists/2024-2_A10628_raw.json",
+      "row_count": 50,
+      "status": "downloaded"
+    },
+    {
+      "year": 2024,
+      "term": "summer",
+      "term_code": "15",
+      "major_code": "A07337",
+      "major_name": "소프트웨어융합대학 소프트웨어융합학과 소프트웨어융합학",
+      "path": "raw_data/course_lists/2024-summer_A07337_raw.json",
+      "row_count": 3,
+      "status": "downloaded"
+    },
+    {
+      "year": 2024,
+      "term": "summer",
+      "term_code": "15",
+      "major_code": "A10627",
+      "major_name": "소프트웨어융합대학 컴퓨터공학부 컴퓨터공학과",
+      "path": "raw_data/course_lists/2024-summer_A10627_raw.json",
+      "row_count": 2,
+      "status": "downloaded"
+    },
+    {
+      "year": 2024,
+      "term": "winter",
+      "term_code": "25",
+      "major_code": "A07337",
+      "major_name": "소프트웨어융합대학 소프트웨어융합학과 소프트웨어융합학",
+      "path": "raw_data/course_lists/2024-winter_A07337_raw.json",
+      "row_count": 3,
+      "status": "downloaded"
+    },
+    {
+      "year": 2024,
+      "term": "winter",
+      "term_code": "25",
+      "major_code": "A10627",
+      "major_name": "소프트웨어융합대학 컴퓨터공학부 컴퓨터공학과",
+      "path": "raw_data/course_lists/2024-winter_A10627_raw.json",
+      "row_count": 2,
+      "status": "downloaded"
+    },
+    {
+      "year": 2025,
+      "term": "1",
+      "term_code": "10",
+      "major_code": "A07337",
+      "major_name": "소프트웨어융합대학 소프트웨어융합학과 소프트웨어융합학",
+      "path": "raw_data/course_lists/2025-1_A07337_raw.json",
+      "row_count": 82,
+      "status": "downloaded"
+    },
+    {
+      "year": 2025,
+      "term": "1",
+      "term_code": "10",
+      "major_code": "A10627",
+      "major_name": "소프트웨어융합대학 컴퓨터공학부 컴퓨터공학과",
+      "path": "raw_data/course_lists/2025-1_A10627_raw.json",
+      "row_count": 102,
+      "status": "downloaded"
+    },
+    {
+      "year": 2025,
+      "term": "1",
+      "term_code": "10",
+      "major_code": "A10628",
+      "major_name": "소프트웨어융합대학 컴퓨터공학부 인공지능학과",
+      "path": "raw_data/course_lists/2025-1_A10628_raw.json",
+      "row_count": 70,
+      "status": "downloaded"
+    },
+    {
+      "year": 2025,
+      "term": "2",
+      "term_code": "20",
+      "major_code": "A07337",
+      "major_name": "소프트웨어융합대학 소프트웨어융합학과 소프트웨어융합학",
+      "path": "raw_data/course_lists/2025-2_A07337_raw.json",
+      "row_count": 82,
+      "status": "downloaded"
+    },
+    {
+      "year": 2025,
+      "term": "2",
+      "term_code": "20",
+      "major_code": "A10627",
+      "major_name": "소프트웨어융합대학 컴퓨터공학부 컴퓨터공학과",
+      "path": "raw_data/course_lists/2025-2_A10627_raw.json",
+      "row_count": 82,
+      "status": "downloaded"
+    },
+    {
+      "year": 2025,
+      "term": "2",
+      "term_code": "20",
+      "major_code": "A10628",
+      "major_name": "소프트웨어융합대학 컴퓨터공학부 인공지능학과",
+      "path": "raw_data/course_lists/2025-2_A10628_raw.json",
+      "row_count": 63,
+      "status": "downloaded"
+    },
+    {
+      "year": 2025,
+      "term": "summer",
+      "term_code": "15",
+      "major_code": "A07337",
+      "major_name": "소프트웨어융합대학 소프트웨어융합학과 소프트웨어융합학",
+      "path": "raw_data/course_lists/2025-summer_A07337_raw.json",
+      "row_count": 3,
+      "status": "downloaded"
+    },
+    {
+      "year": 2025,
+      "term": "summer",
+      "term_code": "15",
+      "major_code": "A10627",
+      "major_name": "소프트웨어융합대학 컴퓨터공학부 컴퓨터공학과",
+      "path": "raw_data/course_lists/2025-summer_A10627_raw.json",
+      "row_count": 2,
+      "status": "downloaded"
+    },
+    {
+      "year": 2025,
+      "term": "winter",
+      "term_code": "25",
+      "major_code": "A07337",
+      "major_name": "소프트웨어융합대학 소프트웨어융합학과 소프트웨어융합학",
+      "path": "raw_data/course_lists/2025-winter_A07337_raw.json",
+      "row_count": 2,
+      "status": "downloaded"
+    },
+    {
+      "year": 2025,
+      "term": "winter",
+      "term_code": "25",
+      "major_code": "A10627",
+      "major_name": "소프트웨어융합대학 컴퓨터공학부 컴퓨터공학과",
+      "path": "raw_data/course_lists/2025-winter_A10627_raw.json",
+      "row_count": 2,
+      "status": "downloaded"
+    },
+    {
+      "year": 2026,
+      "term": "1",
+      "term_code": "10",
+      "major_code": "A07337",
+      "major_name": "소프트웨어융합대학 소프트웨어융합학과 소프트웨어융합학",
+      "path": "raw_data/course_lists/2026-1_A07337_raw.json",
+      "row_count": 84,
+      "status": "downloaded"
+    },
+    {
+      "year": 2026,
+      "term": "1",
+      "term_code": "10",
+      "major_code": "A10627",
+      "major_name": "소프트웨어융합대학 컴퓨터공학부 컴퓨터공학과",
+      "path": "raw_data/course_lists/2026-1_A10627_raw.json",
+      "row_count": 90,
+      "status": "downloaded"
+    },
+    {
+      "year": 2026,
+      "term": "1",
+      "term_code": "10",
+      "major_code": "A10628",
+      "major_name": "소프트웨어융합대학 컴퓨터공학부 인공지능학과",
+      "path": "raw_data/course_lists/2026-1_A10628_raw.json",
+      "row_count": 64,
+      "status": "downloaded"
+    },
+    {
+      "year": 2026,
+      "term": "2",
+      "term_code": "20",
+      "major_code": "A07337",
+      "major_name": "소프트웨어융합대학 소프트웨어융합학과 소프트웨어융합학",
+      "path": "raw_data/course_lists/2026-2_A07337_raw.json",
+      "row_count": 78,
+      "status": "downloaded"
+    },
+    {
+      "year": 2026,
+      "term": "2",
+      "term_code": "20",
+      "major_code": "A07346",
+      "major_name": "소프트웨어융합대학 소프트웨어융합학과",
+      "path": "raw_data/course_lists/2026-2_A07346_raw.json",
+      "row_count": 6,
+      "status": "downloaded"
+    },
+    {
+      "year": 2026,
+      "term": "2",
+      "term_code": "20",
+      "major_code": "A10627",
+      "major_name": "소프트웨어융합대학 컴퓨터공학부 컴퓨터공학과",
+      "path": "raw_data/course_lists/2026-2_A10627_raw.json",
+      "row_count": 89,
+      "status": "downloaded"
+    },
+    {
+      "year": 2026,
+      "term": "2",
+      "term_code": "20",
+      "major_code": "A10628",
+      "major_name": "소프트웨어융합대학 컴퓨터공학부 인공지능학과",
+      "path": "raw_data/course_lists/2026-2_A10628_raw.json",
+      "row_count": 75,
+      "status": "downloaded"
+    },
+    {
+      "year": 2026,
+      "term": "summer",
+      "term_code": "15",
+      "major_code": "A07337",
+      "major_name": "소프트웨어융합대학 소프트웨어융합학과 소프트웨어융합학",
+      "path": "raw_data/course_lists/2026-summer_A07337_raw.json",
+      "row_count": 1,
+      "status": "downloaded"
+    },
+    {
+      "year": 2026,
+      "term": "summer",
+      "term_code": "15",
+      "major_code": "A10627",
+      "major_name": "소프트웨어융합대학 컴퓨터공학부 컴퓨터공학과",
+      "path": "raw_data/course_lists/2026-summer_A10627_raw.json",
+      "row_count": 2,
+      "status": "downloaded"
+    }
+  ],
+  "errors": [
+    "2026-winter: no majors found under A07340"
+  ],
+  "finished_at_utc": "2026-09-22T06:39:32.121766+00:00",
+  "summary": {
+    "downloaded": 68,
+    "skipped_existing": 1,
+    "empty": 1,
+    "failed": 0
+  }
+}
