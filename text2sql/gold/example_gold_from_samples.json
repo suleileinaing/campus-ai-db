@@ -1,0 +1,106 @@
+[
+  {
+    "id": "ex01",
+    "question": "2026년 2학기 CSE406 과목은 어떤 교수님이 분반별로 가르쳐?",
+    "student_id": null,
+    "gold_sql": "SELECT\n    o.year,\n    o.semester,\n    o.course_code,\n    o.section,\n    o.course_name,\n    GROUP_CONCAT(p.name, ', ') AS professors\nFROM course_offerings AS o\nLEFT JOIN offering_professors AS op ON op.offering_id = o.offering_id\nLEFT JOIN professors AS p ON p.professor_id = op.professor_id\nWHERE o.course_code = 'CSE406'\n  AND o.year = 2026\n  AND o.semester = '2'\nGROUP BY o.offering_id\nORDER BY o.section;",
+    "tags": [
+      "조인",
+      "개설강좌"
+    ]
+  },
+  {
+    "id": "ex02",
+    "question": "2026학번 기준으로 CSE203의 선수과목이 뭐야?",
+    "student_id": null,
+    "gold_sql": "SELECT DISTINCT\n    prerequisite_name,\n    prerequisite_course_code,\n    prerequisite_type,\n    minimum_grade_code,\n    prerequisite_group\nFROM course_prerequisites\nWHERE course_code = 'CSE203'\n  AND (cohort_start IS NULL OR cohort_start <= 2026)\n  AND (cohort_end IS NULL OR cohort_end >= 2026)\nORDER BY prerequisite_type, prerequisite_group, prerequisite_name;",
+    "tags": [
+      "선수과목"
+    ]
+  },
+  {
+    "id": "ex03",
+    "question": "2026년 2학기 CSE327 01분반은 주차별로 뭘 배워?",
+    "student_id": null,
+    "gold_sql": "SELECT\n    o.course_code,\n    o.course_name,\n    o.year,\n    o.semester,\n    o.section,\n    w.week,\n    w.date_range,\n    w.topic_content,\n    w.note\nFROM course_offerings AS o\nJOIN syllabi AS s ON s.offering_id = o.offering_id\nJOIN syllabus_weekly_plans AS w ON w.syllabus_id = s.syllabus_id\nWHERE o.course_code = 'CSE327'\n  AND o.year = 2026\n  AND o.semester = '2'\n  AND o.section = '01'\nORDER BY w.week;",
+    "tags": [
+      "강의계획서"
+    ]
+  },
+  {
+    "id": "ex04",
+    "question": "2026년 2학기에 월요일 13시 30분에 시작하는 수업 목록 알려줘",
+    "student_id": null,
+    "gold_sql": "SELECT\n    o.course_code,\n    o.course_name,\n    o.section,\n    ts.day,\n    ts.start_time,\n    ts.end_time,\n    ct.room_code\nFROM course_offerings AS o\nJOIN class_times AS ct ON ct.offering_id = o.offering_id\nJOIN time_slots AS ts ON ts.time_slot_id = ct.time_slot_id\nWHERE o.year = 2026\n  AND o.semester = '2'\n  AND ts.day = 'monday'\n  AND ts.start_time = '13:30'\nORDER BY o.course_code, o.section;",
+    "tags": [
+      "수업시간"
+    ]
+  },
+  {
+    "id": "ex05",
+    "question": "2026년 2학기 CSE327 01분반 평가 비율이 어떻게 돼?",
+    "student_id": null,
+    "gold_sql": "SELECT\n    o.course_code,\n    o.course_name,\n    s.midterm_percentage,\n    s.final_exam_percentage,\n    s.assignment_percentage,\n    s.presentation_percentage,\n    s.attendance_percentage,\n    s.other_percentage\nFROM course_offerings AS o\nJOIN syllabi AS s ON s.offering_id = o.offering_id\nWHERE o.course_code = 'CSE327'\n  AND o.year = 2026\n  AND o.semester = '2'\n  AND o.section = '01';",
+    "tags": [
+      "강의계획서"
+    ]
+  },
+  {
+    "id": "ex06",
+    "question": "2026년 2학기 CSE327 01분반 교재가 뭐야?",
+    "student_id": null,
+    "gold_sql": "SELECT\n    o.course_code,\n    o.course_name,\n    t.sequence,\n    t.title,\n    t.author,\n    t.publisher,\n    t.isbn\nFROM course_offerings AS o\nJOIN syllabi AS s ON s.offering_id = o.offering_id\nJOIN syllabus_textbooks AS t ON t.syllabus_id = s.syllabus_id\nWHERE o.course_code = 'CSE327'\n  AND o.year = 2026\n  AND o.semester = '2'\n  AND o.section = '01'\nORDER BY t.sequence;",
+    "tags": [
+      "강의계획서"
+    ]
+  },
+  {
+    "id": "ex07",
+    "question": "2026년 2학기 산학필수 과목 목록 보여줘",
+    "student_id": null,
+    "gold_sql": "SELECT\n    course_code,\n    course_name,\n    section,\n    year,\n    semester\nFROM course_offerings\nWHERE year = 2026\n  AND semester = '2'\n  AND industry_required = 1\nORDER BY course_code, section;",
+    "tags": [
+      "단일테이블"
+    ]
+  },
+  {
+    "id": "ex08",
+    "question": "내가 지금까지 이수한 학점은 몇 학점이야?",
+    "student_id": 202210001,
+    "gold_sql": "SELECT\n    e.student_id,\n    SUM(c.credits) AS completed_credits\nFROM enrollments AS e\nJOIN courses AS c ON c.course_code = e.course_code\nWHERE e.student_id = 202210001\n  AND e.status = '완료'\n  AND e.retaken = 0\nGROUP BY e.student_id;",
+    "tags": [
+      "개인화",
+      "집계"
+    ]
+  },
+  {
+    "id": "ex09",
+    "question": "졸업하려면 이수구분별로 몇 학점이 더 필요해?",
+    "student_id": 202210001,
+    "gold_sql": "WITH applicable_requirement AS (\n    SELECT gr.requirement_id\n    FROM students AS st\n    JOIN graduation_requirements AS gr\n      ON gr.department_id = st.department_id\n     AND gr.track = st.track\n     AND gr.cohort_start <= st.admission_year\n     AND (gr.cohort_end IS NULL OR gr.cohort_end >= st.admission_year)\n    WHERE st.student_id = 202210001\n),\nearned AS (\n    SELECT e.category_id, SUM(c.credits) AS earned_credits\n    FROM enrollments AS e\n    JOIN courses AS c ON c.course_code = e.course_code\n    WHERE e.student_id = 202210001\n      AND e.status = '완료'\n      AND e.retaken = 0\n    GROUP BY e.category_id\n)\nSELECT\n    cc.category_name,\n    rc.min_credits,\n    COALESCE(earned.earned_credits, 0) AS earned_credits,\n    MAX(rc.min_credits - COALESCE(earned.earned_credits, 0), 0)\n        AS remaining_credits\nFROM applicable_requirement AS ar\nJOIN requirement_categories AS rc ON rc.requirement_id = ar.requirement_id\nJOIN course_categories AS cc ON cc.category_id = rc.category_id\nLEFT JOIN earned ON earned.category_id = rc.category_id\nORDER BY rc.requirement_category_id;",
+    "tags": [
+      "개인화",
+      "졸업요건"
+    ]
+  },
+  {
+    "id": "ex10",
+    "question": "아직 안 들은 졸업 필수과목이 뭐야?",
+    "student_id": 202210001,
+    "gold_sql": "WITH applicable_requirement AS (\n    SELECT gr.requirement_id\n    FROM students AS st\n    JOIN graduation_requirements AS gr\n      ON gr.department_id = st.department_id\n     AND gr.track = st.track\n     AND gr.cohort_start <= st.admission_year\n     AND (gr.cohort_end IS NULL OR gr.cohort_end >= st.admission_year)\n    WHERE st.student_id = 202210001\n)\nSELECT rc.course_code, c.current_name, cc.category_name\nFROM applicable_requirement AS ar\nJOIN requirement_courses AS rc ON rc.requirement_id = ar.requirement_id\nJOIN courses AS c ON c.course_code = rc.course_code\nJOIN course_categories AS cc ON cc.category_id = rc.category_id\nWHERE NOT EXISTS (\n    SELECT 1\n    FROM enrollments AS e\n    WHERE e.student_id = 202210001\n      AND e.course_code = rc.course_code\n      AND e.status = '완료'\n      AND e.retaken = 0\n)\nORDER BY cc.category_name, rc.course_code;",
+    "tags": [
+      "개인화",
+      "졸업요건"
+    ]
+  },
+  {
+    "id": "ex11",
+    "question": "산학필수 요건은 얼마나 채웠어?",
+    "student_id": 202210001,
+    "gold_sql": "SELECT\n    ro.condition AS requirement_condition,\n    COALESCE(SUM(CASE\n        WHEN e.status = '완료' AND e.retaken = 0\n        THEN c.credits ELSE 0 END), 0) AS earned_industry_credits\nFROM students AS st\nJOIN graduation_requirements AS gr\n  ON gr.department_id = st.department_id\n AND gr.track = st.track\n AND gr.cohort_start <= st.admission_year\n AND (gr.cohort_end IS NULL OR gr.cohort_end >= st.admission_year)\nJOIN requirement_others AS ro\n  ON ro.requirement_id = gr.requirement_id AND ro.type = '산학필수'\nLEFT JOIN enrollments AS e ON e.student_id = st.student_id\nLEFT JOIN course_offerings AS o\n  ON o.offering_id = e.offering_id AND o.industry_required = 1\nLEFT JOIN courses AS c ON c.course_code = o.course_code\nWHERE st.student_id = 202210001\nGROUP BY ro.requirement_other_id, ro.condition;",
+    "tags": [
+      "개인화",
+      "졸업요건"
+    ]
+  }
+]

@@ -1,0 +1,3 @@
+id,question,student_id,gold_sql,gold_answer,ordered,tags
+q001,2026년 2학기 산학필수 과목 목록 보여줘,,"SELECT course_code, course_name FROM course_offerings WHERE year = 2026 AND semester = '2' AND industry_required = 1",,,단일테이블
+q002,내가 지금까지 이수한 학점은?,202210001,,"[[123]]",,개인화;집계
