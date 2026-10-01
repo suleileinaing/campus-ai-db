@@ -1,0 +1,200 @@
+﻿질문,대상 학생 ID,정답 SQL,정답 값
+내 DB에서 완료 상태이고 재수강으로 대체되지 않은 수강기록의 학점 합계는 얼마야?,202210029,"WITH target AS (SELECT * FROM students WHERE student_id = 202210029)
+,
+earned AS (
+    SELECT e.course_code, e.category_id, o.credits
+    FROM enrollments AS e
+    JOIN target AS st ON st.student_id = e.student_id
+    JOIN course_offerings AS o
+      ON o.offering_id = e.offering_id AND o.course_code = e.course_code
+    WHERE e.status = '완료' AND e.retaken = 0
+)
+
+SELECT COALESCE(SUM(credits), 0) AS earned_credits FROM earned;
+","[{""earned_credits"":126}]"
+내 DB의 완료·미대체 수강기록 기준 전공필수 학점 합계는 얼마야?,202210029,"WITH target AS (SELECT * FROM students WHERE student_id = 202210029)
+,
+earned AS (
+    SELECT e.course_code, e.category_id, o.credits
+    FROM enrollments AS e
+    JOIN target AS st ON st.student_id = e.student_id
+    JOIN course_offerings AS o
+      ON o.offering_id = e.offering_id AND o.course_code = e.course_code
+    WHERE e.status = '완료' AND e.retaken = 0
+)
+
+SELECT COALESCE(SUM(e.credits), 0) AS earned_major_required_credits
+FROM earned AS e
+JOIN course_categories AS cc ON cc.category_id = e.category_id
+WHERE cc.category_code = '04';
+","[{""earned_major_required_credits"":48}]"
+내 DB의 완료·미대체 수강기록 기준 전공선택 학점 합계는 얼마야?,202210029,"WITH target AS (SELECT * FROM students WHERE student_id = 202210029)
+,
+earned AS (
+    SELECT e.course_code, e.category_id, o.credits
+    FROM enrollments AS e
+    JOIN target AS st ON st.student_id = e.student_id
+    JOIN course_offerings AS o
+      ON o.offering_id = e.offering_id AND o.course_code = e.course_code
+    WHERE e.status = '완료' AND e.retaken = 0
+)
+
+SELECT COALESCE(SUM(e.credits), 0) AS earned_major_elective_credits
+FROM earned AS e
+JOIN course_categories AS cc ON cc.category_id = e.category_id
+WHERE cc.category_code = '05';
+","[{""earned_major_elective_credits"":30}]"
+내 학과·입학년도·트랙의 전공필수 최소학점과 DB 완료·미대체 수강기록 합계를 비교한 잔여학점 계산값은 얼마야?,202210029,"WITH target AS (SELECT * FROM students WHERE student_id = 202210029)
+,
+applicable AS (
+    SELECT gr.*
+    FROM target AS st
+    JOIN graduation_requirements AS gr
+      ON gr.department_id = st.department_id
+     AND gr.track = st.track
+     AND gr.cohort_start <= st.admission_year
+     AND (gr.cohort_end IS NULL OR gr.cohort_end >= st.admission_year)
+)
+,
+earned AS (
+    SELECT e.course_code, e.category_id, o.credits
+    FROM enrollments AS e
+    JOIN target AS st ON st.student_id = e.student_id
+    JOIN course_offerings AS o
+      ON o.offering_id = e.offering_id AND o.course_code = e.course_code
+    WHERE e.status = '완료' AND e.retaken = 0
+)
+
+SELECT ar.requirement_id, rc.min_credits AS required_credits,
+       COALESCE(SUM(e.credits), 0) AS earned_credits,
+       MAX(rc.min_credits - COALESCE(SUM(e.credits), 0), 0) AS remaining_credits
+FROM applicable AS ar
+JOIN requirement_categories AS rc ON rc.requirement_id = ar.requirement_id
+JOIN course_categories AS cc ON cc.category_id = rc.category_id
+LEFT JOIN earned AS e ON e.category_id = rc.category_id
+WHERE cc.category_code = '04'
+GROUP BY ar.requirement_id, rc.requirement_category_id, rc.min_credits
+ORDER BY ar.requirement_id;
+","[{""requirement_id"":1,""required_credits"":45,""earned_credits"":48,""remaining_credits"":0}]"
+내 학과·입학년도·트랙에 적용되는 DB 등록 지정과목 중 아직 유효하게 이수하지 않은 과목은 뭐야?,202210029,"WITH target AS (SELECT * FROM students WHERE student_id = 202210029)
+,
+applicable AS (
+    SELECT gr.*
+    FROM target AS st
+    JOIN graduation_requirements AS gr
+      ON gr.department_id = st.department_id
+     AND gr.track = st.track
+     AND gr.cohort_start <= st.admission_year
+     AND (gr.cohort_end IS NULL OR gr.cohort_end >= st.admission_year)
+)
+
+SELECT DISTINCT rc.course_code, c.current_name AS course_name,
+       cc.category_name
+FROM applicable AS ar
+JOIN requirement_courses AS rc ON rc.requirement_id = ar.requirement_id
+JOIN courses AS c ON c.course_code = rc.course_code
+JOIN course_categories AS cc ON cc.category_id = rc.category_id
+WHERE NOT EXISTS (
+    SELECT 1 FROM enrollments AS e
+    JOIN target AS st ON st.student_id = e.student_id
+    WHERE e.course_code = rc.course_code AND e.status = '완료' AND e.retaken = 0
+)
+ORDER BY cc.category_name, rc.course_code;
+",[]
+2025학년도 2학기에 내가 수강한 과목과 수강 상태를 알려줘.,202210029,"WITH target AS (SELECT * FROM students WHERE student_id = 202210029)
+SELECT o.course_code, o.course_name, o.section, e.status, e.grade
+FROM enrollments AS e JOIN target AS st ON st.student_id = e.student_id
+JOIN course_offerings AS o
+  ON o.offering_id = e.offering_id AND o.course_code = e.course_code
+WHERE o.year = 2025 AND o.semester = '2'
+ORDER BY o.course_code, o.section, e.enrollment_id;
+","[{""course_code"":""AI1003"",""course_name"":""인공지능수학"",""section"":""00"",""status"":""완료"",""grade"":""A+""},{""course_code"":""AI4003"",""course_name"":""졸업논문(인공지능)"",""section"":""00"",""status"":""완료"",""grade"":""P""},{""course_code"":""CSE405"",""course_name"":""졸업프로젝트"",""section"":""00"",""status"":""완료"",""grade"":""A+""},{""course_code"":""GEC1104"",""course_name"":""세계와시민"",""section"":""G45"",""status"":""완료"",""grade"":""A-""}]"
+2025학년도 2학기 내 수강과목의 DB 등록 교재와 강의계획서 등록 여부를 알려줘.,202210029,"WITH target AS (SELECT * FROM students WHERE student_id = 202210029)
+SELECT o.course_code, o.course_name, o.section,
+       CASE WHEN sy.syllabus_id IS NULL THEN '강의계획서 미등록'
+            WHEN t.textbook_id IS NULL THEN '교재 행 미등록'
+            ELSE '교재 등록' END AS data_status,
+       t.sequence, t.title, t.author, t.publisher, t.isbn
+FROM enrollments AS e JOIN target AS st ON st.student_id = e.student_id
+JOIN course_offerings AS o ON o.offering_id = e.offering_id
+LEFT JOIN syllabi AS sy ON sy.offering_id = o.offering_id
+LEFT JOIN syllabus_textbooks AS t ON t.syllabus_id = sy.syllabus_id
+WHERE o.year = 2025 AND o.semester = '2'
+ORDER BY o.course_code, o.section, t.sequence, t.textbook_id;
+","[{""course_code"":""AI1003"",""course_name"":""인공지능수학"",""section"":""00"",""data_status"":""교재 행 미등록"",""sequence"":null,""title"":null,""author"":null,""publisher"":null,""isbn"":null},{""course_code"":""AI4003"",""course_name"":""졸업논문(인공지능)"",""section"":""00"",""data_status"":""교재 행 미등록"",""sequence"":null,""title"":null,""author"":null,""publisher"":null,""isbn"":null},{""course_code"":""CSE405"",""course_name"":""졸업프로젝트"",""section"":""00"",""data_status"":""교재 행 미등록"",""sequence"":null,""title"":null,""author"":null,""publisher"":null,""isbn"":null},{""course_code"":""GEC1104"",""course_name"":""세계와시민"",""section"":""G45"",""data_status"":""강의계획서 미등록"",""sequence"":null,""title"":null,""author"":null,""publisher"":null,""isbn"":null}]"
+DB에 저장된 내 전체 수강이력의 담당 교수와 등록된 연구실 정보를 알려줘.,202210029,"WITH target AS (SELECT * FROM students WHERE student_id = 202210029)
+SELECT DISTINCT p.professor_id, p.name AS professor_name,
+       p.office AS registered_office
+FROM enrollments AS e JOIN target AS st ON st.student_id = e.student_id
+JOIN offering_professors AS op ON op.offering_id = e.offering_id
+JOIN professors AS p ON p.professor_id = op.professor_id
+ORDER BY p.professor_id;
+","[{""professor_id"":12,""professor_name"":""한치근"",""registered_office"":""전자정보대학관 311호""},{""professor_id"":16,""professor_name"":""이성원"",""registered_office"":""전자정보대학/소프트웨어융합대학 323호""},{""professor_id"":21,""professor_name"":""이대호"",""registered_office"":""전자정보대학관 310-2호, 우정원 7035호""},{""professor_id"":25,""professor_name"":""박광훈"",""registered_office"":""321호""},{""professor_id"":33,""professor_name"":""이계산"",""registered_office"":""505호실""},{""professor_id"":34,""professor_name"":""이영구"",""registered_office"":""College of Electronics and Information, RM 315""},{""professor_id"":52,""professor_name"":""이상훈"",""registered_office"":""전자정보대학 345호""},{""professor_id"":59,""professor_name"":""이승규"",""registered_office"":null},{""professor_id"":70,""professor_name"":""배성호"",""registered_office"":""전자정보관 350호""},{""professor_id"":71,""professor_name"":""이해준"",""registered_office"":null},{""professor_id"":78,""professor_name"":""박성배"",""registered_office"":""Room 323-1, College of Electronics and Information""},{""professor_id"":80,""professor_name"":""전준기"",""registered_office"":""응용과학대학 419호 금융수학 연구실""},{""professor_id"":92,""professor_name"":""김휘용"",""registered_office"":""511""},{""professor_id"":99,""professor_name"":""이원희"",""registered_office"":""전자정보대학관 708호""},{""professor_id"":103,""professor_name"":""박준표"",""registered_office"":""우정원 7061""},{""professor_id"":107,""professor_name"":""김성태"",""registered_office"":""전자정보대학 508호""},{""professor_id"":109,""professor_name"":""박경문"",""registered_office"":""전자정보대학 325-4호""},{""professor_id"":123,""professor_name"":""박상근"",""registered_office"":""전자정보대학314호""},{""professor_id"":126,""professor_name"":""김정욱"",""registered_office"":""우정원 7032호""},{""professor_id"":127,""professor_name"":""Chaoning Zhang"",""registered_office"":""전자정보관 326호""},{""professor_id"":129,""professor_name"":""허선영"",""registered_office"":""우정원 7028호""},{""professor_id"":137,""professor_name"":""조명아"",""registered_office"":""우정원 7032호""},{""professor_id"":150,""professor_name"":""김수현"",""registered_office"":""우정원 7027호""},{""professor_id"":186,""professor_name"":""김종원"",""registered_office"":null},{""professor_id"":204,""professor_name"":""문영희"",""registered_office"":null},{""professor_id"":235,""professor_name"":""유지훈"",""registered_office"":null},{""professor_id"":264,""professor_name"":""강희"",""registered_office"":null},{""professor_id"":303,""professor_name"":""조운아"",""registered_office"":null},{""professor_id"":309,""professor_name"":""김동언"",""registered_office"":null},{""professor_id"":369,""professor_name"":""Andrew James Stewart"",""registered_office"":null},{""professor_id"":391,""professor_name"":""방창현"",""registered_office"":null},{""professor_id"":422,""professor_name"":""이은정"",""registered_office"":null},{""professor_id"":611,""professor_name"":""이규호"",""registered_office"":null},{""professor_id"":625,""professor_name"":""김정수"",""registered_office"":null},{""professor_id"":647,""professor_name"":""허림"",""registered_office"":null}]"
+내 DB의 완료·미대체 수강기록을 성적별로 몇 건씩 보유하고 있는지 알려줘.,202210029,"WITH target AS (SELECT * FROM students WHERE student_id = 202210029)
+SELECT e.grade, COUNT(*) AS course_count
+FROM enrollments AS e JOIN target AS st ON st.student_id = e.student_id
+WHERE e.status = '완료' AND e.retaken = 0
+GROUP BY e.grade ORDER BY course_count DESC, e.grade;
+","[{""grade"":""A0"",""course_count"":9},{""grade"":""A-"",""course_count"":8},{""grade"":""B0"",""course_count"":7},{""grade"":""A+"",""course_count"":4},{""grade"":""B-"",""course_count"":4},{""grade"":""C+"",""course_count"":4},{""grade"":""C0"",""course_count"":3},{""grade"":""P"",""course_count"":3},{""grade"":""B+"",""course_count"":2}]"
+내가 재수강한 과목과 해당 재수강 성적을 알려줘.,202210029,"WITH target AS (SELECT * FROM students WHERE student_id = 202210029)
+SELECT e.course_code, o.course_name, o.year, o.semester, e.grade, e.status
+FROM enrollments AS e JOIN target AS st ON st.student_id = e.student_id
+JOIN course_offerings AS o ON o.offering_id = e.offering_id
+WHERE e.is_retake = 1
+ORDER BY e.course_code, o.year, o.semester, e.enrollment_id;
+","[{""course_code"":""AI1003"",""course_name"":""인공지능수학"",""year"":2025,""semester"":""2"",""grade"":""A+"",""status"":""완료""},{""course_code"":""GEC1104"",""course_name"":""세계와시민"",""year"":2025,""semester"":""2"",""grade"":""A-"",""status"":""완료""}]"
+내 전체 수강이력 중 강의계획서 추가문헌및자료에 '노트북' 또는 '랩톱'이 명시된 과목은 뭐야?,202210029,"WITH target AS (SELECT * FROM students WHERE student_id = 202210029)
+SELECT DISTINCT o.course_code, o.course_name, o.year, o.semester,
+       o.section, sy.additional_materials AS matching_source_text
+FROM enrollments AS e JOIN target AS st ON st.student_id = e.student_id
+JOIN course_offerings AS o ON o.offering_id = e.offering_id
+JOIN syllabi AS sy ON sy.offering_id = e.offering_id
+WHERE sy.additional_materials LIKE '%노트북%'
+   OR sy.additional_materials LIKE '%랩톱%'
+ORDER BY o.year, o.semester, o.course_code, o.section;
+",[]
+내 학과·입학년도·트랙에 적용되는 졸업 총 이수학점은 몇 학점이야?,202210029,"WITH target AS (SELECT * FROM students WHERE student_id = 202210029)
+,
+applicable AS (
+    SELECT gr.*
+    FROM target AS st
+    JOIN graduation_requirements AS gr
+      ON gr.department_id = st.department_id
+     AND gr.track = st.track
+     AND gr.cohort_start <= st.admission_year
+     AND (gr.cohort_end IS NULL OR gr.cohort_end >= st.admission_year)
+)
+
+SELECT ar.requirement_id, d.name AS department_name, ar.track,
+       ar.cohort_start, ar.cohort_end, ar.total_credits
+FROM applicable AS ar JOIN departments AS d ON d.department_id = ar.department_id
+ORDER BY ar.requirement_id;
+","[{""requirement_id"":1,""department_name"":""인공지능학과"",""track"":""공통"",""cohort_start"":2022,""cohort_end"":2022,""total_credits"":130}]"
+DB에 등록된 내 학적 상태는 뭐야?,202210029,"WITH target AS (SELECT * FROM students WHERE student_id = 202210029)
+SELECT student_id, status FROM target;
+","[{""student_id"":202210029,""status"":""재학""}]"
+DB에 등록된 내 추가전공 유형과 이름을 알려줘.,202210029,"WITH target AS (SELECT * FROM students WHERE student_id = 202210029)
+SELECT student_id, extra_track_type, extra_track_name FROM target;
+","[{""student_id"":202210029,""extra_track_type"":""없음"",""extra_track_name"":null}]"
+DB에 등록된 내 소속 학과 이름과 코드는 뭐야?,202210029,"WITH target AS (SELECT * FROM students WHERE student_id = 202210029)
+SELECT st.student_id, d.department_id, d.code AS department_code,
+       d.name AS department_name
+FROM target AS st JOIN departments AS d ON d.department_id = st.department_id;
+","[{""student_id"":202210029,""department_id"":12,""department_code"":""A10628"",""department_name"":""인공지능학과""}]"
+내 입학년도 기준으로 SWCON201에 등록된 선수과목과 각 선수과목의 유효 이수기록을 보여줘.,202210029,"WITH target AS (SELECT * FROM students WHERE student_id = 202210029)
+SELECT cp.prerequisite_id, cp.prerequisite_course_code,
+       cp.prerequisite_name, cp.prerequisite_type, cp.prerequisite_group,
+       cp.minimum_required_count, cp.minimum_grade_code, cp.abeek_applicable,
+       e.grade AS recorded_passing_grade,
+       CASE WHEN e.enrollment_id IS NULL THEN '유효 이수기록 없음'
+            ELSE '유효 이수기록 있음' END AS completion_record
+FROM target AS st JOIN course_prerequisites AS cp
+  ON cp.course_code = 'SWCON201'
+ AND (cp.cohort_start IS NULL OR cp.cohort_start <= st.admission_year)
+ AND (cp.cohort_end IS NULL OR cp.cohort_end >= st.admission_year)
+LEFT JOIN enrollments AS e
+  ON e.student_id = st.student_id
+ AND e.course_code = cp.prerequisite_course_code
+ AND e.status = '완료' AND e.retaken = 0
+ORDER BY cp.prerequisite_id, e.enrollment_id;
+","[{""prerequisite_id"":277,""prerequisite_course_code"":""SWCON104"",""prerequisite_name"":""웹/파이선프로그래밍"",""prerequisite_type"":""REQUIRED"",""prerequisite_group"":""01"",""minimum_required_count"":1,""minimum_grade_code"":null,""abeek_applicable"":0,""recorded_passing_grade"":""C+"",""completion_record"":""유효 이수기록 있음""}]"

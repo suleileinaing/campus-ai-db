@@ -1,0 +1,27 @@
+{
+  "overall": {
+    "n": 16,
+    "exec_ok": 16,
+    "first_try_exec_ok": 16,
+    "strict": 5,
+    "relaxed": 6
+  },
+  "by_tag": {
+    "(태그 없음)": {
+      "n": 16,
+      "exec_ok": 16,
+      "first_try_exec_ok": 16,
+      "strict": 5,
+      "relaxed": 6
+    }
+  },
+  "diagnosis": {
+    "correct": 5,
+    "value_mismatch": 9,
+    "row_count_mismatch": 1,
+    "order_mismatch": 1
+  },
+  "gold_invalid": [],
+  "avg_tokens": 5160.1,
+  "avg_latency_sec": 4.41
+}
