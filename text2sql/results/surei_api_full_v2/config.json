@@ -1,0 +1,9 @@
+{
+  "model": "gpt-6-astra",
+  "fewshot": true,
+  "n_fewshot": 11,
+  "temperature": null,
+  "max_repairs": 2,
+  "gold": "text2sql/gold/personal_gold_v2.csv",
+  "n_items": 16
+}
