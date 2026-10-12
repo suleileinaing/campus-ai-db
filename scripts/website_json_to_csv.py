@@ -89,7 +89,7 @@ CATEGORY_DEFINITIONS = [
     {"category_id": 1, "category_code": "11", "category_name": "전공기초"},
     {"category_id": 2, "category_code": "04", "category_name": "전공필수"},
     {"category_id": 3, "category_code": "05", "category_name": "전공선택"},
-    {"category_id": 4, "category_code": "16", "category_name": "필수교과"},
+    {"category_id": 4, "category_code": "16", "category_name": "기초교과"},
     {"category_id": 5, "category_code": "15", "category_name": "배분이수"},
     {"category_id": 6, "category_code": "17", "category_name": "자유이수"},
     {"category_id": 7, "category_code": "08", "category_name": "자유선택"},

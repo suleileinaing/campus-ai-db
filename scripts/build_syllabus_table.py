@@ -28,6 +28,7 @@ HTML_ENGLISH_TYPES = {
     "": "NONE",
     "영어(부분)강좌": "PARTIAL",
     "전체영어강좌": "FULL",
+    "제2외국어강좌": "SECOND_FOREIGN_LANGUAGE",
 }
 
 ENGLISH_VALIDATION_FIELDS = [
