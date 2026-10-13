@@ -40,8 +40,16 @@ IMPORTS = [
     ("graduation_requirements", DATABASE_TABLES / "graduation_requirements.csv"),
     ("requirement_categories", DATABASE_TABLES / "requirement_categories.csv"),
     (
-        "requirement_categories",
-        SIMULATED_TABLES / "simulated_general_requirement_categories.csv",
+        "general_education_requirements",
+        DATABASE_TABLES / "general_education_requirements.csv",
+    ),
+    (
+        "general_education_requirement_categories",
+        DATABASE_TABLES / "general_education_requirement_categories.csv",
+    ),
+    (
+        "general_education_category_members",
+        DATABASE_TABLES / "general_education_category_members.csv",
     ),
     ("requirement_courses", DATABASE_TABLES / "requirement_courses.csv"),
     ("requirement_others", DATABASE_TABLES / "requirement_others.csv"),
@@ -61,7 +69,8 @@ INTEGER_COLUMNS = {
     "weekly_plan_id", "week", "requirement_id", "total_credits",
     "requirement_category_id", "min_credits", "min_areas",
     "per_area_min_credits", "requirement_course_id", "requirement_other_id",
-    "fulfillment_option_id", "target_other_id",
+    "fulfillment_option_id", "target_other_id", "general_requirement_id",
+    "general_requirement_category_id", "total_general_credits",
 }
 REAL_COLUMNS = {
     "midterm_percentage", "final_exam_percentage", "assignment_percentage",

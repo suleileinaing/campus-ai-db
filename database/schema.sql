@@ -227,6 +227,40 @@ CREATE TABLE requirement_categories (
     UNIQUE (requirement_id, category_id)
 );
 
+CREATE TABLE general_education_requirements (
+    general_requirement_id INTEGER PRIMARY KEY,
+    cohort_start INTEGER NOT NULL,
+    cohort_end INTEGER,
+    total_general_credits INTEGER NOT NULL CHECK (total_general_credits >= 0),
+    source_document TEXT NOT NULL,
+    source_note TEXT,
+    CHECK (cohort_end IS NULL OR cohort_start <= cohort_end),
+    UNIQUE (cohort_start, cohort_end)
+);
+
+CREATE TABLE general_education_requirement_categories (
+    general_requirement_category_id INTEGER PRIMARY KEY,
+    general_requirement_id INTEGER NOT NULL
+        REFERENCES general_education_requirements(general_requirement_id),
+    requirement_code TEXT NOT NULL
+        CHECK (requirement_code IN ('CORE_REQUIRED', 'DISTRIBUTION', 'FREE_ELECTIVE')),
+    requirement_name TEXT NOT NULL,
+    min_credits INTEGER NOT NULL CHECK (min_credits >= 0),
+    min_areas INTEGER CHECK (min_areas >= 0 OR min_areas IS NULL),
+    per_area_min_credits INTEGER
+        CHECK (per_area_min_credits >= 0 OR per_area_min_credits IS NULL),
+    UNIQUE (general_requirement_id, requirement_code)
+);
+
+CREATE TABLE general_education_category_members (
+    general_requirement_category_id INTEGER NOT NULL
+        REFERENCES general_education_requirement_categories(
+            general_requirement_category_id
+        ),
+    category_id INTEGER NOT NULL REFERENCES course_categories(category_id),
+    PRIMARY KEY (general_requirement_category_id, category_id)
+);
+
 CREATE TABLE requirement_courses (
     requirement_course_id INTEGER PRIMARY KEY,
     requirement_id INTEGER NOT NULL REFERENCES graduation_requirements(requirement_id),
@@ -277,6 +311,12 @@ CREATE INDEX idx_requirements_department_cohort
     ON graduation_requirements(department_id, cohort_start, cohort_end);
 CREATE INDEX idx_requirement_categories_requirement
     ON requirement_categories(requirement_id, category_id);
+CREATE INDEX idx_general_requirements_cohort
+    ON general_education_requirements(cohort_start, cohort_end);
+CREATE INDEX idx_general_requirement_categories_requirement
+    ON general_education_requirement_categories(general_requirement_id);
+CREATE INDEX idx_general_category_members_category
+    ON general_education_category_members(category_id);
 CREATE INDEX idx_requirement_courses_requirement
     ON requirement_courses(requirement_id, course_code);
 CREATE INDEX idx_requirement_others_requirement

@@ -36,7 +36,7 @@ CAMPUS AI Database/
 ├── processed_data/
 │   ├── website_tables/           # 수강신청 사이트 기반 실제 공개 데이터
 │   ├── database_tables/          # 강의계획서·졸업요건 정제 데이터
-│   └── simulated/                # 학생/수강이력 및 임시 교양 데이터
+│   └── simulated/                # 가상 학생·수강이력 및 관련 생성 기록
 ├── raw_data/                     # 원본 공개 데이터와 근거 문서
 ├── scripts/                      # 수집·변환·DB 구축·검증 코드
 ├── validation_report/            # 추출 및 정합성 검증 결과
@@ -120,10 +120,15 @@ CAMPUS AI Database/
 | `requirement_courses` | 해당 교육과정에서 지정된 필수 과목 |
 | `requirement_others` | 산학필수, 영어강좌, SW교육, 졸업논문, 다전공 등의 조건 |
 | `requirement_fulfillment_options` | 과목 대체·마이크로디그리 등 충족 방법; 현재 시뮬레이션 |
+| `general_education_requirements` | 입학연도 범위별 총 교양 이수학점과 공식 출처 |
+| `general_education_requirement_categories` | 필수·배분·자유이수 최소학점과 영역 조건 |
+| `general_education_category_members` | 공식 교양요건과 수강신청 사이트 이수구분의 다대다 매핑 |
 
 2022~2026년 컴퓨터공학과(CS), 인공지능학과(AI), 소프트웨어융합학과(SWCON)의 공식 PDF를 근거로 총 15개 졸업요건 세트를 저장했다. 총학점·이수구분별 최소학점·기타 조건은 공식 데이터이다. `requirement_courses`는 PDF에서 과목 단위 정규화가 완료된 학과·연도만 포함하므로, 행이 없다는 것을 "필수과목 없음"으로 해석하면 안 된다. 범위는 `validation_report/graduation_requirement_coverage.csv`에서 확인한다. [남음 과목들은 추후 추가될 예정이다]
 
-교양 이수구분(category 4 `기초교과`, 5 `배분이수`, 6 `자유이수`)은 현재 시뮬레이션 데이터를 사용한다. `processed_data/simulated/simulated_general_requirement_categories.csv`에 분리하여 모든 졸업요건 세트에 category 4 17학점, `배분이수` 9학점(3개 영역·영역당 3학점), `자유이수` 3학점을 임시 적용했다. category 4의 17학점이 공식적으로 `기초교과`만을 의미하는지, category 11 `필수교과`까지 합산하는지는 아직 확인되지 않았으므로 후마니타스 공식 학번별 기준을 검증한 뒤 확정한다.
+교양 졸업요건은 `raw_data/graduation_requirements/general_edu_grad_req.pdf`의 2024 후마니타스 교양교육과정 시행세칙을 근거로 학과별 전공 졸업요건과 분리했다. 현재 DB 범위에서 2020~2023학번은 필수교과 17학점, 배분이수 12학점(7개 중 4개 영역), 자유이수 3학점으로 총 32학점 이상이며, 2024~2026학번은 필수교과 17학점, 배분이수 9학점(5개 중 3개 영역), 자유이수 3학점으로 총 29학점 이상이다. 각 배분이수 영역에서는 3학점을 이수한다.
+
+공식 `필수교과` 17학점은 수강신청 사이트의 category 4 `기초교과`와 category 11 `필수교과` 과목군을 함께 포함한다. 원본 source code를 유지하면서 두 분류를 하나의 공식 요건으로 계산하기 위해 `general_education_category_members`를 사용한다. 기존 simulated 교양 졸업요건 파일은 공식 데이터로 대체하여 삭제했다.
 
 현재는 출처와 적용 연도를 명확히 검증하기 위해 졸업요건을 학과·학번별 한 행씩 유지한다. 향후 모든 연도의 지정과목 정규화가 완료되면 총학점, 이수구분별 최소학점, 지정과목 및 기타 조건이 모두 같은 연속 학번 구간을 확인하여 `cohort_start`와 `cohort_end` 범위 한 행으로 통합할 수 있다. 총학점만 같은 경우에는 동일한 졸업요건으로 간주하지 않는다.
 
@@ -156,6 +161,9 @@ CAMPUS AI Database/
 | `syllabus_weekly_plans` | `weekly_plan_id`, `syllabus_id`, `week`, `date_range`, `topic_content`, `note` |
 | `graduation_requirements` | `requirement_id`, `department_id`, `track`, `cohort_start`, `cohort_end`, `total_credits` |
 | `requirement_categories` | `requirement_category_id`, `requirement_id`, `category_id`, `min_credits`, `min_areas`, `per_area_min_credits` |
+| `general_education_requirements` | `general_requirement_id`, `cohort_start`, `cohort_end`, `total_general_credits`, `source_document`, `source_note` |
+| `general_education_requirement_categories` | `general_requirement_category_id`, `general_requirement_id`, `requirement_code`, `requirement_name`, `min_credits`, `min_areas`, `per_area_min_credits` |
+| `general_education_category_members` | `general_requirement_category_id`, `category_id` |
 | `requirement_courses` | `requirement_course_id`, `requirement_id`, `course_code`, `category_id` |
 | `requirement_others` | `requirement_other_id`, `requirement_id`, `type`, `condition` |
 | `requirement_fulfillment_options` | `fulfillment_option_id`, `target_type`, `target_course_code`, `target_other_id`, `method`, `detail_json` |
@@ -172,12 +180,12 @@ PK/FK, 자료형 및 제약조건은 `database/schema.sql`, 테이블 관계는 
 - 10,718개 강의계획서의 상세 추출 정보
 - 강의계획서의 교재, 평가방법, 주차별 계획, 선수과목
 - 2022~2026년 CS/AI/SWCON 공식 졸업요건
+- 2020~2026학번 후마니타스 공식 교양 졸업요건
 
 ### 시뮬레이션 데이터
 
 - `students` 44건: 학번, 학과, 입학연도, 트랙 및 학적 상태를 생성한 가상 학생 데이터
 - `enrollments` 1,188건: 가상 학생의 성적, 이수 상태 및 재수강 여부. 과목과 `offering_id`는 실제 수집한 개설강좌를 참조한다.
-- `simulated_general_requirement_categories` 45건: 15개 졸업요건 세트에 임시 적용한 교양 이수요건. 현재 category 4 `기초교과` 17학점, `배분이수` 9학점(3개 영역·영역당 3학점), `자유이수` 3학점으로 구성된다. 17학점의 공식 적용 범위는 후마니타스 자료 확인 후 확정해야 한다.
 - `requirement_fulfillment_options` 5건: 공식 근거가 아직 확정되지 않은 대체과목 및 마이크로디그리 충족 방법
 
 현재 강좌, 개설강좌, 교수, 담당교수 연결, 수업시간 및 시간대에는 시뮬레이션 데이터를 사용하지 않는다. 이 데이터들은 수강신청 사이트와 강의계획서에서 수집한 실제 공개 데이터이다.
@@ -242,6 +250,8 @@ PK/FK, 자료형 및 제약조건은 `database/schema.sql`, 테이블 관계는 
 | 선수과목 근거 연결 | 4,934 |
 | 주차별 계획 | 169,824 |
 | 졸업요건 세트 | 15 |
+| 교양 졸업요건 세트 | 2 |
+| 교양 구분별 요건 | 6 |
 | 시뮬레이션 학생 | 44 |
 | 시뮬레이션 수강이력 | 1,188 |
 
