@@ -1,0 +1,3 @@
+﻿general_requirement_id,cohort_start,cohort_end,total_general_credits,source_document,source_note
+1,2020,2023,32,raw_data/graduation_requirements/general_edu_grad_req.pdf,2019학번부터 2023학번까지 기준 중 DB 적용 범위
+2,2024,2026,29,raw_data/graduation_requirements/general_edu_grad_req.pdf,2024학번 이후 기준 중 현재 DB 적용 범위

@@ -27,12 +27,15 @@ erDiagram
     course_categories ||--o{ enrollments : "최종 확정 이수구분"
     course_categories ||--o{ requirement_categories : "최소학점 구분"
     course_categories ||--o{ requirement_courses : "지정과목 구분"
+    course_categories ||--o{ general_education_category_members : "교양 source 분류"
 
     %% ===== 졸업요건 (학번 종속) =====
     graduation_requirements ||--o{ requirement_categories : "구분별 최소학점"
     graduation_requirements ||--o{ requirement_courses : "지정과목"
     courses ||--o{ requirement_courses : "지정과목"
     graduation_requirements ||--o{ requirement_others : "기타 졸업요건"
+    general_education_requirements ||--o{ general_education_requirement_categories : "교양 구분별 최소학점"
+    general_education_requirement_categories ||--o{ general_education_category_members : "포함 source 분류"
     courses o|--o{ requirement_fulfillment_options : "과목 충족대안"
     requirement_others o|--o{ requirement_fulfillment_options : "기타요건 충족대안"
 
@@ -203,6 +206,27 @@ erDiagram
         int min_credits "최소 이수학점"
         int min_areas "배분이수 최소 학과/영역수(NULL=무관)"
         int per_area_min_credits "학과/영역당 최소학점"
+    }
+    general_education_requirements {
+        int general_requirement_id PK
+        int cohort_start "적용 시작 학번"
+        int cohort_end "적용 종료 학번"
+        int total_general_credits "총 교양 이수학점"
+        string source_document "공식 PDF 경로"
+        string source_note
+    }
+    general_education_requirement_categories {
+        int general_requirement_category_id PK
+        int general_requirement_id FK
+        string requirement_code "CORE_REQUIRED/DISTRIBUTION/FREE_ELECTIVE"
+        string requirement_name
+        int min_credits
+        int min_areas
+        int per_area_min_credits
+    }
+    general_education_category_members {
+        int general_requirement_category_id PK, FK
+        int category_id PK, FK
     }
     requirement_courses {
         int requirement_course_id PK

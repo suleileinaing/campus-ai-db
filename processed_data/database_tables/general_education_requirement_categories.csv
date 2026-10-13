@@ -1,0 +1,7 @@
+﻿general_requirement_category_id,general_requirement_id,requirement_code,requirement_name,min_credits,min_areas,per_area_min_credits
+1,1,CORE_REQUIRED,필수교과,17,,
+2,1,DISTRIBUTION,배분이수교과,12,4,3
+3,1,FREE_ELECTIVE,자유이수교과,3,,
+4,2,CORE_REQUIRED,필수교과,17,,
+5,2,DISTRIBUTION,배분이수교과,9,3,3
+6,2,FREE_ELECTIVE,자유이수교과,3,,

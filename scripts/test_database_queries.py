@@ -143,6 +143,39 @@ TESTS = [
         (202210001, 202210001),
     ),
     (
+        "student general-education requirement",
+        """
+        SELECT ger.total_general_credits,
+               gerc.requirement_name,
+               gerc.min_credits,
+               gerc.min_areas,
+               gerc.per_area_min_credits
+        FROM students AS st
+        JOIN general_education_requirements AS ger
+          ON ger.cohort_start <= st.admission_year
+         AND (ger.cohort_end IS NULL OR ger.cohort_end >= st.admission_year)
+        JOIN general_education_requirement_categories AS gerc
+          ON gerc.general_requirement_id = ger.general_requirement_id
+        WHERE st.student_id = ?
+          AND ger.total_general_credits = 32
+        ORDER BY gerc.general_requirement_category_id
+        """,
+        (202210001,),
+    ),
+    (
+        "official general-education cohorts",
+        """
+        SELECT general_requirement_id
+        FROM general_education_requirements
+        WHERE (cohort_start = 2022 AND cohort_end = 2023
+               AND total_general_credits = 32)
+           OR (cohort_start = 2024 AND cohort_end = 2026
+               AND total_general_credits = 29)
+        ORDER BY general_requirement_id
+        """,
+        (),
+    ),
+    (
         "student unmet required courses",
         """
         WITH applicable_requirement AS (
