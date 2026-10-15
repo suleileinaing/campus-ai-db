@@ -1,0 +1,342 @@
+[
+ {
+  "id": "q001",
+  "question": "내 DB에서 완료 상태이고 재수강으로 대체되지 않은 수강기록의 학점 합계는 얼마야?",
+  "student_id": 202210029,
+  "gold_sql": "WITH target AS (SELECT * FROM students WHERE student_id = 202210029)\n,\nearned AS (\n    SELECT e.course_code, e.category_id, o.credits\n    FROM enrollments AS e\n    JOIN target AS st ON st.student_id = e.student_id\n    JOIN course_offerings AS o\n      ON o.offering_id = e.offering_id AND o.course_code = e.course_code\n    WHERE e.status = '완료' AND e.retaken = 0\n)\n\nSELECT COALESCE(SUM(credits), 0) AS earned_credits FROM earned;",
+  "gold_answer": "[{\"earned_credits\":126}]",
+  "tags": [
+   "개인화"
+  ]
+ },
+ {
+  "id": "q002",
+  "question": "내 DB의 완료·미대체 수강기록 기준 전공필수 학점 합계는 얼마야?",
+  "student_id": 202210029,
+  "gold_sql": "WITH target AS (SELECT * FROM students WHERE student_id = 202210029)\n,\nearned AS (\n    SELECT e.course_code, e.category_id, o.credits\n    FROM enrollments AS e\n    JOIN target AS st ON st.student_id = e.student_id\n    JOIN course_offerings AS o\n      ON o.offering_id = e.offering_id AND o.course_code = e.course_code\n    WHERE e.status = '완료' AND e.retaken = 0\n)\n\nSELECT COALESCE(SUM(e.credits), 0) AS earned_major_required_credits\nFROM earned AS e\nJOIN course_categories AS cc ON cc.category_id = e.category_id\nWHERE cc.category_code = '04';",
+  "gold_answer": "[{\"earned_major_required_credits\":48}]",
+  "tags": [
+   "개인화"
+  ]
+ },
+ {
+  "id": "q003",
+  "question": "내 DB의 완료·미대체 수강기록 기준 전공선택 학점 합계는 얼마야?",
+  "student_id": 202210029,
+  "gold_sql": "WITH target AS (SELECT * FROM students WHERE student_id = 202210029)\n,\nearned AS (\n    SELECT e.course_code, e.category_id, o.credits\n    FROM enrollments AS e\n    JOIN target AS st ON st.student_id = e.student_id\n    JOIN course_offerings AS o\n      ON o.offering_id = e.offering_id AND o.course_code = e.course_code\n    WHERE e.status = '완료' AND e.retaken = 0\n)\n\nSELECT COALESCE(SUM(e.credits), 0) AS earned_major_elective_credits\nFROM earned AS e\nJOIN course_categories AS cc ON cc.category_id = e.category_id\nWHERE cc.category_code = '05';",
+  "gold_answer": "[{\"earned_major_elective_credits\":30}]",
+  "tags": [
+   "개인화"
+  ]
+ },
+ {
+  "id": "q004",
+  "question": "내 학과·입학년도·트랙의 전공필수 최소학점과 DB 완료·미대체 수강기록 합계를 비교한 잔여학점 계산값은 얼마야?",
+  "student_id": 202210029,
+  "gold_sql": "WITH target AS (SELECT * FROM students WHERE student_id = 202210029)\n,\napplicable AS (\n    SELECT gr.*\n    FROM target AS st\n    JOIN graduation_requirements AS gr\n      ON gr.department_id = st.department_id\n     AND gr.track = st.track\n     AND gr.cohort_start <= st.admission_year\n     AND (gr.cohort_end IS NULL OR gr.cohort_end >= st.admission_year)\n)\n,\nearned AS (\n    SELECT e.course_code, e.category_id, o.credits\n    FROM enrollments AS e\n    JOIN target AS st ON st.student_id = e.student_id\n    JOIN course_offerings AS o\n      ON o.offering_id = e.offering_id AND o.course_code = e.course_code\n    WHERE e.status = '완료' AND e.retaken = 0\n)\n\nSELECT ar.requirement_id, rc.min_credits AS required_credits,\n       COALESCE(SUM(e.credits), 0) AS earned_credits,\n       MAX(rc.min_credits - COALESCE(SUM(e.credits), 0), 0) AS remaining_credits\nFROM applicable AS ar\nJOIN requirement_categories AS rc ON rc.requirement_id = ar.requirement_id\nJOIN course_categories AS cc ON cc.category_id = rc.category_id\nLEFT JOIN earned AS e ON e.category_id = rc.category_id\nWHERE cc.category_code = '04'\nGROUP BY ar.requirement_id, rc.requirement_category_id, rc.min_credits\nORDER BY ar.requirement_id;",
+  "gold_answer": "[{\"requirement_id\":1,\"required_credits\":45,\"earned_credits\":48,\"remaining_credits\":0}]",
+  "tags": [
+   "개인화"
+  ]
+ },
+ {
+  "id": "q005",
+  "question": "2025학년도 2학기에 내가 수강한 과목과 수강 상태를 알려줘.",
+  "student_id": 202210029,
+  "gold_sql": "WITH target AS (SELECT * FROM students WHERE student_id = 202210029)\nSELECT o.course_code, o.course_name, o.section, e.status, e.grade\nFROM enrollments AS e JOIN target AS st ON st.student_id = e.student_id\nJOIN course_offerings AS o\n  ON o.offering_id = e.offering_id AND o.course_code = e.course_code\nWHERE o.year = 2025 AND o.semester = '2'\nORDER BY o.course_code, o.section, e.enrollment_id;",
+  "gold_answer": "[{\"course_code\":\"AI1003\",\"course_name\":\"인공지능수학\",\"section\":\"00\",\"status\":\"완료\",\"grade\":\"A+\"},{\"course_code\":\"AI4003\",\"course_name\":\"졸업논문(인공지능)\",\"section\":\"00\",\"status\":\"완료\",\"grade\":\"P\"},{\"course_code\":\"CSE405\",\"course_name\":\"졸업프로젝트\",\"section\":\"00\",\"status\":\"완료\",\"grade\":\"A+\"},{\"course_code\":\"GEC1104\",\"course_name\":\"세계와시민\",\"section\":\"G45\",\"status\":\"완료\",\"grade\":\"A-\"}]",
+  "tags": [
+   "개인화"
+  ]
+ },
+ {
+  "id": "q006",
+  "question": "2025학년도 2학기 내 수강과목의 DB 등록 교재와 강의계획서 등록 여부를 알려줘.",
+  "student_id": 202210029,
+  "gold_sql": "WITH target AS (SELECT * FROM students WHERE student_id = 202210029)\nSELECT o.course_code, o.course_name, o.section,\n       CASE WHEN sy.syllabus_id IS NULL THEN '강의계획서 미등록'\n            WHEN t.textbook_id IS NULL THEN '교재 행 미등록'\n            ELSE '교재 등록' END AS data_status,\n       t.sequence, t.title, t.author, t.publisher, t.isbn\nFROM enrollments AS e JOIN target AS st ON st.student_id = e.student_id\nJOIN course_offerings AS o ON o.offering_id = e.offering_id\nLEFT JOIN syllabi AS sy ON sy.offering_id = o.offering_id\nLEFT JOIN syllabus_textbooks AS t ON t.syllabus_id = sy.syllabus_id\nWHERE o.year = 2025 AND o.semester = '2'\nORDER BY o.course_code, o.section, t.sequence, t.textbook_id;",
+  "gold_answer": "[{\"course_code\":\"AI1003\",\"course_name\":\"인공지능수학\",\"section\":\"00\",\"data_status\":\"교재 행 미등록\",\"sequence\":null,\"title\":null,\"author\":null,\"publisher\":null,\"isbn\":null},{\"course_code\":\"AI4003\",\"course_name\":\"졸업논문(인공지능)\",\"section\":\"00\",\"data_status\":\"교재 행 미등록\",\"sequence\":null,\"title\":null,\"author\":null,\"publisher\":null,\"isbn\":null},{\"course_code\":\"CSE405\",\"course_name\":\"졸업프로젝트\",\"section\":\"00\",\"data_status\":\"교재 행 미등록\",\"sequence\":null,\"title\":null,\"author\":null,\"publisher\":null,\"isbn\":null},{\"course_code\":\"GEC1104\",\"course_name\":\"세계와시민\",\"section\":\"G45\",\"data_status\":\"교재 등록\",\"sequence\":1,\"title\":\"세계 시민\",\"author\":\"경희대학교 후마니타스칼리지\",\"publisher\":\"경희대출판문화원\",\"isbn\":\"976-89-822-613-7\"}]",
+  "tags": [
+   "개인화"
+  ]
+ },
+ {
+  "id": "q007",
+  "question": "내 DB의 완료·미대체 수강기록을 성적별로 몇 건씩 보유하고 있는지 알려줘.",
+  "student_id": 202210029,
+  "gold_sql": "WITH target AS (SELECT * FROM students WHERE student_id = 202210029)\nSELECT e.grade, COUNT(*) AS course_count\nFROM enrollments AS e JOIN target AS st ON st.student_id = e.student_id\nWHERE e.status = '완료' AND e.retaken = 0\nGROUP BY e.grade ORDER BY course_count DESC, e.grade;",
+  "gold_answer": "[{\"grade\":\"A0\",\"course_count\":9},{\"grade\":\"A-\",\"course_count\":8},{\"grade\":\"B0\",\"course_count\":7},{\"grade\":\"A+\",\"course_count\":4},{\"grade\":\"B-\",\"course_count\":4},{\"grade\":\"C+\",\"course_count\":4},{\"grade\":\"C0\",\"course_count\":3},{\"grade\":\"P\",\"course_count\":3},{\"grade\":\"B+\",\"course_count\":2}]",
+  "tags": [
+   "개인화"
+  ]
+ },
+ {
+  "id": "q008",
+  "question": "내가 재수강한 과목과 해당 재수강 성적을 알려줘.",
+  "student_id": 202210029,
+  "gold_sql": "WITH target AS (SELECT * FROM students WHERE student_id = 202210029)\nSELECT e.course_code, o.course_name, o.year, o.semester, e.grade, e.status\nFROM enrollments AS e JOIN target AS st ON st.student_id = e.student_id\nJOIN course_offerings AS o ON o.offering_id = e.offering_id\nWHERE e.is_retake = 1\nORDER BY e.course_code, o.year, o.semester, e.enrollment_id;",
+  "gold_answer": "[{\"course_code\":\"AI1003\",\"course_name\":\"인공지능수학\",\"year\":2025,\"semester\":\"2\",\"grade\":\"A+\",\"status\":\"완료\"},{\"course_code\":\"GEC1104\",\"course_name\":\"세계와시민\",\"year\":2025,\"semester\":\"2\",\"grade\":\"A-\",\"status\":\"완료\"}]",
+  "tags": [
+   "개인화"
+  ]
+ },
+ {
+  "id": "q009",
+  "question": "내 전체 수강이력 중 강의계획서 추가문헌및자료에 '노트북' 또는 '랩톱'이 명시된 과목은 뭐야?",
+  "student_id": 202210029,
+  "gold_sql": "WITH target AS (SELECT * FROM students WHERE student_id = 202210029)\nSELECT DISTINCT o.course_code, o.course_name, o.year, o.semester,\n       o.section, sy.additional_materials AS matching_source_text\nFROM enrollments AS e JOIN target AS st ON st.student_id = e.student_id\nJOIN course_offerings AS o ON o.offering_id = e.offering_id\nJOIN syllabi AS sy ON sy.offering_id = e.offering_id\nWHERE sy.additional_materials LIKE '%노트북%'\n   OR sy.additional_materials LIKE '%랩톱%'\nORDER BY o.year, o.semester, o.course_code, o.section;",
+  "gold_answer": "[]",
+  "tags": [
+   "개인화"
+  ]
+ },
+ {
+  "id": "q010",
+  "question": "내 학과·입학년도·트랙에 적용되는 졸업 총 이수학점은 몇 학점이야?",
+  "student_id": 202210029,
+  "gold_sql": "WITH target AS (SELECT * FROM students WHERE student_id = 202210029)\n,\napplicable AS (\n    SELECT gr.*\n    FROM target AS st\n    JOIN graduation_requirements AS gr\n      ON gr.department_id = st.department_id\n     AND gr.track = st.track\n     AND gr.cohort_start <= st.admission_year\n     AND (gr.cohort_end IS NULL OR gr.cohort_end >= st.admission_year)\n)\n\nSELECT ar.requirement_id, d.name AS department_name, ar.track,\n       ar.cohort_start, ar.cohort_end, ar.total_credits\nFROM applicable AS ar JOIN departments AS d ON d.department_id = ar.department_id\nORDER BY ar.requirement_id;",
+  "gold_answer": "[{\"requirement_id\":1,\"department_name\":\"인공지능학과\",\"track\":\"공통\",\"cohort_start\":2022,\"cohort_end\":2022,\"total_credits\":130}]",
+  "tags": [
+   "개인화"
+  ]
+ },
+ {
+  "id": "q011",
+  "question": "DB에 등록된 내 학적 상태는 뭐야?",
+  "student_id": 202210029,
+  "gold_sql": "WITH target AS (SELECT * FROM students WHERE student_id = 202210029)\nSELECT student_id, status FROM target;",
+  "gold_answer": "[{\"student_id\":202210029,\"status\":\"재학\"}]",
+  "tags": [
+   "개인화"
+  ]
+ },
+ {
+  "id": "q012",
+  "question": "DB에 등록된 내 추가전공 유형과 이름을 알려줘.",
+  "student_id": 202210029,
+  "gold_sql": "WITH target AS (SELECT * FROM students WHERE student_id = 202210029)\nSELECT student_id, extra_track_type, extra_track_name FROM target;",
+  "gold_answer": "[{\"student_id\":202210029,\"extra_track_type\":\"없음\",\"extra_track_name\":null}]",
+  "tags": [
+   "개인화"
+  ]
+ },
+ {
+  "id": "q013",
+  "question": "DB에 등록된 내 소속 학과 이름과 코드는 뭐야?",
+  "student_id": 202210029,
+  "gold_sql": "WITH target AS (SELECT * FROM students WHERE student_id = 202210029)\nSELECT st.student_id, d.department_id, d.code AS department_code,\n       d.name AS department_name\nFROM target AS st JOIN departments AS d ON d.department_id = st.department_id;",
+  "gold_answer": "[{\"student_id\":202210029,\"department_id\":12,\"department_code\":\"A10628\",\"department_name\":\"인공지능학과\"}]",
+  "tags": [
+   "개인화"
+  ]
+ },
+ {
+  "id": "q014",
+  "question": "내 입학년도 기준으로 SWCON201에 등록된 선수과목과 각 선수과목의 유효 이수기록을 보여줘.",
+  "student_id": 202210029,
+  "gold_sql": "WITH target AS (SELECT * FROM students WHERE student_id = 202210029)\nSELECT cp.prerequisite_id, cp.prerequisite_course_code,\n       cp.prerequisite_name, cp.prerequisite_type, cp.prerequisite_group,\n       cp.minimum_required_count, cp.minimum_grade_code, cp.abeek_applicable,\n       e.grade AS recorded_passing_grade,\n       CASE WHEN e.enrollment_id IS NULL THEN '유효 이수기록 없음'\n            ELSE '유효 이수기록 있음' END AS completion_record\nFROM target AS st JOIN course_prerequisites AS cp\n  ON cp.course_code = 'SWCON201'\n AND (cp.cohort_start IS NULL OR cp.cohort_start <= st.admission_year)\n AND (cp.cohort_end IS NULL OR cp.cohort_end >= st.admission_year)\nLEFT JOIN enrollments AS e\n  ON e.student_id = st.student_id\n AND e.course_code = cp.prerequisite_course_code\n AND e.status = '완료' AND e.retaken = 0\nORDER BY cp.prerequisite_id, e.enrollment_id;",
+  "gold_answer": "[{\"prerequisite_id\":277,\"prerequisite_course_code\":\"SWCON104\",\"prerequisite_name\":\"웹/파이선프로그래밍\",\"prerequisite_type\":\"REQUIRED\",\"prerequisite_group\":\"01\",\"minimum_required_count\":1,\"minimum_grade_code\":null,\"abeek_applicable\":0,\"recorded_passing_grade\":\"C+\",\"completion_record\":\"유효 이수기록 있음\"}]",
+  "tags": [
+   "개인화"
+  ]
+ },
+ {
+  "id": "q015",
+  "question": "내 학과·입학년도에 적용되는 산학필수와 전공영어강좌 조건의 DB 등록 원문을 보여줘.",
+  "student_id": 202310025,
+  "gold_sql": "WITH target AS (SELECT * FROM students WHERE student_id = 202310025)\n    SELECT ro.type, ro.condition\n    FROM target AS st\n    JOIN graduation_requirements AS gr\n      ON gr.department_id = st.department_id AND gr.track = st.track\n     AND st.admission_year BETWEEN gr.cohort_start AND gr.cohort_end\n    JOIN requirement_others AS ro ON ro.requirement_id = gr.requirement_id\n    WHERE ro.type IN ('산학필수', '전공영어강좌')\n    ORDER BY ro.type;",
+  "gold_answer": "[{\"type\":\"산학필수\",\"condition\":\"12학점 이상\"},{\"type\":\"전공영어강좌\",\"condition\":\"3과목 이상\"}]",
+  "tags": [
+   "개인화"
+  ]
+ },
+ {
+  "id": "q016",
+  "question": "2024학번 교양교육과정의 배분이수교과는 총 몇 학점 이상이고, 몇 개 영역에서 각각 몇 학점씩 이수해야 해?",
+  "student_id": 202410203,
+  "gold_sql": "WITH target AS (SELECT * FROM students WHERE student_id = 202410203)\n    SELECT rc.min_credits, rc.min_areas, rc.per_area_min_credits\n    FROM target AS st\n    JOIN graduation_requirements AS gr\n      ON gr.department_id = st.department_id AND gr.track = st.track\n     AND st.admission_year BETWEEN gr.cohort_start AND gr.cohort_end\n    JOIN requirement_categories AS rc ON rc.requirement_id = gr.requirement_id\n    WHERE rc.category_id = 5;",
+  "gold_answer": "[{\"min_credits\":9,\"min_areas\":3,\"per_area_min_credits\":3}]",
+  "tags": [
+   "개인화"
+  ]
+ },
+ {
+  "id": "q017",
+  "question": "DB에서 내 수강이력 중 '미이수'로 등록된 과목의 이름, 학기, 성적은 뭐야?",
+  "student_id": 202310025,
+  "gold_sql": "WITH target AS (SELECT * FROM students WHERE student_id = 202310025)\n    SELECT o.course_code, o.course_name, o.year, o.semester, e.grade\n    FROM target AS st\n    JOIN enrollments AS e ON e.student_id = st.student_id\n    JOIN course_offerings AS o ON o.offering_id = e.offering_id\n     AND o.course_code = e.course_code\n    WHERE e.status = '미이수'\n    ORDER BY o.year, o.semester, o.course_code, e.enrollment_id;",
+  "gold_answer": "[{\"course_code\":\"SWCON103\",\"course_name\":\"디자인적사고\",\"year\":2024,\"semester\":\"1\",\"grade\":\"F\"}]",
+  "tags": [
+   "개인화"
+  ]
+ },
+ {
+  "id": "q018",
+  "question": "DB 기록상 내가 2025학년도 2학기에 이수한 AI1003 00분반의 중간고사와 기말고사 비율은 각각 몇 %야?",
+  "student_id": 202210029,
+  "gold_sql": "WITH target AS (SELECT * FROM students WHERE student_id = 202210029)\n    SELECT o.course_code, o.section,\n           s.midterm_percentage, s.final_exam_percentage\n    FROM target AS st\n    JOIN enrollments AS e ON e.student_id = st.student_id\n    JOIN course_offerings AS o ON o.offering_id = e.offering_id\n     AND o.course_code = e.course_code\n    JOIN syllabi AS s ON s.offering_id = o.offering_id\n    WHERE o.year = 2025 AND o.semester = '2' AND o.course_code = 'AI1003'\n      AND o.section = '00' AND e.status = '완료' AND e.retaken = 0;",
+  "gold_answer": "[{\"course_code\":\"AI1003\",\"section\":\"00\",\"midterm_percentage\":40.0,\"final_exam_percentage\":50.0}]",
+  "tags": [
+   "개인화"
+  ]
+ },
+ {
+  "id": "q019",
+  "question": "DB의 내 완료·미대체 수강기록을 학년도와 학기별로 묶으면 과목 수와 학점 합계가 각각 얼마야?",
+  "student_id": 202410103,
+  "gold_sql": "WITH target AS (SELECT * FROM students WHERE student_id = 202410103)\n    SELECT o.year, o.semester, COUNT(*) AS course_count,\n           SUM(o.credits) AS recorded_credits\n    FROM target AS st\n    JOIN enrollments AS e ON e.student_id = st.student_id\n    JOIN course_offerings AS o ON o.offering_id = e.offering_id\n     AND o.course_code = e.course_code\n    WHERE e.status = '완료' AND e.retaken = 0\n    GROUP BY o.year, o.semester\n    ORDER BY o.year, o.semester;",
+  "gold_answer": "[{\"year\":2024,\"semester\":\"1\",\"course_count\":5,\"recorded_credits\":12},{\"year\":2024,\"semester\":\"2\",\"course_count\":4,\"recorded_credits\":11},{\"year\":2025,\"semester\":\"1\",\"course_count\":5,\"recorded_credits\":14},{\"year\":2025,\"semester\":\"2\",\"course_count\":5,\"recorded_credits\":13},{\"year\":2026,\"semester\":\"1\",\"course_count\":4,\"recorded_credits\":12}]",
+  "tags": [
+   "개인화"
+  ]
+ },
+ {
+  "id": "q020",
+  "question": "DB 기록상 내가 2025학년도 2학기에 완료한 수강기록은 이수구분별로 몇 건이야?",
+  "student_id": 202410203,
+  "gold_sql": "WITH target AS (SELECT * FROM students WHERE student_id = 202410203)\n    SELECT cc.category_id, cc.category_name, COUNT(*) AS course_count\n    FROM target AS st\n    JOIN enrollments AS e ON e.student_id = st.student_id\n    JOIN course_offerings AS o ON o.offering_id = e.offering_id\n     AND o.course_code = e.course_code\n    JOIN course_categories AS cc ON cc.category_id = e.category_id\n    WHERE e.status = '완료' AND e.retaken = 0\n      AND o.year = 2025 AND o.semester = '2'\n    GROUP BY cc.category_id, cc.category_name\n    ORDER BY cc.category_id;",
+  "gold_answer": "[{\"category_id\":2,\"category_name\":\"전공필수\",\"course_count\":1},{\"category_id\":3,\"category_name\":\"전공선택\",\"course_count\":2},{\"category_id\":4,\"category_name\":\"기초교과\",\"course_count\":1},{\"category_id\":5,\"category_name\":\"배분이수\",\"course_count\":1}]",
+  "tags": [
+   "개인화"
+  ]
+ },
+ {
+  "id": "q021",
+  "question": "DB의 내 완료·미대체 수강기록 중 산학필수로 표시된 개설강좌의 과목명, 학기, 학점은 뭐야?",
+  "student_id": 202410103,
+  "gold_sql": "WITH target AS (SELECT * FROM students WHERE student_id = 202410103)\n    SELECT o.course_code, o.course_name, o.year, o.semester, o.credits\n    FROM target AS st\n    JOIN enrollments AS e ON e.student_id = st.student_id\n    JOIN course_offerings AS o ON o.offering_id = e.offering_id\n     AND o.course_code = e.course_code\n    WHERE e.status = '완료' AND e.retaken = 0\n      AND o.industry_required = 1\n    ORDER BY o.year, o.semester, o.course_code, o.offering_id;",
+  "gold_answer": "[{\"course_code\":\"CSE335\",\"course_name\":\"클라우드컴퓨팅\",\"year\":2026,\"semester\":\"1\",\"credits\":3}]",
+  "tags": [
+   "개인화"
+  ]
+ },
+ {
+  "id": "q022",
+  "question": "DB의 내 완료·미대체 수강과목 중 강의계획서 과제 평가 비율이 30% 이상인 과목과 비율을 알려줘.",
+  "student_id": 202310025,
+  "gold_sql": "WITH target AS (SELECT * FROM students WHERE student_id = 202310025)\n    SELECT o.course_code, o.course_name, o.year, o.semester,\n           s.assignment_percentage\n    FROM target AS st\n    JOIN enrollments AS e ON e.student_id = st.student_id\n    JOIN course_offerings AS o ON o.offering_id = e.offering_id\n     AND o.course_code = e.course_code\n    JOIN syllabi AS s ON s.offering_id = o.offering_id\n    WHERE e.status = '완료' AND e.retaken = 0\n      AND s.assignment_percentage >= 30\n    ORDER BY o.year, o.semester, o.course_code, o.offering_id;",
+  "gold_answer": "[{\"course_code\":\"GEC1105\",\"course_name\":\"성찰과표현\",\"year\":2023,\"semester\":\"2\",\"assignment_percentage\":30.0},{\"course_code\":\"SWCON253\",\"course_name\":\"기계학습\",\"year\":2024,\"semester\":\"1\",\"assignment_percentage\":30.0},{\"course_code\":\"AI3001\",\"course_name\":\"고급딥러닝\",\"year\":2025,\"semester\":\"1\",\"assignment_percentage\":30.0},{\"course_code\":\"SWCON494\",\"course_name\":\"영상분석과패턴인식\",\"year\":2025,\"semester\":\"1\",\"assignment_percentage\":30.0},{\"course_code\":\"SWCON331\",\"course_name\":\"로봇프로그래밍\",\"year\":2025,\"semester\":\"2\",\"assignment_percentage\":30.0},{\"course_code\":\"AI4003\",\"course_name\":\"졸업논문(인공지능)\",\"year\":2026,\"semester\":\"1\",\"assignment_percentage\":40.0},{\"course_code\":\"AI3104\",\"course_name\":\"몰입심화학습(온디바이스AI)\",\"year\":2026,\"semester\":\"2\",\"assignment_percentage\":50.0},{\"course_code\":\"AI3107\",\"course_name\":\"몰입심화학습(피지컬AI)\",\"year\":2026,\"semester\":\"2\",\"assignment_percentage\":100.0}]",
+  "tags": [
+   "개인화"
+  ]
+ },
+ {
+  "id": "q023",
+  "question": "DB의 내 완료·미대체 수강과목 중 중간고사 비율이 기말고사보다 높은 과목은 뭐야? 두 비율도 보여줘.",
+  "student_id": 202310025,
+  "gold_sql": "WITH target AS (SELECT * FROM students WHERE student_id = 202310025)\n    SELECT o.course_code, o.course_name, o.year, o.semester,\n           s.midterm_percentage, s.final_exam_percentage\n    FROM target AS st\n    JOIN enrollments AS e ON e.student_id = st.student_id\n    JOIN course_offerings AS o ON o.offering_id = e.offering_id\n     AND o.course_code = e.course_code\n    JOIN syllabi AS s ON s.offering_id = o.offering_id\n    WHERE e.status = '완료' AND e.retaken = 0\n      AND s.midterm_percentage > s.final_exam_percentage\n    ORDER BY o.year, o.semester, o.course_code, o.offering_id;",
+  "gold_answer": "[{\"course_code\":\"AI1002\",\"course_name\":\"인공지능프로그래밍\",\"year\":2023,\"semester\":\"2\",\"midterm_percentage\":30.0,\"final_exam_percentage\":0.0},{\"course_code\":\"CSE331\",\"course_name\":\"딥러닝\",\"year\":2024,\"semester\":\"2\",\"midterm_percentage\":60.0,\"final_exam_percentage\":0.0}]",
+  "tags": [
+   "개인화"
+  ]
+ },
+ {
+  "id": "q024",
+  "question": "내 입학년도에 적용되는 AI3001(고급딥러닝)의 필수 선수과목 코드와 권장 선수과목 코드를 구분해서 알려줘.",
+  "student_id": 202310025,
+  "gold_sql": "WITH target AS (SELECT * FROM students WHERE student_id = 202310025)\n    SELECT DISTINCT cp.prerequisite_type, cp.prerequisite_course_code\n    FROM target AS st\n    JOIN course_prerequisites AS cp ON cp.course_code = 'AI3001'\n    WHERE cp.prerequisite_course_code IS NOT NULL\n      AND (\n        (cp.prerequisite_type = 'REQUIRED'\n         AND cp.cohort_start <= st.admission_year\n         AND (cp.cohort_end IS NULL OR cp.cohort_end >= st.admission_year))\n        OR cp.prerequisite_type = 'RECOMMENDED'\n      )\n    ORDER BY cp.prerequisite_type, cp.prerequisite_course_code;",
+  "gold_answer": "[{\"prerequisite_type\":\"RECOMMENDED\",\"prerequisite_course_code\":\"AI3002\"},{\"prerequisite_type\":\"RECOMMENDED\",\"prerequisite_course_code\":\"SWCON104\"},{\"prerequisite_type\":\"REQUIRED\",\"prerequisite_course_code\":\"CSE331\"}]",
+  "tags": [
+   "개인화"
+  ]
+ },
+ {
+  "id": "q025",
+  "question": "2026학년도 2학기 AI1002 인공지능프로그래밍 00분반은 무슨 요일, 몇 시, 어느 강의실에서 열려?",
+  "student_id": null,
+  "gold_sql": "SELECT ts.day, ts.start_time, ts.end_time, ct.room_code\n    FROM course_offerings AS o\n    JOIN class_times AS ct ON ct.offering_id = o.offering_id\n    JOIN time_slots AS ts ON ts.time_slot_id = ct.time_slot_id\n    WHERE o.offering_id = 1697 AND o.year = 2026 AND o.semester = '2'\n      AND o.course_code = 'AI1002' AND o.section = '00'\n    ORDER BY CASE ts.day WHEN 'monday' THEN 1 WHEN 'tuesday' THEN 2\n      WHEN 'wednesday' THEN 3 WHEN 'thursday' THEN 4 WHEN 'friday' THEN 5\n      WHEN 'saturday' THEN 6 ELSE 7 END,\n      ts.start_time, ts.end_time, ct.room_code;",
+  "gold_answer": "[{\"day\":\"tuesday\",\"start_time\":\"13:00\",\"end_time\":\"14:50\",\"room_code\":\"B06\"},{\"day\":\"thursday\",\"start_time\":\"13:00\",\"end_time\":\"14:50\",\"room_code\":\"B06\"}]",
+  "tags": [
+   "공통"
+  ]
+ },
+ {
+  "id": "q026",
+  "question": "2026학년도 2학기 AI1002 인공지능프로그래밍 00분반 강의계획서에 등록된 상담 시간은 언제야?",
+  "student_id": null,
+  "gold_sql": "SELECT s.consultation_time\n    FROM course_offerings AS o\n    JOIN syllabi AS s ON s.offering_id = o.offering_id\n    WHERE o.offering_id = 1697 AND o.year = 2026 AND o.semester = '2'\n      AND o.course_code = 'AI1002' AND o.section = '00';",
+  "gold_answer": "[{\"consultation_time\":\"Thu 15:00-16:00 (사전 이메일 협의)\"}]",
+  "tags": [
+   "공통"
+  ]
+ },
+ {
+  "id": "q027",
+  "question": "2026학년도 2학기 AI1002 인공지능프로그래밍 00분반 강의계획서의 4주차 주제는 뭐야?",
+  "student_id": null,
+  "gold_sql": "SELECT wp.week, wp.topic_content\n    FROM course_offerings AS o\n    JOIN syllabi AS s ON s.offering_id = o.offering_id\n    JOIN syllabus_weekly_plans AS wp ON wp.syllabus_id = s.syllabus_id\n    WHERE o.offering_id = 1697 AND o.year = 2026 AND o.semester = '2'\n      AND o.course_code = 'AI1002' AND o.section = '00' AND wp.week = 4\n    ORDER BY wp.weekly_plan_id;",
+  "gold_answer": "[{\"week\":4,\"topic_content\":\"Classification Algorithms (Chapter 4)\"}]",
+  "tags": [
+   "공통"
+  ]
+ },
+ {
+  "id": "q028",
+  "question": "2026학년도 2학기 AI1003 인공지능수학 00분반의 중간·기말·과제·출석 평가 비율은 각각 몇 %야?",
+  "student_id": null,
+  "gold_sql": "SELECT s.midterm_percentage, s.final_exam_percentage,\n           s.assignment_percentage, s.attendance_percentage\n    FROM course_offerings AS o\n    JOIN syllabi AS s ON s.offering_id = o.offering_id\n    WHERE o.offering_id = 1698 AND o.year = 2026 AND o.semester = '2'\n      AND o.course_code = 'AI1003' AND o.section = '00';",
+  "gold_answer": "[{\"midterm_percentage\":35.0,\"final_exam_percentage\":35.0,\"assignment_percentage\":20.0,\"attendance_percentage\":10.0}]",
+  "tags": [
+   "공통"
+  ]
+ },
+ {
+  "id": "q029",
+  "question": "2026학년도 2학기 AI3003 자연언어학습 00분반의 강의계획서에 등록된 수업유형과 교수법은 뭐야?",
+  "student_id": null,
+  "gold_sql": "SELECT s.class_types_json, s.teaching_methods_json\n    FROM course_offerings AS o\n    JOIN syllabi AS s ON s.offering_id = o.offering_id\n    WHERE o.offering_id = 1701 AND o.year = 2026 AND o.semester = '2'\n      AND o.course_code = 'AI3003' AND o.section = '00';",
+  "gold_answer": "[{\"class_types_json\":\"[\\\"이론강의\\\", \\\"실험/실습\\\"]\",\"teaching_methods_json\":\"[\\\"팀별발표\\\", \\\"e-campus활용\\\", \\\"이론강의\\\"]\"}]",
+  "tags": [
+   "공통"
+  ]
+ },
+ {
+  "id": "q030",
+  "question": "2026학년도 2학기 AI3008 설명및신뢰가능한AI 00분반 강의계획서에 적힌 수업목표는 뭐야?",
+  "student_id": null,
+  "gold_sql": "SELECT s.objectives\n    FROM course_offerings AS o\n    JOIN syllabi AS s ON s.offering_id = o.offering_id\n    WHERE o.offering_id = 1702 AND o.year = 2026 AND o.semester = '2'\n      AND o.course_code = 'AI3008' AND o.section = '00';",
+  "gold_answer": "[{\"objectives\":\"- 설명가능한AI 의 필요성에 대한 이해\\n- 설명가능한AI의 최신 연구동향 이해 및 활용\\n- 설명가능한AI 기술의 평가방법 이해 및 활용\"}]",
+  "tags": [
+   "공통"
+  ]
+ },
+ {
+  "id": "q031",
+  "question": "2026학년도 2학기 객체지향프로그래밍 00·01분반의 과제 평가 비율은 각각 몇 %야?",
+  "student_id": null,
+  "gold_sql": "SELECT o.course_code, o.section, s.assignment_percentage\n    FROM course_offerings AS o\n    JOIN syllabi AS s ON s.offering_id = o.offering_id\n    WHERE o.offering_id IN (1720, 1721) AND o.year = 2026\n      AND o.semester = '2' AND o.course_name = '객체지향프로그래밍'\n    ORDER BY o.section, o.offering_id;",
+  "gold_answer": "[{\"course_code\":\"CSE103\",\"section\":\"00\",\"assignment_percentage\":30.0},{\"course_code\":\"CSE103\",\"section\":\"01\",\"assignment_percentage\":60.0}]",
+  "tags": [
+   "공통"
+  ]
+ },
+ {
+  "id": "q032",
+  "question": "2026학년도 2학기 운영체제 00·01분반의 개설강좌 데이터에 표시된 수업형태는 각각 뭐야?",
+  "student_id": null,
+  "gold_sql": "SELECT o.course_code, o.section, o.delivery_mode\n    FROM course_offerings AS o\n    WHERE o.offering_id IN (1729, 1730) AND o.year = 2026\n      AND o.semester = '2' AND o.course_name = '운영체제'\n    ORDER BY o.section, o.offering_id;",
+  "gold_answer": "[{\"course_code\":\"CSE301\",\"section\":\"00\",\"delivery_mode\":\"ONLINE\"},{\"course_code\":\"CSE301\",\"section\":\"01\",\"delivery_mode\":\"OFFLINE\"}]",
+  "tags": [
+   "공통"
+  ]
+ },
+ {
+  "id": "q033",
+  "question": "2026학년도 2학기 자료구조 02분반 강의계획서에 등록된 교재는 총 몇 권이야?",
+  "student_id": null,
+  "gold_sql": "SELECT COUNT(t.textbook_id) AS registered_textbook_count\n    FROM course_offerings AS o\n    JOIN syllabi AS s ON s.offering_id = o.offering_id\n    LEFT JOIN syllabus_textbooks AS t ON t.syllabus_id = s.syllabus_id\n    WHERE o.offering_id = 1728 AND o.year = 2026 AND o.semester = '2'\n      AND o.course_name = '자료구조' AND o.section = '02';",
+  "gold_answer": "[{\"registered_textbook_count\":4}]",
+  "tags": [
+   "공통"
+  ]
+ },
+ {
+  "id": "q034",
+  "question": "2026학년도 2학기 데이터베이스 00·01분반의 중간고사와 기말고사 비율은 각각 몇 %야?",
+  "student_id": null,
+  "gold_sql": "SELECT o.course_code, o.section,\n           s.midterm_percentage, s.final_exam_percentage\n    FROM course_offerings AS o\n    JOIN syllabi AS s ON s.offering_id = o.offering_id\n    WHERE o.offering_id IN (1736, 1737) AND o.year = 2026\n      AND o.semester = '2' AND o.course_name = '데이터베이스'\n    ORDER BY o.section, o.offering_id;",
+  "gold_answer": "[{\"course_code\":\"CSE305\",\"section\":\"00\",\"midterm_percentage\":30.0,\"final_exam_percentage\":40.0},{\"course_code\":\"CSE305\",\"section\":\"01\",\"midterm_percentage\":40.0,\"final_exam_percentage\":45.0}]",
+  "tags": [
+   "공통"
+  ]
+ }
+]
