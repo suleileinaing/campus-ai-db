@@ -1,0 +1,11 @@
+{
+  "model": "gpt-6-astra",
+  "fewshot": false,
+  "n_fewshot": 0,
+  "fewshot_titles": [],
+  "excluded_fewshot": [],
+  "temperature": null,
+  "max_repairs": 2,
+  "gold": "text2sql/gold/실행평가_100문항.json",
+  "n_items": 100
+}
