@@ -86,9 +86,25 @@ python -m text2sql.evaluate --gold text2sql/gold/personal_gold_v2.csv --no-fewsh
 - **relaxed**: 예측 결과에서 gold 컬럼에 대응하는 컬럼만 뽑았을 때 같음(컬럼 추가·순서 차이 허용)
 - 결과 파일: `summary.md`(보고서용 표와 오답 목록), `results.csv`, `results.jsonl`(시도별 원문 포함), `system_prompt.txt`, `config.json`
 
+### LLM-as-a-judge (의미 기준 채점)
+
+실행 비교는 글자 단위라서 의미는 맞지만 형식이 다른 답('03' 과 3, 컬럼 구성 등)을 오답으로 처리한다.
+`llm_judge.py` 는 이미 돌린 결과(`results.jsonl`)의 문항마다 [질문 + 정답 표 + 예측 SQL 실행 결과 표] 를
+ChatKHU 에 보내 `{"verdict": 1|0, "reason": "..."}` 로 판정받는다.
+
+```bash
+python -m text2sql.llm_judge --run exec100_zeroshot      # 기존 결과를 채점(SQL 생성은 다시 안 함)
+python -m text2sql.evaluate --gold ... --llm-judge       # 평가 직후 바로 채점
+```
+
+- 결과: `judge_summary.md`(두 기준 정답률, 일치표, 유형별, 기준이 갈린 문항), `judge_compare.csv`(문항별 나란히 비교), `judge.jsonl`(judge 원문 포함)
+- judge 모델은 `.env` 의 `CHATKHU_JUDGE_MODEL`(비우면 `CHATKHU_MODEL`), temperature 0. 생성 모델과 같은 모델이면 자기 답에 후한 경향이 있을 수 있다.
+- SQL 실행 실패 문항은 judge 를 부르지 않고 0. 중간에 끊기면 다시 실행할 때 판정 안 된 문항만 채점한다(`--force` 로 전부 다시).
+
 ## 개인정보 처리
 
 - LLM 에는 스키마, 코드성 컬럼의 값 형식, 질문, 로그인 학생 ID, SQL 오류 메시지만 보낸다. **조회 결과 행은 보내지 않는다.**
+  - 예외: 평가용 `llm_judge` 는 채점을 위해 정답·예측 결과 행을 보낸다. 실제 학생 데이터가 든 DB 로는 돌리지 말고 가상 학생(fixture) 질의셋에만 쓴다.
 - `students`, `enrollments` 를 읽는 쿼리는 로그인 학생 ID 가 있어야 하고, 다른 학생 ID 가 들어 있으면 거부한다. 이는 1차 방어선일 뿐이며 실제 서비스에선 백엔드 인가(README 다음 단계 7)가 필요하다.
 
 ## 팀과 정할 것

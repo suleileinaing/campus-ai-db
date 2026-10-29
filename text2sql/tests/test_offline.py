@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import csv
 import json
 import tempfile
 import unittest
@@ -12,6 +13,7 @@ from text2sql.config import PROJECT_DIR, TEXT2SQL_DIR
 from text2sql.evaluate import evaluate
 from text2sql.executor import SQLExecutor, extract_sql
 from text2sql.gold_loader import load_gold
+from text2sql.llm_judge import judge_record, parse_verdict, run_judge
 from text2sql.pipeline import Text2SQL
 from text2sql.prompt import PromptBuilder
 from text2sql.tests.mock_llm import BrokenThenFixedLLM, OracleLLM, ScriptedLLM
@@ -239,3 +241,44 @@ class TestSubset(unittest.TestCase):
         with tempfile.TemporaryDirectory() as d:
             s = evaluate(items, Text2SQL(llm, PromptBuilder(use_fewshot=False), SQLExecutor()), SQLExecutor(), Path(d))
         self.assertEqual((s["overall"]["relaxed"], s["overall"]["subset"]), (0, 1))
+
+class TestLLMJudge(unittest.TestCase):
+    @staticmethod
+    def rec(id_, strict, pred_rows, exec_ok=True):
+        return {"id": id_, "question": f"{id_} 학점은?", "tags": ["t"], "strict": strict, "relaxed": strict,
+                "diagnosis": "correct" if strict else "value_mismatch", "exec_ok": exec_ok,
+                "exec_error_kind": None if exec_ok else "sqlite", "pred_sql": f"SELECT '{id_}'",
+                "gold_columns": ["credits"], "gold_rows": [[3.0]],
+                "pred_columns": ["학점"], "pred_rows": pred_rows}
+
+    def test_parse_verdict(self):
+        self.assertEqual(parse_verdict('{"verdict": 1, "reason": "같음"}'), (1, "같음"))
+        self.assertEqual(parse_verdict('```json\n{"verdict": "0", "reason": "다름"}\n```'), (0, "다름"))
+        for bad in ("정답입니다", '{"verdict": 2, "reason": ""}', "{verdict: 1}"):
+            with self.assertRaises(ValueError):
+                parse_verdict(bad)
+
+    def test_retry_on_bad_format(self):
+        r = judge_record(ScriptedLLM(["맞는 것 같아요", '{"verdict": 1, "reason": "3학점 일치"}']), self.rec("a", False, [["3학점"]]))
+        self.assertEqual((r.verdict, r.status, r.reason), (1, "judged", "3학점 일치"))
+        r = judge_record(ScriptedLLM(["몰라", "몰라"]), self.rec("a", False, [["3학점"]]))
+        self.assertEqual((r.verdict, r.status), (None, "parse_error"))
+
+    def test_exec_fail_skips_judge(self):
+        r = judge_record(ScriptedLLM([]), self.rec("a", False, [], exec_ok=False))
+        self.assertEqual((r.verdict, r.status), (0, "skipped:exec_fail"))
+
+    def test_run_judge_compare_and_resume(self):
+        recs = [self.rec("a", True, [[3]]), self.rec("b", False, [["3학점"]]), self.rec("c", False, [], exec_ok=False)]
+        with tempfile.TemporaryDirectory() as d:
+            out = Path(d)
+            (out / "results.jsonl").write_text("\n".join(json.dumps(r, ensure_ascii=False) for r in recs), encoding="utf-8")
+            llm = ScriptedLLM(['{"verdict": 1, "reason": "일치"}', '{"verdict": 1, "reason": "표기만 다름"}'])
+            s = run_judge(out, llm, "m")
+            self.assertEqual(s["overall"], {"n": 3, "exec_strict": 1, "exec_relaxed": 1, "llm": 2})
+            self.assertEqual(s["agreement"], {"both_correct": 1, "llm_only": 1, "both_wrong": 1})
+            self.assertIn("표기만 다름", (out / "judge_summary.md").read_text(encoding="utf-8"))
+            with (out / "judge_compare.csv").open(encoding="utf-8-sig", newline="") as f:
+                self.assertEqual([r["agreement"] for r in csv.DictReader(f)], ["both_correct", "llm_only", "both_wrong"])
+            s2 = run_judge(out, ScriptedLLM([]), "m")  # 이미 판정된 문항은 다시 부르지 않음
+            self.assertEqual(s2["overall"], s["overall"])

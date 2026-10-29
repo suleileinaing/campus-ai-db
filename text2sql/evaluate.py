@@ -239,6 +239,7 @@ def main() -> None:
                     help="평가 문항과 겹치는 few-shot 예시 제목(sample_queries.sql 의 '-- N.' 뒤 제목). 여러 번 지정 가능")
     ap.add_argument("--limit", type=int, default=None, help="앞에서부터 N개만(크레딧 절약용)")
     ap.add_argument("--oracle", action="store_true", help="API 없이 gold SQL 을 예측으로 사용해 파이프라인 점검")
+    ap.add_argument("--llm-judge", action="store_true", help="평가 후 ChatKHU 로 의미 기준 채점(llm_judge)도 실행")
     args = ap.parse_args()
 
     settings = Settings()
@@ -274,6 +275,13 @@ def main() -> None:
     s = evaluate(items, engine, executor, out_dir)
     o = s["overall"]
     print(f"\nstrict {_pct(o['strict'], o['n'])} | relaxed {_pct(o['relaxed'], o['n'])} | subset {_pct(o['subset'], o['n'])} → {out_dir}")
+
+    if args.llm_judge:
+        from .llm_judge import make_judge_llm, run_judge
+        judge_llm, judge_model = make_judge_llm(settings)
+        j = run_judge(out_dir, judge_llm, judge_model)["overall"]
+        print(f"\nexecution strict {_pct(j['exec_strict'], j['n'])} | relaxed {_pct(j['exec_relaxed'], j['n'])}"
+              f" | LLM judge {_pct(j['llm'], j['n'])} → {out_dir / 'judge_summary.md'}")
 
 
 if __name__ == "__main__":
