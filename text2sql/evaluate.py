@@ -48,7 +48,7 @@ def gold_rows_for(item: GoldItem, executor: SQLExecutor) -> tuple[list[tuple] | 
     rows = item.answer_rows()
     if rows is None:
         return None, [], "gold_sql 과 gold_answer 가 모두 비어 있습니다."
-    return rows, [], None
+    return rows, item.answer_columns(), None
 
 
 def score_record(rec: dict, gold_rows, gold_columns, pred_rows, ordered: bool) -> None:
@@ -235,6 +235,8 @@ def main() -> None:
     ap.add_argument("--run-name", default=None)
     ap.add_argument("--no-fewshot", action="store_true")
     ap.add_argument("--max-fewshot", type=int, default=None)
+    ap.add_argument("--exclude-fewshot", action="append", default=[], metavar="TITLE",
+                    help="평가 문항과 겹치는 few-shot 예시 제목(sample_queries.sql 의 '-- N.' 뒤 제목). 여러 번 지정 가능")
     ap.add_argument("--limit", type=int, default=None, help="앞에서부터 N개만(크레딧 절약용)")
     ap.add_argument("--oracle", action="store_true", help="API 없이 gold SQL 을 예측으로 사용해 파이프라인 점검")
     args = ap.parse_args()
@@ -244,12 +246,13 @@ def main() -> None:
     executor = SQLExecutor(row_limit=settings.row_limit, timeout_sec=settings.query_timeout_sec)
     prompt = PromptBuilder(
         use_fewshot=not args.no_fewshot,
-        exclude_sqls=[i.gold_sql for i in items if i.gold_sql],
+        exclude_sqls=[s for i in items for s in (i.gold_sql, i.reference_sql) if s],
+        exclude_titles=args.exclude_fewshot,
         max_fewshot=args.max_fewshot,
     )
     if args.oracle:
         from .tests.mock_llm import OracleLLM
-        llm = OracleLLM({i.question: (None if i.expect_refusal else (i.gold_sql or "SELECT 1")) for i in items})
+        llm = OracleLLM({i.question: (None if i.expect_refusal else (i.gold_sql or i.reference_sql or "SELECT 1")) for i in items})
         model_name = "oracle"
     else:
         from .chatkhu_client import ChatKHUClient
@@ -263,6 +266,7 @@ def main() -> None:
     (out_dir / "system_prompt.txt").write_text(prompt.system_prompt(), encoding="utf-8")
     (out_dir / "config.json").write_text(json.dumps({
         "model": model_name, "fewshot": not args.no_fewshot, "n_fewshot": len(prompt.fewshot),
+        "fewshot_titles": [e.title for e in prompt.fewshot], "excluded_fewshot": prompt.excluded_fewshot,
         "temperature": settings.temperature, "max_repairs": settings.max_repair_attempts,
         "gold": str(args.gold), "n_items": len(items),
     }, ensure_ascii=False, indent=2), encoding="utf-8")

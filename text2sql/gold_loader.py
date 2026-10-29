@@ -1,7 +1,7 @@
 """gold 질의셋 로더. JSON(list) 또는 CSV 를 읽는다.
 
 필드: id, question, student_id(선택), gold_sql, gold_answer(선택), ordered(선택), tags(선택),
-      expect_refusal(선택), note(선택)
+      expect_refusal(선택), note(선택), reference_sql(선택, 채점에는 쓰지 않음)
 팀 질의셋의 한국어 헤더(질문, 대상 학생 ID, 정답 SQL, 정답 값, 유형, 출처)도 그대로 읽는다.
 - 학생 ID 가 '-' 이면 로그인 없음.
 - 정답 SQL 이 '없음' 으로 시작하거나 정답 값이 '접근 거부' 로 시작하면 거부가 정답인 문항(expect_refusal).
@@ -30,6 +30,14 @@ class GoldItem:
     tags: list[str] = field(default_factory=list)
     expect_refusal: bool = False
     note: str = ""
+    reference_sql: str | None = None  # 참고용 SQL(채점에는 안 씀, few-shot 누수 제외·oracle 점검용)
+
+    def answer_columns(self) -> list[str]:
+        """gold_answer 가 행 단위 dict 면 그 키를 컬럼 이름으로 쓴다."""
+        a = self.gold_answer
+        if isinstance(a, list) and a and all(isinstance(x, dict) for x in a):
+            return list(a[0].keys())
+        return []
 
     def answer_rows(self) -> list[tuple] | None:
         a = self.gold_answer
@@ -116,6 +124,7 @@ def load_gold(path: str | Path) -> list[GoldItem]:
             tags=_to_tags(r.get("tags")),
             expect_refusal=bool(refusal),
             note=str(r.get("note") or ""),
+            reference_sql=(r.get("reference_sql") or "").strip() or None,
         ))
     if not items:
         raise ValueError(f"{path} 에서 질문을 찾지 못했습니다.")
