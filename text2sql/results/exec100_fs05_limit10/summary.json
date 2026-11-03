@@ -1,0 +1,82 @@
+{
+  "overall": {
+    "n": 10,
+    "exec_ok": 10,
+    "first_try_exec_ok": 10,
+    "strict": 10,
+    "relaxed": 10,
+    "subset": 10
+  },
+  "by_tag": {
+    "english_industry": {
+      "n": 1,
+      "exec_ok": 1,
+      "first_try_exec_ok": 1,
+      "strict": 1,
+      "relaxed": 1,
+      "subset": 1
+    },
+    "multi_document_multi_hop_reasoning": {
+      "n": 4,
+      "exec_ok": 4,
+      "first_try_exec_ok": 4,
+      "strict": 4,
+      "relaxed": 4,
+      "subset": 4
+    },
+    "multi_hop": {
+      "n": 4,
+      "exec_ok": 4,
+      "first_try_exec_ok": 4,
+      "strict": 4,
+      "relaxed": 4,
+      "subset": 4
+    },
+    "official_public_facts": {
+      "n": 10,
+      "exec_ok": 10,
+      "first_try_exec_ok": 10,
+      "strict": 10,
+      "relaxed": 10,
+      "subset": 10
+    },
+    "professor_assessment_filter": {
+      "n": 4,
+      "exec_ok": 4,
+      "first_try_exec_ok": 4,
+      "strict": 4,
+      "relaxed": 4,
+      "subset": 4
+    },
+    "professor_required_credit_chain": {
+      "n": 4,
+      "exec_ok": 4,
+      "first_try_exec_ok": 4,
+      "strict": 4,
+      "relaxed": 4,
+      "subset": 4
+    },
+    "single_document": {
+      "n": 2,
+      "exec_ok": 2,
+      "first_try_exec_ok": 2,
+      "strict": 2,
+      "relaxed": 2,
+      "subset": 2
+    },
+    "teacher_credits": {
+      "n": 1,
+      "exec_ok": 1,
+      "first_try_exec_ok": 1,
+      "strict": 1,
+      "relaxed": 1,
+      "subset": 1
+    }
+  },
+  "diagnosis": {
+    "correct": 10
+  },
+  "gold_invalid": [],
+  "avg_tokens": 4538.1,
+  "avg_latency_sec": 3.47
+}
