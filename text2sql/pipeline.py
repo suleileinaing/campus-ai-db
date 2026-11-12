@@ -29,6 +29,7 @@ class Text2SQLOutput:
     student_id: int | None
     final_sql: str | None
     result: ExecutionResult | None
+    fewshot_titles: list[str] = field(default_factory=list)
     attempts: list[Attempt] = field(default_factory=list)
 
     @property
@@ -56,14 +57,20 @@ class Text2SQL:
         self.prompt = prompt
         self.executor = executor
         self.max_repairs = max_repairs
-        self._system = prompt.system_prompt()
 
     def ask(self, question: str, student_id: int | None = None) -> Text2SQLOutput:
+        selected_fewshot = self.prompt.fewshot_for(question)
         messages = [
-            {"role": "system", "content": self._system},
+            {"role": "system", "content": self.prompt.system_prompt(question)},
             {"role": "user", "content": self.prompt.user_prompt(question, student_id)},
         ]
-        out = Text2SQLOutput(question=question, student_id=student_id, final_sql=None, result=None)
+        out = Text2SQLOutput(
+            question=question,
+            student_id=student_id,
+            final_sql=None,
+            result=None,
+            fewshot_titles=[e.title for e in selected_fewshot],
+        )
 
         for _ in range(self.max_repairs + 1):
             resp = self.llm.complete(messages)

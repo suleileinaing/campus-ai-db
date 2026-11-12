@@ -1,0 +1,1826 @@
+﻿id,question,student_id,tags,strict,relaxed,subset,diagnosis,missing_columns,n_attempts,first_try_exec_ok,exec_error,gold_sql,pred_sql,total_tokens,latency_sec,fewshot_titles
+J001,"2026학년도 2학기 SWCON331-00(로봇프로그래밍) 담당 교수의 다른 수업 중, 같은 학기 소프트웨어융합학과 기준 전공필수이면서 3학점인 강좌가 있어? 해당 과목코드·분반·학점을 모두 알려줘. 기준 과목의 다른 분반도 제외해줘.",,"multi_hop,professor_required_credit_chain,official_public_facts",True,True,True,correct,,1,True,,,"WITH anchor_professors AS (
+    SELECT DISTINCT op.professor_id
+    FROM course_offerings AS o
+    JOIN offering_professors AS op ON op.offering_id = o.offering_id
+    WHERE o.year = 2026
+      AND o.semester = '2'
+      AND o.course_code = 'SWCON331'
+      AND o.section = '00'
+)
+SELECT DISTINCT o.course_code, o.section, o.credits
+FROM course_offerings AS o
+JOIN offering_professors AS op ON op.offering_id = o.offering_id
+JOIN anchor_professors AS ap ON ap.professor_id = op.professor_id
+JOIN course_offering_categories AS oc ON oc.offering_id = o.offering_id
+JOIN departments AS d ON d.department_id = oc.department_id
+JOIN course_categories AS cc ON cc.category_id = oc.category_id
+WHERE o.year = 2026
+  AND o.semester = '2'
+  AND d.name = '소프트웨어융합학과'
+  AND cc.category_name = '전공필수'
+  AND o.credits = 3
+  AND o.course_code <> 'SWCON331'
+ORDER BY o.course_code, o.section;",5129,4.69,"2024학년도 2학기 CSE302-02 컴퓨터네트워크 담당 교수의 다른 수업 중, 같은 학기 인공지능학과 기준 전공필수이면서 3학점인 강좌의 과목코드, 분반과 학점을 알려줘. CSE302의 다른 분반도 제외해줘. | 2024학년도 2학기 AI4001-00 캡스톤디자인 담당 교수가 같은 학기 컴퓨터공학과 개설목록에서 맡은 다른 과목의 코드와 분반을 알려줘. AI4001의 다른 분반도 제외해줘. | 2024학년도 2학기 CSE302-02 컴퓨터네트워크 담당 교수가 같은 학기 인공지능학과 개설목록에서 맡은 다른 과목의 분반 수와 개설학점 합계를 알려줘. CSE302의 다른 분반도 제외해줘. | 2024학년도 2학기 AI1002-00 인공지능프로그래밍과 CSE203-00 컴퓨터구조를 모두 담당한 교수 이름을 알려줘."
+J002,"2026학년도 2학기 SWCON253-00(기계학습) 담당 교수의 다른 수업 중, 같은 학기 소프트웨어융합학과 기준 전공필수이면서 3학점인 강좌가 있어? 해당 과목코드·분반·학점을 모두 알려줘. 기준 과목의 다른 분반도 제외해줘.",,"multi_hop,professor_required_credit_chain,official_public_facts",True,True,True,correct,,1,True,,,"WITH anchor_professors AS (
+    SELECT DISTINCT op.professor_id
+    FROM course_offerings AS o
+    JOIN offering_professors AS op ON op.offering_id = o.offering_id
+    WHERE o.year = 2026
+      AND o.semester = '2'
+      AND o.course_code = 'SWCON253'
+      AND o.section = '00'
+)
+SELECT DISTINCT o.course_code, o.section, o.credits
+FROM course_offerings AS o
+JOIN offering_professors AS op ON op.offering_id = o.offering_id
+JOIN anchor_professors AS ap ON ap.professor_id = op.professor_id
+JOIN course_offering_categories AS oc ON oc.offering_id = o.offering_id
+JOIN departments AS d ON d.department_id = oc.department_id
+JOIN course_categories AS cc ON cc.category_id = oc.category_id
+WHERE o.year = 2026
+  AND o.semester = '2'
+  AND d.name = '소프트웨어융합학과'
+  AND cc.category_name = '전공필수'
+  AND o.credits = 3
+  AND o.course_code <> 'SWCON253'
+ORDER BY o.course_code, o.section;",5134,5.51,"2024학년도 2학기 CSE302-02 컴퓨터네트워크 담당 교수의 다른 수업 중, 같은 학기 인공지능학과 기준 전공필수이면서 3학점인 강좌의 과목코드, 분반과 학점을 알려줘. CSE302의 다른 분반도 제외해줘. | 2024학년도 2학기 AI4001-00 캡스톤디자인 담당 교수가 같은 학기 컴퓨터공학과 개설목록에서 맡은 다른 과목의 코드와 분반을 알려줘. AI4001의 다른 분반도 제외해줘. | 2024학년도 2학기 CSE302-02 컴퓨터네트워크 담당 교수가 같은 학기 인공지능학과 개설목록에서 맡은 다른 과목의 분반 수와 개설학점 합계를 알려줘. CSE302의 다른 분반도 제외해줘. | 2024학년도 2학기 AI1002-00 인공지능프로그래밍과 CSE203-00 컴퓨터구조를 모두 담당한 교수 이름을 알려줘."
+J003,"2026학년도 2학기 CSE304-00(알고리즘) 담당 교수의 다른 수업 중, 같은 학기 컴퓨터공학과 기준 전공필수이면서 3학점인 강좌가 있어? 해당 과목코드·분반·학점을 모두 알려줘. 기준 과목의 다른 분반도 제외해줘.",,"multi_hop,professor_required_credit_chain,official_public_facts",True,True,True,correct,,1,True,,,"WITH anchor_professors AS (
+    SELECT DISTINCT op.professor_id
+    FROM course_offerings AS o
+    JOIN offering_professors AS op ON op.offering_id = o.offering_id
+    WHERE o.year = 2026
+      AND o.semester = '2'
+      AND o.course_code = 'CSE304'
+      AND o.section = '00'
+)
+SELECT DISTINCT o.course_code, o.section, o.credits
+FROM course_offerings AS o
+JOIN offering_professors AS op ON op.offering_id = o.offering_id
+JOIN anchor_professors AS ap ON ap.professor_id = op.professor_id
+JOIN course_offering_categories AS oc ON oc.offering_id = o.offering_id
+JOIN departments AS d ON d.department_id = oc.department_id
+JOIN course_categories AS cc ON cc.category_id = oc.category_id
+WHERE o.year = 2026
+  AND o.semester = '2'
+  AND d.name = '컴퓨터공학과'
+  AND cc.category_name = '전공필수'
+  AND o.credits = 3
+  AND o.course_code <> 'CSE304'
+ORDER BY o.course_code, o.section;",5119,5.53,"2024학년도 2학기 CSE302-02 컴퓨터네트워크 담당 교수의 다른 수업 중, 같은 학기 인공지능학과 기준 전공필수이면서 3학점인 강좌의 과목코드, 분반과 학점을 알려줘. CSE302의 다른 분반도 제외해줘. | 2024학년도 2학기 AI4001-00 캡스톤디자인 담당 교수가 같은 학기 컴퓨터공학과 개설목록에서 맡은 다른 과목의 코드와 분반을 알려줘. AI4001의 다른 분반도 제외해줘. | 2024학년도 2학기 CSE302-02 컴퓨터네트워크 담당 교수가 같은 학기 인공지능학과 개설목록에서 맡은 다른 과목의 분반 수와 개설학점 합계를 알려줘. CSE302의 다른 분반도 제외해줘. | 2024학년도 2학기 AI1002-00 인공지능프로그래밍과 CSE203-00 컴퓨터구조를 모두 담당한 교수 이름을 알려줘."
+J004,"2026학년도 2학기 SWCON253-02(기계학습) 담당 교수의 다른 수업 중, 같은 학기 컴퓨터공학과 기준 전공필수이면서 3학점인 강좌가 있어? 해당 과목코드·분반·학점을 모두 알려줘. 기준 과목의 다른 분반도 제외해줘.",,"multi_hop,professor_required_credit_chain,official_public_facts",True,True,True,correct,,1,True,,,"WITH anchor_professors AS (
+    SELECT DISTINCT op.professor_id
+    FROM course_offerings AS o
+    JOIN offering_professors AS op ON op.offering_id = o.offering_id
+    WHERE o.year = 2026
+      AND o.semester = '2'
+      AND o.course_code = 'SWCON253'
+      AND o.section = '02'
+)
+SELECT DISTINCT o.course_code, o.section, o.credits
+FROM course_offerings AS o
+JOIN offering_professors AS op ON op.offering_id = o.offering_id
+JOIN anchor_professors AS ap ON ap.professor_id = op.professor_id
+JOIN course_offering_categories AS oc ON oc.offering_id = o.offering_id
+JOIN departments AS d ON d.department_id = oc.department_id
+JOIN course_categories AS cc ON cc.category_id = oc.category_id
+WHERE o.year = 2026
+  AND o.semester = '2'
+  AND d.name = '컴퓨터공학과'
+  AND cc.category_name = '전공필수'
+  AND o.credits = 3
+  AND o.course_code <> 'SWCON253'
+ORDER BY o.course_code, o.section;",5106,4.23,"2024학년도 2학기 CSE302-02 컴퓨터네트워크 담당 교수의 다른 수업 중, 같은 학기 인공지능학과 기준 전공필수이면서 3학점인 강좌의 과목코드, 분반과 학점을 알려줘. CSE302의 다른 분반도 제외해줘. | 2024학년도 2학기 AI4001-00 캡스톤디자인 담당 교수가 같은 학기 컴퓨터공학과 개설목록에서 맡은 다른 과목의 코드와 분반을 알려줘. AI4001의 다른 분반도 제외해줘. | 2024학년도 2학기 CSE302-02 컴퓨터네트워크 담당 교수가 같은 학기 인공지능학과 개설목록에서 맡은 다른 과목의 분반 수와 개설학점 합계를 알려줘. CSE302의 다른 분반도 제외해줘. | 2024학년도 2학기 AI1002-00 인공지능프로그래밍과 CSE203-00 컴퓨터구조를 모두 담당한 교수 이름을 알려줘."
+J005,"2026학년도 2학기 SWCON331-00(로봇프로그래밍) 담당 교수의 같은 학기 다른 수업 중 소프트웨어융합학과 기준 전공필수이고, 공식 강의계획서에 과제 반영 비율이 30% 이상으로 기재된 강좌의 과목코드·분반·과제 비율을 알려줘. 기준 과목의 다른 분반도 제외하고, 미기재 비율은 0으로 보지 마.",,"multi_document_multi_hop_reasoning,professor_assessment_filter,official_public_facts",True,True,True,correct,,1,True,,,"WITH anchor_professors AS (
+    SELECT DISTINCT op.professor_id
+    FROM course_offerings AS o
+    JOIN offering_professors AS op ON op.offering_id = o.offering_id
+    WHERE o.year = 2026 AND o.semester = '2'
+      AND o.course_code = 'SWCON331'
+      AND o.section = '00'
+)
+SELECT DISTINCT o.course_code, o.section, s.assignment_percentage
+FROM course_offerings AS o
+JOIN offering_professors AS op ON op.offering_id = o.offering_id
+JOIN anchor_professors AS ap ON ap.professor_id = op.professor_id
+JOIN course_offering_categories AS oc ON oc.offering_id = o.offering_id
+JOIN departments AS d ON d.department_id = oc.department_id
+JOIN course_categories AS cc ON cc.category_id = oc.category_id
+JOIN syllabi AS s ON s.offering_id = o.offering_id
+WHERE o.year = 2026 AND o.semester = '2'
+  AND d.name = '소프트웨어융합학과'
+  AND cc.category_name = '전공필수'
+  AND s.assignment_percentage >= 30
+  AND o.course_code <> 'SWCON331'
+ORDER BY o.course_code, o.section;",5108,4.64,"2024학년도 2학기 CSE302-02 컴퓨터네트워크 담당 교수의 다른 수업 중, 같은 학기 인공지능학과 기준 전공필수이면서 3학점인 강좌의 과목코드, 분반과 학점을 알려줘. CSE302의 다른 분반도 제외해줘. | 2024학년도 2학기 CSE302-02 컴퓨터네트워크 담당 교수가 같은 학기 인공지능학과 개설목록에서 맡은 다른 과목의 분반 수와 개설학점 합계를 알려줘. CSE302의 다른 분반도 제외해줘. | 2024학년도 2학기 AI4001-00 캡스톤디자인 담당 교수가 같은 학기 컴퓨터공학과 개설목록에서 맡은 다른 과목의 코드와 분반을 알려줘. AI4001의 다른 분반도 제외해줘. | 2024학년도 2학기 AI3008-00 설명및신뢰가능한AI의 중간고사와 기말고사 반영 비율은 각각 몇 퍼센트야?"
+J006,"2026학년도 2학기 SWCON253-00(기계학습) 담당 교수의 같은 학기 다른 수업 중 소프트웨어융합학과 기준 전공필수이고, 공식 강의계획서에 과제 반영 비율이 30% 이상으로 기재된 강좌의 과목코드·분반·과제 비율을 알려줘. 기준 과목의 다른 분반도 제외하고, 미기재 비율은 0으로 보지 마.",,"multi_document_multi_hop_reasoning,professor_assessment_filter,official_public_facts",True,True,True,correct,,1,True,,,"WITH anchor_professors AS (
+    SELECT DISTINCT op.professor_id
+    FROM course_offerings AS o
+    JOIN offering_professors AS op ON op.offering_id = o.offering_id
+    WHERE o.year = 2026
+      AND o.semester = '2'
+      AND o.course_code = 'SWCON253'
+      AND o.section = '00'
+)
+SELECT DISTINCT o.course_code, o.section, s.assignment_percentage
+FROM course_offerings AS o
+JOIN offering_professors AS op ON op.offering_id = o.offering_id
+JOIN anchor_professors AS ap ON ap.professor_id = op.professor_id
+JOIN course_offering_categories AS oc ON oc.offering_id = o.offering_id
+JOIN departments AS d ON d.department_id = oc.department_id
+JOIN course_categories AS cc ON cc.category_id = oc.category_id
+JOIN syllabi AS s ON s.offering_id = o.offering_id
+WHERE o.year = 2026
+  AND o.semester = '2'
+  AND d.name = '소프트웨어융합학과'
+  AND cc.category_name = '전공필수'
+  AND s.assignment_percentage >= 30
+  AND o.course_code <> 'SWCON253'
+ORDER BY o.course_code, o.section;",5115,5.68,"2024학년도 2학기 CSE302-02 컴퓨터네트워크 담당 교수의 다른 수업 중, 같은 학기 인공지능학과 기준 전공필수이면서 3학점인 강좌의 과목코드, 분반과 학점을 알려줘. CSE302의 다른 분반도 제외해줘. | 2024학년도 2학기 CSE302-02 컴퓨터네트워크 담당 교수가 같은 학기 인공지능학과 개설목록에서 맡은 다른 과목의 분반 수와 개설학점 합계를 알려줘. CSE302의 다른 분반도 제외해줘. | 2024학년도 2학기 AI4001-00 캡스톤디자인 담당 교수가 같은 학기 컴퓨터공학과 개설목록에서 맡은 다른 과목의 코드와 분반을 알려줘. AI4001의 다른 분반도 제외해줘. | 2024학년도 2학기 AI3008-00 설명및신뢰가능한AI의 중간고사와 기말고사 반영 비율은 각각 몇 퍼센트야?"
+J007,"2026학년도 2학기 CSE304-00(알고리즘) 담당 교수의 같은 학기 다른 수업 중 컴퓨터공학과 기준 전공필수이고, 공식 강의계획서에 과제 반영 비율이 30% 이상으로 기재된 강좌의 과목코드·분반·과제 비율을 알려줘. 기준 과목의 다른 분반도 제외하고, 미기재 비율은 0으로 보지 마.",,"multi_document_multi_hop_reasoning,professor_assessment_filter,official_public_facts",True,True,True,correct,,1,True,,,"WITH anchor_professors AS (
+    SELECT DISTINCT op.professor_id
+    FROM course_offerings AS o
+    JOIN offering_professors AS op ON op.offering_id = o.offering_id
+    WHERE o.year = 2026
+      AND o.semester = '2'
+      AND o.course_code = 'CSE304'
+      AND o.section = '00'
+)
+SELECT DISTINCT o.course_code, o.section, s.assignment_percentage
+FROM course_offerings AS o
+JOIN offering_professors AS op ON op.offering_id = o.offering_id
+JOIN anchor_professors AS ap ON ap.professor_id = op.professor_id
+JOIN course_offering_categories AS oc ON oc.offering_id = o.offering_id
+JOIN departments AS d ON d.department_id = oc.department_id
+JOIN course_categories AS cc ON cc.category_id = oc.category_id
+JOIN syllabi AS s ON s.offering_id = o.offering_id
+WHERE o.year = 2026
+  AND o.semester = '2'
+  AND d.name = '컴퓨터공학과'
+  AND cc.category_name = '전공필수'
+  AND s.assignment_percentage >= 30
+  AND o.course_code <> 'CSE304'
+ORDER BY o.course_code, o.section;",5115,4.69,"2024학년도 2학기 CSE302-02 컴퓨터네트워크 담당 교수의 다른 수업 중, 같은 학기 인공지능학과 기준 전공필수이면서 3학점인 강좌의 과목코드, 분반과 학점을 알려줘. CSE302의 다른 분반도 제외해줘. | 2024학년도 2학기 CSE302-02 컴퓨터네트워크 담당 교수가 같은 학기 인공지능학과 개설목록에서 맡은 다른 과목의 분반 수와 개설학점 합계를 알려줘. CSE302의 다른 분반도 제외해줘. | 2024학년도 2학기 AI4001-00 캡스톤디자인 담당 교수가 같은 학기 컴퓨터공학과 개설목록에서 맡은 다른 과목의 코드와 분반을 알려줘. AI4001의 다른 분반도 제외해줘. | 2024학년도 2학기 AI3008-00 설명및신뢰가능한AI의 중간고사와 기말고사 반영 비율은 각각 몇 퍼센트야?"
+J008,"2026학년도 2학기 SWCON253-02(기계학습) 담당 교수의 같은 학기 다른 수업 중 컴퓨터공학과 기준 전공필수이고, 공식 강의계획서에 과제 반영 비율이 30% 이상으로 기재된 강좌의 과목코드·분반·과제 비율을 알려줘. 기준 과목의 다른 분반도 제외하고, 미기재 비율은 0으로 보지 마.",,"multi_document_multi_hop_reasoning,professor_assessment_filter,official_public_facts",True,True,True,correct,,1,True,,,"WITH anchor_professors AS (
+    SELECT DISTINCT op.professor_id
+    FROM course_offerings AS o
+    JOIN offering_professors AS op ON op.offering_id = o.offering_id
+    WHERE o.year = 2026
+      AND o.semester = '2'
+      AND o.course_code = 'SWCON253'
+      AND o.section = '02'
+)
+SELECT DISTINCT o.course_code, o.section, s.assignment_percentage
+FROM course_offerings AS o
+JOIN offering_professors AS op ON op.offering_id = o.offering_id
+JOIN anchor_professors AS ap ON ap.professor_id = op.professor_id
+JOIN course_offering_categories AS oc ON oc.offering_id = o.offering_id
+JOIN departments AS d ON d.department_id = oc.department_id
+JOIN course_categories AS cc ON cc.category_id = oc.category_id
+JOIN syllabi AS s ON s.offering_id = o.offering_id
+WHERE o.year = 2026
+  AND o.semester = '2'
+  AND d.name = '컴퓨터공학과'
+  AND cc.category_name = '전공필수'
+  AND s.assignment_percentage >= 30
+  AND o.course_code <> 'SWCON253'
+ORDER BY o.course_code, o.section;",5101,5.16,"2024학년도 2학기 CSE302-02 컴퓨터네트워크 담당 교수의 다른 수업 중, 같은 학기 인공지능학과 기준 전공필수이면서 3학점인 강좌의 과목코드, 분반과 학점을 알려줘. CSE302의 다른 분반도 제외해줘. | 2024학년도 2학기 CSE302-02 컴퓨터네트워크 담당 교수가 같은 학기 인공지능학과 개설목록에서 맡은 다른 과목의 분반 수와 개설학점 합계를 알려줘. CSE302의 다른 분반도 제외해줘. | 2024학년도 2학기 AI4001-00 캡스톤디자인 담당 교수가 같은 학기 컴퓨터공학과 개설목록에서 맡은 다른 과목의 코드와 분반을 알려줘. AI4001의 다른 분반도 제외해줘. | 2024학년도 2학기 AI3008-00 설명및신뢰가능한AI의 중간고사와 기말고사 반영 비율은 각각 몇 퍼센트야?"
+J009,2026학년도 2학기 EE209-02(논리회로)의 담당 교수 이름과 학점을 알려줘.,,"single_document,teacher_credits,official_public_facts",True,True,True,correct,,1,True,,,"SELECT DISTINCT p.name, o.credits
+FROM course_offerings AS o
+JOIN offering_professors AS op ON op.offering_id = o.offering_id
+JOIN professors AS p ON p.professor_id = op.professor_id
+WHERE o.year = 2026
+  AND o.semester = '2'
+  AND o.course_code = 'EE209'
+  AND o.section = '02'
+ORDER BY p.name;",4895,3.08,"2024학년도 2학기 AI1002-00 인공지능프로그래밍과 CSE203-00 컴퓨터구조를 모두 담당한 교수 이름을 알려줘. | 2024학년도 2학기 CSE302-02 컴퓨터네트워크 담당 교수의 다른 수업 중, 같은 학기 인공지능학과 기준 전공필수이면서 3학점인 강좌의 과목코드, 분반과 학점을 알려줘. CSE302의 다른 분반도 제외해줘. | 2024학년도 2학기 CSE302-02 컴퓨터네트워크 담당 교수가 같은 학기 인공지능학과 개설목록에서 맡은 다른 과목의 분반 수와 개설학점 합계를 알려줘. CSE302의 다른 분반도 제외해줘. | 2024학년도 2학기 AI4001-00 캡스톤디자인 담당 교수가 같은 학기 컴퓨터공학과 개설목록에서 맡은 다른 과목의 코드와 분반을 알려줘. AI4001의 다른 분반도 제외해줘."
+J010,2026학년도 2학기 EE209-02(논리회로)의 영어강좌 구분(영어전체/영어부분/해당없음)과 산학필수 여부(예/아니오)를 알려줘.,,"single_document,english_industry,official_public_facts",True,True,True,correct,,1,True,,,"SELECT CASE o.english_type
+           WHEN 'FULL' THEN '영어전체'
+           WHEN 'PARTIAL' THEN '영어부분'
+           ELSE '해당없음'
+       END AS english_course_type,
+       CASE o.industry_required
+           WHEN 1 THEN '예'
+           ELSE '아니오'
+       END AS industry_required
+FROM course_offerings AS o
+WHERE o.year = 2026
+  AND o.semester = '2'
+  AND o.course_code = 'EE209'
+  AND o.section = '02';",4659,2.34,"2024학년도 2학기 AI1002-00 인공지능프로그래밍의 영어강좌 구분을 영어전체·영어부분·해당없음으로, 산학필수 여부를 예·아니오로 알려줘. | 2024학년도 2학기 CSE302-02 컴퓨터네트워크 담당 교수의 다른 수업 중, 같은 학기 인공지능학과 기준 전공필수이면서 3학점인 강좌의 과목코드, 분반과 학점을 알려줘. CSE302의 다른 분반도 제외해줘. | 2024학년도 2학기 AI1002-00 인공지능프로그래밍의 요일, 시작·종료 시간과 강의실을 알려줘. | 2024학년도 2학기 AI1002-00 인공지능프로그래밍과 CSE203-00 컴퓨터구조를 모두 담당한 교수 이름을 알려줘."
+J011,"2026학년도 1학기 SWCON367-01(게임콘텐츠캡스톤디자인) 담당 교수의 같은 학기 소프트웨어융합학과 개설목록 내 다른 3학점 강좌 중, 중간·기말 비율이 모두 기재된 강좌끼리 비교하면 시험 비율 합계가 가장 낮은 강좌는? 과목코드·분반·합계를 알려주고 동률은 모두 포함해줘. 기준 과목 코드는 제외해줘.",,"multi_document_multi_hop_reasoning,professor_assessment_ranking,official_public_facts",True,True,True,correct,,1,True,,,"WITH anchor_professors AS (
+    SELECT DISTINCT op.professor_id
+    FROM course_offerings AS o
+    JOIN offering_professors AS op ON op.offering_id = o.offering_id
+    WHERE o.year = 2026
+      AND o.semester = '1'
+      AND o.course_code = 'SWCON367'
+      AND o.section = '01'
+),
+candidates AS (
+    SELECT DISTINCT
+           o.offering_id,
+           o.course_code,
+           o.section,
+           s.midterm_percentage + s.final_exam_percentage AS exam_percentage_sum
+    FROM course_offerings AS o
+    JOIN offering_professors AS op ON op.offering_id = o.offering_id
+    JOIN anchor_professors AS ap ON ap.professor_id = op.professor_id
+    JOIN course_offering_categories AS oc ON oc.offering_id = o.offering_id
+    JOIN departments AS d ON d.department_id = oc.department_id
+    JOIN syllabi AS s ON s.offering_id = o.offering_id
+    WHERE o.year = 2026
+      AND o.semester = '1'
+      AND d.name = '소프트웨어융합학과'
+      AND o.credits = 3
+      AND o.course_code <> 'SWCON367'
+      AND s.midterm_percentage IS NOT NULL
+      AND s.final_exam_percentage IS NOT NULL
+),
+ranked_candidates AS (
+    SELECT course_code,
+           section,
+           exam_percentage_sum,
+           RANK() OVER (ORDER BY exam_percentage_sum) AS exam_rank
+    FROM candidates
+)
+SELECT course_code, section, exam_percentage_sum
+FROM ranked_candidates
+WHERE exam_rank = 1
+ORDER BY course_code, section;",5368,6.79,"2024학년도 2학기 CSE302-02 컴퓨터네트워크 담당 교수가 같은 학기 인공지능학과 개설목록에서 맡은 다른 과목의 분반 수와 개설학점 합계를 알려줘. CSE302의 다른 분반도 제외해줘. | 2024학년도 2학기 AI4001-00 캡스톤디자인 담당 교수가 같은 학기 컴퓨터공학과 개설목록에서 맡은 다른 과목의 코드와 분반을 알려줘. AI4001의 다른 분반도 제외해줘. | 2024학년도 2학기 CSE302-02 컴퓨터네트워크 담당 교수의 다른 수업 중, 같은 학기 인공지능학과 기준 전공필수이면서 3학점인 강좌의 과목코드, 분반과 학점을 알려줘. CSE302의 다른 분반도 제외해줘. | 2024학년도 2학기 인공지능학과 개설목록에서 전공선택으로 분류된 강좌의 분반 수와 개설학점 합계를 알려줘."
+J012,2026학년도 1학기 CSE301-01(운영체제)의 담당 교수 이름과 학점을 알려줘.,,"single_document,teacher_credits,official_public_facts",True,True,True,correct,,1,True,,,"SELECT DISTINCT p.name, o.credits
+FROM course_offerings AS o
+JOIN offering_professors AS op ON op.offering_id = o.offering_id
+JOIN professors AS p ON p.professor_id = op.professor_id
+WHERE o.year = 2026
+  AND o.semester = '1'
+  AND o.course_code = 'CSE301'
+  AND o.section = '01';",4893,3.87,"2024학년도 2학기 CSE302-02 컴퓨터네트워크 담당 교수의 다른 수업 중, 같은 학기 인공지능학과 기준 전공필수이면서 3학점인 강좌의 과목코드, 분반과 학점을 알려줘. CSE302의 다른 분반도 제외해줘. | 2024학년도 2학기 AI1002-00 인공지능프로그래밍과 CSE203-00 컴퓨터구조를 모두 담당한 교수 이름을 알려줘. | 2024학년도 2학기 CSE302-02 컴퓨터네트워크 담당 교수가 같은 학기 인공지능학과 개설목록에서 맡은 다른 과목의 분반 수와 개설학점 합계를 알려줘. CSE302의 다른 분반도 제외해줘. | 2024학년도 2학기 AI4001-00 캡스톤디자인 담당 교수가 같은 학기 컴퓨터공학과 개설목록에서 맡은 다른 과목의 코드와 분반을 알려줘. AI4001의 다른 분반도 제외해줘."
+J013,2026학년도 1학기 CSE301-01(운영체제)의 영어강좌 구분(영어전체/영어부분/해당없음)과 산학필수 여부(예/아니오)를 알려줘.,,"single_document,english_industry,official_public_facts",True,True,True,correct,,1,True,,,"SELECT CASE o.english_type
+           WHEN 'FULL' THEN '영어전체'
+           WHEN 'PARTIAL' THEN '영어부분'
+           ELSE '해당없음'
+       END AS english_course_type,
+       CASE o.industry_required
+           WHEN 1 THEN '예'
+           ELSE '아니오'
+       END AS industry_required
+FROM course_offerings AS o
+WHERE o.year = 2026
+  AND o.semester = '1'
+  AND o.course_code = 'CSE301'
+  AND o.section = '01';",4843,2.48,"2024학년도 2학기 AI1002-00 인공지능프로그래밍의 영어강좌 구분을 영어전체·영어부분·해당없음으로, 산학필수 여부를 예·아니오로 알려줘. | 2024학년도 2학기 CSE302-02 컴퓨터네트워크 담당 교수의 다른 수업 중, 같은 학기 인공지능학과 기준 전공필수이면서 3학점인 강좌의 과목코드, 분반과 학점을 알려줘. CSE302의 다른 분반도 제외해줘. | 로그인 학생 202210034가 아직 완료하지 않은 지정 필수과목의 과목코드와 과목명을 알려줘. | 2024학년도 2학기 CSE302-02 컴퓨터네트워크 담당 교수가 같은 학기 인공지능학과 개설목록에서 맡은 다른 과목의 분반 수와 개설학점 합계를 알려줘. CSE302의 다른 분반도 제외해줘."
+J014,"2026학년도 1학기 SWCON366-00(3D데이터처리) 담당 교수의 같은 학기 소프트웨어융합학과 개설목록 내 다른 3학점 강좌 중, 중간·기말 비율이 모두 기재된 강좌끼리 비교하면 시험 비율 합계가 가장 낮은 강좌는? 과목코드·분반·합계를 알려주고 동률은 모두 포함해줘. 기준 과목 코드는 제외해줘.",,"multi_document_multi_hop_reasoning,professor_assessment_ranking,official_public_facts",True,True,True,correct,,1,True,,,"WITH anchor_professors AS (
+    SELECT DISTINCT op.professor_id
+    FROM course_offerings AS o
+    JOIN offering_professors AS op ON op.offering_id = o.offering_id
+    WHERE o.year = 2026
+      AND o.semester = '1'
+      AND o.course_code = 'SWCON366'
+      AND o.section = '00'
+),
+candidates AS (
+    SELECT DISTINCT
+           o.offering_id,
+           o.course_code,
+           o.section,
+           s.midterm_percentage + s.final_exam_percentage AS exam_percentage_sum
+    FROM course_offerings AS o
+    JOIN offering_professors AS op ON op.offering_id = o.offering_id
+    JOIN anchor_professors AS ap ON ap.professor_id = op.professor_id
+    JOIN course_offering_categories AS oc ON oc.offering_id = o.offering_id
+    JOIN departments AS d ON d.department_id = oc.department_id
+    JOIN syllabi AS s ON s.offering_id = o.offering_id
+    WHERE o.year = 2026
+      AND o.semester = '1'
+      AND d.name = '소프트웨어융합학과'
+      AND o.credits = 3
+      AND o.course_code <> 'SWCON366'
+      AND s.midterm_percentage IS NOT NULL
+      AND s.final_exam_percentage IS NOT NULL
+)
+SELECT course_code, section, exam_percentage_sum
+FROM candidates
+WHERE exam_percentage_sum = (
+    SELECT MIN(exam_percentage_sum)
+    FROM candidates
+)
+ORDER BY course_code, section;",5283,5.62,"2024학년도 2학기 CSE302-02 컴퓨터네트워크 담당 교수가 같은 학기 인공지능학과 개설목록에서 맡은 다른 과목의 분반 수와 개설학점 합계를 알려줘. CSE302의 다른 분반도 제외해줘. | 2024학년도 2학기 AI4001-00 캡스톤디자인 담당 교수가 같은 학기 컴퓨터공학과 개설목록에서 맡은 다른 과목의 코드와 분반을 알려줘. AI4001의 다른 분반도 제외해줘. | 2024학년도 2학기 CSE302-02 컴퓨터네트워크 담당 교수의 다른 수업 중, 같은 학기 인공지능학과 기준 전공필수이면서 3학점인 강좌의 과목코드, 분반과 학점을 알려줘. CSE302의 다른 분반도 제외해줘. | 2024학년도 2학기 인공지능학과 개설목록에서 전공선택으로 분류된 강좌의 분반 수와 개설학점 합계를 알려줘."
+J015,2025학년도 1학기 EE211-02(확률및랜덤변수)의 담당 교수 이름과 학점을 알려줘.,,"single_document,teacher_credits,official_public_facts",True,True,True,correct,,1,True,,,"SELECT DISTINCT p.name, o.credits
+FROM course_offerings AS o
+JOIN offering_professors AS op ON op.offering_id = o.offering_id
+JOIN professors AS p ON p.professor_id = op.professor_id
+WHERE o.year = 2025
+  AND o.semester = '1'
+  AND o.course_code = 'EE211'
+  AND o.section = '02';",4903,2.88,"2024학년도 2학기 AI1002-00 인공지능프로그래밍과 CSE203-00 컴퓨터구조를 모두 담당한 교수 이름을 알려줘. | 2024학년도 2학기 CSE302-02 컴퓨터네트워크 담당 교수의 다른 수업 중, 같은 학기 인공지능학과 기준 전공필수이면서 3학점인 강좌의 과목코드, 분반과 학점을 알려줘. CSE302의 다른 분반도 제외해줘. | 2024학년도 2학기 CSE302-02 컴퓨터네트워크 담당 교수가 같은 학기 인공지능학과 개설목록에서 맡은 다른 과목의 분반 수와 개설학점 합계를 알려줘. CSE302의 다른 분반도 제외해줘. | 2024학년도 2학기 AI4001-00 캡스톤디자인 담당 교수가 같은 학기 컴퓨터공학과 개설목록에서 맡은 다른 과목의 코드와 분반을 알려줘. AI4001의 다른 분반도 제외해줘."
+J016,2025학년도 1학기 EE211-02(확률및랜덤변수)의 영어강좌 구분(영어전체/영어부분/해당없음)과 산학필수 여부(예/아니오)를 알려줘.,,"single_document,english_industry,official_public_facts",True,True,True,correct,,1,True,,,"SELECT CASE o.english_type
+           WHEN 'FULL' THEN '영어전체'
+           WHEN 'PARTIAL' THEN '영어부분'
+           ELSE '해당없음'
+       END AS english_course_type,
+       CASE o.industry_required
+           WHEN 1 THEN '예'
+           ELSE '아니오'
+       END AS industry_required
+FROM course_offerings AS o
+WHERE o.year = 2025
+  AND o.semester = '1'
+  AND o.course_code = 'EE211'
+  AND o.section = '02';",4700,2.6,"2024학년도 2학기 AI1002-00 인공지능프로그래밍의 영어강좌 구분을 영어전체·영어부분·해당없음으로, 산학필수 여부를 예·아니오로 알려줘. | 로그인 학생 202210029가 2025학년도 2학기에 수강한 과목 중 교재가 등록된 과목의 과목코드와 교재 제목을 알려줘. | 로그인 학생 202210034가 아직 완료하지 않은 지정 필수과목의 과목코드와 과목명을 알려줘. | 2024학년도 2학기 CSE302-02 컴퓨터네트워크 담당 교수의 다른 수업 중, 같은 학기 인공지능학과 기준 전공필수이면서 3학점인 강좌의 과목코드, 분반과 학점을 알려줘. CSE302의 다른 분반도 제외해줘."
+J017,"2026학년도 1학기 SWCON401-06(소프트웨어융합캡스톤디자인) 담당 교수의 같은 학기 소프트웨어융합학과 개설목록 내 다른 3학점 강좌 중, 중간·기말 비율이 모두 기재된 강좌끼리 비교하면 시험 비율 합계가 가장 낮은 강좌는? 과목코드·분반·합계를 알려주고 동률은 모두 포함해줘. 기준 과목 코드는 제외해줘.",,"multi_document_multi_hop_reasoning,professor_assessment_ranking,official_public_facts",True,True,True,correct,,1,True,,,"WITH anchor_professors AS (
+    SELECT DISTINCT op.professor_id
+    FROM course_offerings AS o
+    JOIN offering_professors AS op ON op.offering_id = o.offering_id
+    WHERE o.year = 2026 AND o.semester = '1'
+      AND o.course_code = 'SWCON401' AND o.section = '06'
+), candidates AS (
+    SELECT DISTINCT o.offering_id,
+           o.course_code,
+           o.section,
+           s.midterm_percentage + s.final_exam_percentage AS exam_total
+    FROM course_offerings AS o
+    JOIN offering_professors AS op ON op.offering_id = o.offering_id
+    JOIN anchor_professors AS ap ON ap.professor_id = op.professor_id
+    JOIN course_offering_categories AS oc ON oc.offering_id = o.offering_id
+    JOIN departments AS d ON d.department_id = oc.department_id
+    JOIN syllabi AS s ON s.offering_id = o.offering_id
+    WHERE o.year = 2026 AND o.semester = '1'
+      AND d.name = '소프트웨어융합학과'
+      AND o.credits = 3
+      AND o.course_code <> 'SWCON401'
+      AND s.midterm_percentage IS NOT NULL
+      AND s.final_exam_percentage IS NOT NULL
+)
+SELECT course_code, section, exam_total
+FROM candidates
+WHERE exam_total = (SELECT MIN(exam_total) FROM candidates)
+ORDER BY course_code, section;",5316,6.86,"2024학년도 2학기 CSE302-02 컴퓨터네트워크 담당 교수가 같은 학기 인공지능학과 개설목록에서 맡은 다른 과목의 분반 수와 개설학점 합계를 알려줘. CSE302의 다른 분반도 제외해줘. | 2024학년도 2학기 AI4001-00 캡스톤디자인 담당 교수가 같은 학기 컴퓨터공학과 개설목록에서 맡은 다른 과목의 코드와 분반을 알려줘. AI4001의 다른 분반도 제외해줘. | 2024학년도 2학기 CSE302-02 컴퓨터네트워크 담당 교수의 다른 수업 중, 같은 학기 인공지능학과 기준 전공필수이면서 3학점인 강좌의 과목코드, 분반과 학점을 알려줘. CSE302의 다른 분반도 제외해줘. | 2024학년도 2학기 인공지능학과 개설목록에서 전공선택으로 분류된 강좌의 분반 수와 개설학점 합계를 알려줘."
+J018,2026학년도 2학기 AI4007-07(독립심화학습(인공지능)2)의 담당 교수 이름과 학점을 알려줘.,,"single_document,teacher_credits,official_public_facts",True,True,True,correct,,1,True,,,"SELECT DISTINCT p.name, o.credits
+FROM course_offerings AS o
+JOIN offering_professors AS op ON op.offering_id = o.offering_id
+JOIN professors AS p ON p.professor_id = op.professor_id
+WHERE o.year = 2026
+  AND o.semester = '2'
+  AND o.course_code = 'AI4007'
+  AND o.section = '07';",4918,3.61,"2024학년도 2학기 AI1002-00 인공지능프로그래밍과 CSE203-00 컴퓨터구조를 모두 담당한 교수 이름을 알려줘. | 2024학년도 2학기 AI4001-00 캡스톤디자인 담당 교수가 같은 학기 컴퓨터공학과 개설목록에서 맡은 다른 과목의 코드와 분반을 알려줘. AI4001의 다른 분반도 제외해줘. | 2024학년도 2학기 CSE302-02 컴퓨터네트워크 담당 교수의 다른 수업 중, 같은 학기 인공지능학과 기준 전공필수이면서 3학점인 강좌의 과목코드, 분반과 학점을 알려줘. CSE302의 다른 분반도 제외해줘. | 2024학년도 2학기 CSE302-02 컴퓨터네트워크 담당 교수가 같은 학기 인공지능학과 개설목록에서 맡은 다른 과목의 분반 수와 개설학점 합계를 알려줘. CSE302의 다른 분반도 제외해줘."
+J019,2026학년도 2학기 AI4007-07(독립심화학습(인공지능)2)의 영어강좌 구분(영어전체/영어부분/해당없음)과 산학필수 여부(예/아니오)를 알려줘.,,"single_document,english_industry,official_public_facts",True,True,True,correct,,1,True,,,"SELECT CASE o.english_type
+           WHEN 'FULL' THEN '영어전체'
+           WHEN 'PARTIAL' THEN '영어부분'
+           ELSE '해당없음'
+       END AS english_course_type,
+       CASE o.industry_required
+           WHEN 1 THEN '예'
+           ELSE '아니오'
+       END AS industry_required
+FROM course_offerings AS o
+WHERE o.year = 2026
+  AND o.semester = '2'
+  AND o.course_code = 'AI4007'
+  AND o.section = '07';",4611,2.67,"2024학년도 2학기 AI1002-00 인공지능프로그래밍의 영어강좌 구분을 영어전체·영어부분·해당없음으로, 산학필수 여부를 예·아니오로 알려줘. | 2024학년도 2학기 AI4001-00 캡스톤디자인 담당 교수가 같은 학기 컴퓨터공학과 개설목록에서 맡은 다른 과목의 코드와 분반을 알려줘. AI4001의 다른 분반도 제외해줘. | 2024학년도 2학기 AI1002-00 인공지능프로그래밍의 요일, 시작·종료 시간과 강의실을 알려줘. | 2024학년도 2학기 AI1002-00 인공지능프로그래밍과 CSE203-00 컴퓨터구조를 모두 담당한 교수 이름을 알려줘."
+J020,"2026학년도 1학기 IE215-00(데이터사이언스) 담당 교수의 같은 학기 소프트웨어융합학과 개설목록 내 다른 3학점 강좌 중, 중간·기말 비율이 모두 기재된 강좌끼리 비교하면 시험 비율 합계가 가장 낮은 강좌는? 과목코드·분반·합계를 알려주고 동률은 모두 포함해줘. 기준 과목 코드는 제외해줘.",,"multi_document_multi_hop_reasoning,professor_assessment_ranking,official_public_facts",True,True,True,correct,,1,True,,,"WITH anchor_professors AS (
+    SELECT DISTINCT op.professor_id
+    FROM course_offerings AS o
+    JOIN offering_professors AS op
+      ON op.offering_id = o.offering_id
+    WHERE o.year = 2026
+      AND o.semester = '1'
+      AND o.course_code = 'IE215'
+      AND o.section = '00'
+),
+candidates AS (
+    SELECT DISTINCT
+           o.offering_id,
+           o.course_code,
+           o.section,
+           s.midterm_percentage + s.final_exam_percentage AS exam_total
+    FROM course_offerings AS o
+    JOIN offering_professors AS op
+      ON op.offering_id = o.offering_id
+    JOIN anchor_professors AS ap
+      ON ap.professor_id = op.professor_id
+    JOIN course_offering_categories AS oc
+      ON oc.offering_id = o.offering_id
+    JOIN departments AS d
+      ON d.department_id = oc.department_id
+    JOIN syllabi AS s
+      ON s.offering_id = o.offering_id
+    WHERE o.year = 2026
+      AND o.semester = '1'
+      AND d.name = '소프트웨어융합학과'
+      AND o.credits = 3
+      AND o.course_code <> 'IE215'
+      AND s.midterm_percentage IS NOT NULL
+      AND s.final_exam_percentage IS NOT NULL
+)
+SELECT course_code, section, exam_total
+FROM candidates
+WHERE exam_total = (SELECT MIN(exam_total) FROM candidates)
+ORDER BY course_code, section;",5343,5.78,"2024학년도 2학기 CSE302-02 컴퓨터네트워크 담당 교수가 같은 학기 인공지능학과 개설목록에서 맡은 다른 과목의 분반 수와 개설학점 합계를 알려줘. CSE302의 다른 분반도 제외해줘. | 2024학년도 2학기 AI4001-00 캡스톤디자인 담당 교수가 같은 학기 컴퓨터공학과 개설목록에서 맡은 다른 과목의 코드와 분반을 알려줘. AI4001의 다른 분반도 제외해줘. | 2024학년도 2학기 CSE302-02 컴퓨터네트워크 담당 교수의 다른 수업 중, 같은 학기 인공지능학과 기준 전공필수이면서 3학점인 강좌의 과목코드, 분반과 학점을 알려줘. CSE302의 다른 분반도 제외해줘. | 2024학년도 2학기 인공지능학과 개설목록에서 전공선택으로 분류된 강좌의 분반 수와 개설학점 합계를 알려줘."
+J021,"2025학년도 1학기 CSE406-01(캡스톤디자인)와 2026학년도 1학기 CSE406-01(캡스톤디자인)의 기말고사 비율을 순서대로 알려주고, 두 번째에서 첫 번째를 뺀 차이를 퍼센트포인트로 계산해줘.",,"multi_document_reasoning,exam_change,official_public_facts",True,True,True,correct,,1,True,,,"SELECT
+    (SELECT s.final_exam_percentage
+     FROM course_offerings AS o
+     JOIN syllabi AS s ON s.offering_id = o.offering_id
+     WHERE o.year = 2025 AND o.semester = '1'
+       AND o.course_code = 'CSE406' AND o.section = '01') AS first_final_percentage,
+    (SELECT s.final_exam_percentage
+     FROM course_offerings AS o
+     JOIN syllabi AS s ON s.offering_id = o.offering_id
+     WHERE o.year = 2026 AND o.semester = '1'
+       AND o.course_code = 'CSE406' AND o.section = '01') AS second_final_percentage,
+    (SELECT s.final_exam_percentage
+     FROM course_offerings AS o
+     JOIN syllabi AS s ON s.offering_id = o.offering_id
+     WHERE o.year = 2026 AND o.semester = '1'
+       AND o.course_code = 'CSE406' AND o.section = '01')
+    -
+    (SELECT s.final_exam_percentage
+     FROM course_offerings AS o
+     JOIN syllabi AS s ON s.offering_id = o.offering_id
+     WHERE o.year = 2025 AND o.semester = '1'
+       AND o.course_code = 'CSE406' AND o.section = '01') AS difference_percentage_points;",4900,4.96,"2024학년도 2학기 AI3008-00 설명및신뢰가능한AI의 중간고사와 기말고사 반영 비율은 각각 몇 퍼센트야? | 로그인 학생 202210029가 2025학년도 2학기에 수강한 과목 중 교재가 등록된 과목의 과목코드와 교재 제목을 알려줘. | 2024학년도 2학기 AI3008-00 설명및신뢰가능한AI에서 중간고사 75점, 기말고사 85점을 받았다면 두 시험이 최종 100점에 기여하는 점수 합은 얼마야? 다른 항목은 제외해줘. | 2024학년도 2학기 AI4001-00 캡스톤디자인 담당 교수가 같은 학기 컴퓨터공학과 개설목록에서 맡은 다른 과목의 코드와 분반을 알려줘. AI4001의 다른 분반도 제외해줘."
+J022,"2025학년도 1학기 CSE406-01(캡스톤디자인)와 2026학년도 1학기 CSE406-06(캡스톤디자인)의 기말고사 비율을 순서대로 알려주고, 두 번째에서 첫 번째를 뺀 차이를 퍼센트포인트로 계산해줘.",,"multi_document_reasoning,exam_change,official_public_facts",True,True,True,correct,,1,True,,,"SELECT
+    (SELECT s.final_exam_percentage
+     FROM course_offerings AS o
+     JOIN syllabi AS s ON s.offering_id = o.offering_id
+     WHERE o.year = 2025 AND o.semester = '1'
+       AND o.course_code = 'CSE406' AND o.section = '01') AS first_final_exam_percentage,
+    (SELECT s.final_exam_percentage
+     FROM course_offerings AS o
+     JOIN syllabi AS s ON s.offering_id = o.offering_id
+     WHERE o.year = 2026 AND o.semester = '1'
+       AND o.course_code = 'CSE406' AND o.section = '06') AS second_final_exam_percentage,
+    (SELECT s.final_exam_percentage
+     FROM course_offerings AS o
+     JOIN syllabi AS s ON s.offering_id = o.offering_id
+     WHERE o.year = 2026 AND o.semester = '1'
+       AND o.course_code = 'CSE406' AND o.section = '06')
+    -
+    (SELECT s.final_exam_percentage
+     FROM course_offerings AS o
+     JOIN syllabi AS s ON s.offering_id = o.offering_id
+     WHERE o.year = 2025 AND o.semester = '1'
+       AND o.course_code = 'CSE406' AND o.section = '01')
+    AS difference_percentage_points;",4888,4.76,"2024학년도 2학기 AI3008-00 설명및신뢰가능한AI의 중간고사와 기말고사 반영 비율은 각각 몇 퍼센트야? | 로그인 학생 202210029가 2025학년도 2학기에 수강한 과목 중 교재가 등록된 과목의 과목코드와 교재 제목을 알려줘. | 2024학년도 2학기 AI3008-00 설명및신뢰가능한AI에서 중간고사 75점, 기말고사 85점을 받았다면 두 시험이 최종 100점에 기여하는 점수 합은 얼마야? 다른 항목은 제외해줘. | 2024학년도 2학기 AI4001-00 캡스톤디자인 담당 교수가 같은 학기 컴퓨터공학과 개설목록에서 맡은 다른 과목의 코드와 분반을 알려줘. AI4001의 다른 분반도 제외해줘."
+J023,"2026학년도 2학기 CSE406-16(캡스톤디자인)와 2025학년도 2학기 CSE406-06(캡스톤디자인)의 기말고사 비율을 순서대로 알려주고, 두 번째에서 첫 번째를 뺀 차이를 퍼센트포인트로 계산해줘.",,"multi_document_reasoning,exam_change,official_public_facts",True,True,True,correct,,1,True,,,"WITH target AS (
+    SELECT 1 AS ord, 2026 AS year, '2' AS semester, 'CSE406' AS course_code, '16' AS section
+    UNION ALL
+    SELECT 2, 2025, '2', 'CSE406', '06'
+),
+rates AS (
+    SELECT t.ord, s.final_exam_percentage
+    FROM target AS t
+    LEFT JOIN course_offerings AS o
+      ON o.year = t.year
+     AND o.semester = t.semester
+     AND o.course_code = t.course_code
+     AND o.section = t.section
+    LEFT JOIN syllabi AS s ON s.offering_id = o.offering_id
+)
+SELECT
+    MAX(CASE WHEN ord = 1 THEN final_exam_percentage END) AS first_final_exam_percentage,
+    MAX(CASE WHEN ord = 2 THEN final_exam_percentage END) AS second_final_exam_percentage,
+    MAX(CASE WHEN ord = 2 THEN final_exam_percentage END)
+      - MAX(CASE WHEN ord = 1 THEN final_exam_percentage END) AS difference_percentage_points
+FROM rates;",4992,6.84,"2024학년도 2학기 AI3008-00 설명및신뢰가능한AI의 중간고사와 기말고사 반영 비율은 각각 몇 퍼센트야? | 로그인 학생 202210029가 2025학년도 2학기에 수강한 과목 중 교재가 등록된 과목의 과목코드와 교재 제목을 알려줘. | 2024학년도 2학기 AI3008-00 설명및신뢰가능한AI에서 중간고사 75점, 기말고사 85점을 받았다면 두 시험이 최종 100점에 기여하는 점수 합은 얼마야? 다른 항목은 제외해줘. | 2024학년도 2학기 CSE302-02 컴퓨터네트워크 담당 교수가 같은 학기 인공지능학과 개설목록에서 맡은 다른 과목의 분반 수와 개설학점 합계를 알려줘. CSE302의 다른 분반도 제외해줘."
+J024,"2026학년도 2학기 AI4007-01(독립심화학습(인공지능)2)와 2025학년도 2학기 AI4007-00(독립심화학습(인공지능)2)의 기말고사 비율을 순서대로 알려주고, 두 번째에서 첫 번째를 뺀 차이를 퍼센트포인트로 계산해줘.",,"multi_document_reasoning,exam_change,official_public_facts",True,True,True,correct,,1,True,,,"WITH exam_percentages AS (
+    SELECT
+        MAX(CASE
+            WHEN o.year = 2026 AND o.semester = '2' AND o.section = '01'
+            THEN s.final_exam_percentage
+        END) AS first_percentage,
+        MAX(CASE
+            WHEN o.year = 2025 AND o.semester = '2' AND o.section = '00'
+            THEN s.final_exam_percentage
+        END) AS second_percentage
+    FROM course_offerings AS o
+    JOIN syllabi AS s ON s.offering_id = o.offering_id
+    WHERE o.course_code = 'AI4007'
+      AND (
+          (o.year = 2026 AND o.semester = '2' AND o.section = '01')
+          OR
+          (o.year = 2025 AND o.semester = '2' AND o.section = '00')
+      )
+)
+SELECT
+    first_percentage AS first_final_exam_percentage,
+    second_percentage AS second_final_exam_percentage,
+    second_percentage - first_percentage AS difference_percentage_points
+FROM exam_percentages;",4832,4.83,"2024학년도 2학기 AI3008-00 설명및신뢰가능한AI의 중간고사와 기말고사 반영 비율은 각각 몇 퍼센트야? | 2024학년도 2학기 AI3008-00 설명및신뢰가능한AI에서 중간고사 75점, 기말고사 85점을 받았다면 두 시험이 최종 100점에 기여하는 점수 합은 얼마야? 다른 항목은 제외해줘. | 2024학년도 2학기 AI4001-00 캡스톤디자인 담당 교수가 같은 학기 컴퓨터공학과 개설목록에서 맡은 다른 과목의 코드와 분반을 알려줘. AI4001의 다른 분반도 제외해줘. | 로그인 학생 202210029가 2025학년도 2학기에 수강한 과목 중 교재가 등록된 과목의 과목코드와 교재 제목을 알려줘."
+J025,"2025학년도 1학기 CSE406-01(캡스톤디자인)와 2026학년도 1학기 AI4003-00(졸업논문(인공지능))의 과제보고서 비율을 순서대로 알려주고, 두 번째에서 첫 번째를 뺀 차이를 퍼센트포인트로 계산해줘.",,"multi_document_reasoning,assignment_gap,official_public_facts",True,True,True,correct,,1,True,,,"WITH targets AS (
+    SELECT 1 AS seq, 'CSE406' AS course_code, '01' AS section, 2025 AS year, '1' AS semester
+    UNION ALL
+    SELECT 2, 'AI4003', '00', 2026, '1'
+),
+percentages AS (
+    SELECT t.seq, s.assignment_percentage
+    FROM targets AS t
+    JOIN course_offerings AS o
+      ON o.course_code = t.course_code
+     AND o.section = t.section
+     AND o.year = t.year
+     AND o.semester = t.semester
+    LEFT JOIN syllabi AS s ON s.offering_id = o.offering_id
+)
+SELECT
+    MAX(CASE WHEN seq = 1 THEN assignment_percentage END) AS first_assignment_percentage,
+    MAX(CASE WHEN seq = 2 THEN assignment_percentage END) AS second_assignment_percentage,
+    MAX(CASE WHEN seq = 2 THEN assignment_percentage END)
+      - MAX(CASE WHEN seq = 1 THEN assignment_percentage END) AS difference_percentage_points
+FROM percentages;",4869,5.87,"2024학년도 2학기 AI3008-00 설명및신뢰가능한AI의 중간고사와 기말고사 반영 비율은 각각 몇 퍼센트야? | 2024학년도 2학기 AI4001-00 캡스톤디자인 담당 교수가 같은 학기 컴퓨터공학과 개설목록에서 맡은 다른 과목의 코드와 분반을 알려줘. AI4001의 다른 분반도 제외해줘. | 2024학년도 2학기 AI3008-00 설명및신뢰가능한AI에서 중간고사 75점, 기말고사 85점을 받았다면 두 시험이 최종 100점에 기여하는 점수 합은 얼마야? 다른 항목은 제외해줘. | 로그인 학생 202210029가 2025학년도 2학기에 수강한 과목 중 교재가 등록된 과목의 과목코드와 교재 제목을 알려줘."
+J026,"2025학년도 2학기 CSE302-01(컴퓨터네트워크)와 2026학년도 1학기 SWCON321-02(데이터분석캡스톤디자인)의 과제보고서 비율을 순서대로 알려주고, 두 번째에서 첫 번째를 뺀 차이를 퍼센트포인트로 계산해줘.",,"multi_document_reasoning,assignment_gap,official_public_facts",True,True,True,correct,,1,True,,,"WITH rates AS (
+    SELECT o.course_code, s.assignment_percentage
+    FROM course_offerings AS o
+    JOIN syllabi AS s ON s.offering_id = o.offering_id
+    WHERE (o.year = 2025 AND o.semester = '2'
+           AND o.course_code = 'CSE302' AND o.section = '01')
+       OR (o.year = 2026 AND o.semester = '1'
+           AND o.course_code = 'SWCON321' AND o.section = '02')
+)
+SELECT
+    MAX(CASE WHEN course_code = 'CSE302' THEN assignment_percentage END)
+        AS first_assignment_percentage,
+    MAX(CASE WHEN course_code = 'SWCON321' THEN assignment_percentage END)
+        AS second_assignment_percentage,
+    MAX(CASE WHEN course_code = 'SWCON321' THEN assignment_percentage END)
+      - MAX(CASE WHEN course_code = 'CSE302' THEN assignment_percentage END)
+        AS difference_percentage_points
+FROM rates;",4925,4.89,"2024학년도 2학기 CSE302-02 컴퓨터네트워크 담당 교수가 같은 학기 인공지능학과 개설목록에서 맡은 다른 과목의 분반 수와 개설학점 합계를 알려줘. CSE302의 다른 분반도 제외해줘. | 2024학년도 2학기 AI3008-00 설명및신뢰가능한AI의 중간고사와 기말고사 반영 비율은 각각 몇 퍼센트야? | 2024학년도 2학기 CSE302-02 컴퓨터네트워크 담당 교수의 다른 수업 중, 같은 학기 인공지능학과 기준 전공필수이면서 3학점인 강좌의 과목코드, 분반과 학점을 알려줘. CSE302의 다른 분반도 제외해줘. | 로그인 학생 202210029가 2025학년도 2학기에 수강한 과목 중 교재가 등록된 과목의 과목코드와 교재 제목을 알려줘."
+J027,"2025학년도 1학기 CSE450-00(모바일/웹서비스프로그래밍)와 2025학년도 2학기 CSE406-06(캡스톤디자인)의 과제보고서 비율을 순서대로 알려주고, 두 번째에서 첫 번째를 뺀 차이를 퍼센트포인트로 계산해줘.",,"multi_document_reasoning,assignment_gap,official_public_facts",True,True,True,correct,,1,True,,,"SELECT
+    first_syllabus.assignment_percentage AS first_assignment_percentage,
+    second_syllabus.assignment_percentage AS second_assignment_percentage,
+    second_syllabus.assignment_percentage - first_syllabus.assignment_percentage
+        AS difference_percentage_points
+FROM course_offerings AS first_offering
+JOIN syllabi AS first_syllabus
+    ON first_syllabus.offering_id = first_offering.offering_id
+JOIN course_offerings AS second_offering
+    ON second_offering.year = 2025
+   AND second_offering.semester = '2'
+   AND second_offering.course_code = 'CSE406'
+   AND second_offering.section = '06'
+JOIN syllabi AS second_syllabus
+    ON second_syllabus.offering_id = second_offering.offering_id
+WHERE first_offering.year = 2025
+  AND first_offering.semester = '1'
+  AND first_offering.course_code = 'CSE450'
+  AND first_offering.section = '00';",4777,5.74,"2024학년도 2학기 AI3008-00 설명및신뢰가능한AI의 중간고사와 기말고사 반영 비율은 각각 몇 퍼센트야? | 로그인 학생 202210029가 2025학년도 2학기에 수강한 과목 중 교재가 등록된 과목의 과목코드와 교재 제목을 알려줘. | 2024학년도 2학기 AI3008-00 설명및신뢰가능한AI에서 중간고사 75점, 기말고사 85점을 받았다면 두 시험이 최종 100점에 기여하는 점수 합은 얼마야? 다른 항목은 제외해줘. | 2024학년도 2학기 CSE302-02 컴퓨터네트워크 담당 교수가 같은 학기 인공지능학과 개설목록에서 맡은 다른 과목의 분반 수와 개설학점 합계를 알려줘. CSE302의 다른 분반도 제외해줘."
+J028,"2025학년도 2학기 CSE403-00(졸업논문(컴퓨터공학전공))와 2025학년도 1학기 AI1001-00(인공지능개론)의 과제보고서 비율을 순서대로 알려주고, 두 번째에서 첫 번째를 뺀 차이를 퍼센트포인트로 계산해줘.",,"multi_document_reasoning,assignment_gap,official_public_facts",True,True,True,correct,,1,True,,,"SELECT
+    (SELECT s.assignment_percentage
+     FROM course_offerings AS o
+     JOIN syllabi AS s ON s.offering_id = o.offering_id
+     WHERE o.year = 2025 AND o.semester = '2'
+       AND o.course_code = 'CSE403' AND o.section = '00') AS first_assignment_percentage,
+    (SELECT s.assignment_percentage
+     FROM course_offerings AS o
+     JOIN syllabi AS s ON s.offering_id = o.offering_id
+     WHERE o.year = 2025 AND o.semester = '1'
+       AND o.course_code = 'AI1001' AND o.section = '00') AS second_assignment_percentage,
+    (SELECT s.assignment_percentage
+     FROM course_offerings AS o
+     JOIN syllabi AS s ON s.offering_id = o.offering_id
+     WHERE o.year = 2025 AND o.semester = '1'
+       AND o.course_code = 'AI1001' AND o.section = '00')
+    -
+    (SELECT s.assignment_percentage
+     FROM course_offerings AS o
+     JOIN syllabi AS s ON s.offering_id = o.offering_id
+     WHERE o.year = 2025 AND o.semester = '2'
+       AND o.course_code = 'CSE403' AND o.section = '00')
+    AS difference_percentage_points;",4774,5.23,"2024학년도 2학기 AI3008-00 설명및신뢰가능한AI의 중간고사와 기말고사 반영 비율은 각각 몇 퍼센트야? | 로그인 학생 202210029가 2025학년도 2학기에 수강한 과목 중 교재가 등록된 과목의 과목코드와 교재 제목을 알려줘. | 2024학년도 2학기 AI1002-00 인공지능프로그래밍과 CSE203-00 컴퓨터구조를 모두 담당한 교수 이름을 알려줘. | 2024학년도 2학기 AI3008-00 설명및신뢰가능한AI에서 중간고사 75점, 기말고사 85점을 받았다면 두 시험이 최종 100점에 기여하는 점수 합은 얼마야? 다른 항목은 제외해줘."
+J029,"2025학년도 1학기 EE211-02(확률및랜덤변수)와 2025학년도 1학기 CSE438-00(최신기술콜로키움1)의 중간·기말 비율 합계를 각각 구하고, 두 번째 합계에서 첫 번째 합계를 뺀 차이도 알려줘.",,"multi_document_reasoning,combined_exam_gap,official_public_facts",True,True,True,correct,,2,False,,,"WITH ratios AS (
+    SELECT o.course_code,
+           s.midterm_percentage + s.final_exam_percentage AS ratio_sum
+    FROM course_offerings AS o
+    JOIN syllabi AS s ON s.offering_id = o.offering_id
+    WHERE o.year = 2025
+      AND o.semester = '1'
+      AND (
+          (o.course_code = 'EE211' AND o.section = '02')
+          OR (o.course_code = 'CSE438' AND o.section = '00')
+      )
+)
+SELECT MAX(CASE WHEN course_code = 'EE211' THEN ratio_sum END) AS ee211_ratio_sum,
+       MAX(CASE WHEN course_code = 'CSE438' THEN ratio_sum END) AS cse438_ratio_sum,
+       MAX(CASE WHEN course_code = 'CSE438' THEN ratio_sum END)
+         - MAX(CASE WHEN course_code = 'EE211' THEN ratio_sum END) AS difference
+FROM ratios;",10022,9.41,2024학년도 2학기 AI3008-00 설명및신뢰가능한AI의 중간고사와 기말고사 반영 비율은 각각 몇 퍼센트야? | 2024학년도 2학기 CSE302-02 컴퓨터네트워크 담당 교수가 같은 학기 인공지능학과 개설목록에서 맡은 다른 과목의 분반 수와 개설학점 합계를 알려줘. CSE302의 다른 분반도 제외해줘. | 로그인 학생 202210029가 2025학년도 2학기에 수강한 과목 중 교재가 등록된 과목의 과목코드와 교재 제목을 알려줘. | 2024학년도 2학기 인공지능학과 개설목록에서 전공선택으로 분류된 강좌의 분반 수와 개설학점 합계를 알려줘.
+J030,"2026학년도 2학기 AI3003-00(자연언어학습)와 2025학년도 1학기 CSE428-00(컴퓨터그래픽스)의 중간·기말 비율 합계를 각각 구하고, 두 번째 합계에서 첫 번째 합계를 뺀 차이도 알려줘.",,"multi_document_reasoning,combined_exam_gap,official_public_facts",True,True,True,correct,,1,True,,,"WITH first_total AS (
+    SELECT s.midterm_percentage + s.final_exam_percentage AS total
+    FROM course_offerings AS o
+    JOIN syllabi AS s ON s.offering_id = o.offering_id
+    WHERE o.year = 2026 AND o.semester = '2'
+      AND o.course_code = 'AI3003' AND o.section = '00'
+), second_total AS (
+    SELECT s.midterm_percentage + s.final_exam_percentage AS total
+    FROM course_offerings AS o
+    JOIN syllabi AS s ON s.offering_id = o.offering_id
+    WHERE o.year = 2025 AND o.semester = '1'
+      AND o.course_code = 'CSE428' AND o.section = '00'
+)
+SELECT first_total.total AS first_total,
+       second_total.total AS second_total,
+       second_total.total - first_total.total AS difference
+FROM first_total
+CROSS JOIN second_total;",5050,6.38,"2024학년도 2학기 AI3008-00 설명및신뢰가능한AI의 중간고사와 기말고사 반영 비율은 각각 몇 퍼센트야? | 2024학년도 2학기 AI1002-00 인공지능프로그래밍과 CSE203-00 컴퓨터구조를 모두 담당한 교수 이름을 알려줘. | 2024학년도 2학기 CSE302-02 컴퓨터네트워크 담당 교수가 같은 학기 인공지능학과 개설목록에서 맡은 다른 과목의 분반 수와 개설학점 합계를 알려줘. CSE302의 다른 분반도 제외해줘. | 2024학년도 2학기 AI1002-00 인공지능프로그래밍의 영어강좌 구분을 영어전체·영어부분·해당없음으로, 산학필수 여부를 예·아니오로 알려줘."
+J031,"2025학년도 1학기 CSE496-06(연구연수활동1(컴퓨터공학))와 2025학년도 1학기 CSE304-00(알고리즘)의 중간·기말 비율 합계를 각각 구하고, 두 번째 합계에서 첫 번째 합계를 뺀 차이도 알려줘.",,"multi_document_reasoning,combined_exam_gap,official_public_facts",True,True,True,correct,,2,False,,,"WITH totals AS (
+    SELECT o.course_code, o.section,
+           s.midterm_percentage + s.final_exam_percentage AS total
+    FROM course_offerings AS o
+    JOIN syllabi AS s ON s.offering_id = o.offering_id
+    WHERE o.year = 2025 AND o.semester = '1'
+      AND (
+          (o.course_code = 'CSE496' AND o.section = '06')
+          OR (o.course_code = 'CSE304' AND o.section = '00')
+      )
+)
+SELECT MAX(CASE WHEN course_code = 'CSE496' AND section = '06' THEN total END)
+           AS cse496_midterm_final_total,
+       MAX(CASE WHEN course_code = 'CSE304' AND section = '00' THEN total END)
+           AS cse304_midterm_final_total,
+       MAX(CASE WHEN course_code = 'CSE304' AND section = '00' THEN total END)
+       - MAX(CASE WHEN course_code = 'CSE496' AND section = '06' THEN total END)
+           AS difference
+FROM totals;",10241,9.53,2024학년도 2학기 CSE302-02 컴퓨터네트워크 담당 교수가 같은 학기 인공지능학과 개설목록에서 맡은 다른 과목의 분반 수와 개설학점 합계를 알려줘. CSE302의 다른 분반도 제외해줘. | 2024학년도 2학기 AI3008-00 설명및신뢰가능한AI의 중간고사와 기말고사 반영 비율은 각각 몇 퍼센트야? | 로그인 학생 202210029가 2025학년도 2학기에 수강한 과목 중 교재가 등록된 과목의 과목코드와 교재 제목을 알려줘. | 2024학년도 2학기 인공지능학과 개설목록에서 전공선택으로 분류된 강좌의 분반 수와 개설학점 합계를 알려줘.
+J032,"2025학년도 1학기 CSE405-00(졸업프로젝트)와 2026학년도 1학기 IE419-00(서비스데이터사이언스)의 중간·기말 비율 합계를 각각 구하고, 두 번째 합계에서 첫 번째 합계를 뺀 차이도 알려줘.",,"multi_document_reasoning,combined_exam_gap,official_public_facts",True,True,True,correct,,1,True,,,"WITH totals AS (
+    SELECT o.year,
+           o.semester,
+           o.course_code,
+           o.section,
+           s.midterm_percentage + s.final_exam_percentage AS exam_total
+    FROM course_offerings AS o
+    JOIN syllabi AS s ON s.offering_id = o.offering_id
+    WHERE (o.year = 2025 AND o.semester = '1'
+           AND o.course_code = 'CSE405' AND o.section = '00')
+       OR (o.year = 2026 AND o.semester = '1'
+           AND o.course_code = 'IE419' AND o.section = '00')
+)
+SELECT (SELECT exam_total FROM totals
+        WHERE year = 2025 AND semester = '1'
+          AND course_code = 'CSE405' AND section = '00') AS first_total,
+       (SELECT exam_total FROM totals
+        WHERE year = 2026 AND semester = '1'
+          AND course_code = 'IE419' AND section = '00') AS second_total,
+       (SELECT exam_total FROM totals
+        WHERE year = 2026 AND semester = '1'
+          AND course_code = 'IE419' AND section = '00')
+       -
+       (SELECT exam_total FROM totals
+        WHERE year = 2025 AND semester = '1'
+          AND course_code = 'CSE405' AND section = '00') AS difference;",5218,8.14,"2024학년도 2학기 AI3008-00 설명및신뢰가능한AI의 중간고사와 기말고사 반영 비율은 각각 몇 퍼센트야? | 2024학년도 2학기 CSE302-02 컴퓨터네트워크 담당 교수가 같은 학기 인공지능학과 개설목록에서 맡은 다른 과목의 분반 수와 개설학점 합계를 알려줘. CSE302의 다른 분반도 제외해줘. | 2024학년도 2학기 AI1002-00 인공지능프로그래밍의 영어강좌 구분을 영어전체·영어부분·해당없음으로, 산학필수 여부를 예·아니오로 알려줘. | 2024학년도 2학기 인공지능학과 개설목록에서 전공선택으로 분류된 강좌의 분반 수와 개설학점 합계를 알려줘."
+J033,2026학년도 2학기 EE209-02(논리회로)와 2026학년도 1학기 CSE204-01(자료구조) 중 중간고사 비율이 더 큰 강좌의 과목코드·연도·학기·분반·비율을 알려줘. 같으면 둘 다 알려줘.,,"multi_document_reasoning,midterm_max,official_public_facts",True,True,True,correct,,1,True,,,"WITH candidates AS (
+    SELECT o.course_code, o.year, o.semester, o.section, s.midterm_percentage
+    FROM course_offerings AS o
+    JOIN syllabi AS s ON s.offering_id = o.offering_id
+    WHERE (o.course_code = 'EE209' AND o.year = 2026 AND o.semester = '2' AND o.section = '02')
+       OR (o.course_code = 'CSE204' AND o.year = 2026 AND o.semester = '1' AND o.section = '01')
+)
+SELECT course_code, year, semester, section, midterm_percentage
+FROM candidates
+WHERE midterm_percentage = (SELECT MAX(midterm_percentage) FROM candidates);",4668,3.72,"2024학년도 2학기 AI3008-00 설명및신뢰가능한AI의 중간고사와 기말고사 반영 비율은 각각 몇 퍼센트야? | 2024학년도 2학기 AI3008-00 설명및신뢰가능한AI에서 중간고사 75점, 기말고사 85점을 받았다면 두 시험이 최종 100점에 기여하는 점수 합은 얼마야? 다른 항목은 제외해줘. | 2024학년도 2학기 CSE302-02 컴퓨터네트워크 담당 교수가 같은 학기 인공지능학과 개설목록에서 맡은 다른 과목의 분반 수와 개설학점 합계를 알려줘. CSE302의 다른 분반도 제외해줘. | 로그인 학생 202210029가 2025학년도 2학기에 수강한 과목 중 교재가 등록된 과목의 과목코드와 교재 제목을 알려줘."
+J034,2026학년도 2학기 EE211-00(확률및랜덤변수)와 2026학년도 2학기 AI4007-00(독립심화학습(인공지능)2) 중 중간고사 비율이 더 큰 강좌의 과목코드·연도·학기·분반·비율을 알려줘. 같으면 둘 다 알려줘.,,"multi_document_reasoning,midterm_max,official_public_facts",True,True,True,correct,,1,True,,,"WITH candidate_courses AS (
+    SELECT o.course_code, o.year, o.semester, o.section, s.midterm_percentage
+    FROM course_offerings AS o
+    JOIN syllabi AS s ON s.offering_id = o.offering_id
+    WHERE (o.year = 2026 AND o.semester = '2' AND o.course_code = 'EE211' AND o.section = '00')
+       OR (o.year = 2026 AND o.semester = '2' AND o.course_code = 'AI4007' AND o.section = '00')
+)
+SELECT course_code, year, semester, section, midterm_percentage
+FROM candidate_courses
+WHERE midterm_percentage = (SELECT MAX(midterm_percentage) FROM candidate_courses);",4636,3.2,"2024학년도 2학기 AI3008-00 설명및신뢰가능한AI의 중간고사와 기말고사 반영 비율은 각각 몇 퍼센트야? | 2024학년도 2학기 AI3008-00 설명및신뢰가능한AI에서 중간고사 75점, 기말고사 85점을 받았다면 두 시험이 최종 100점에 기여하는 점수 합은 얼마야? 다른 항목은 제외해줘. | 2024학년도 2학기 AI4001-00 캡스톤디자인 담당 교수가 같은 학기 컴퓨터공학과 개설목록에서 맡은 다른 과목의 코드와 분반을 알려줘. AI4001의 다른 분반도 제외해줘. | 로그인 학생 202210029가 2025학년도 2학기에 수강한 과목 중 교재가 등록된 과목의 과목코드와 교재 제목을 알려줘."
+J035,2026학년도 2학기 SWCON401-02(소프트웨어융합캡스톤디자인)와 2026학년도 1학기 CSE301-01(운영체제) 중 중간고사 비율이 더 큰 강좌의 과목코드·연도·학기·분반·비율을 알려줘. 같으면 둘 다 알려줘.,,"multi_document_reasoning,midterm_max,official_public_facts",True,True,True,correct,,1,True,,,"WITH target_courses AS (
+    SELECT o.course_code, o.year, o.semester, o.section, s.midterm_percentage
+    FROM course_offerings AS o
+    JOIN syllabi AS s ON s.offering_id = o.offering_id
+    WHERE (o.course_code = 'SWCON401' AND o.year = 2026 AND o.semester = '2' AND o.section = '02')
+       OR (o.course_code = 'CSE301' AND o.year = 2026 AND o.semester = '1' AND o.section = '01')
+)
+SELECT course_code, year, semester, section, midterm_percentage
+FROM target_courses
+WHERE midterm_percentage = (SELECT MAX(midterm_percentage) FROM target_courses);",4891,5.19,"2024학년도 2학기 AI3008-00 설명및신뢰가능한AI의 중간고사와 기말고사 반영 비율은 각각 몇 퍼센트야? | 2024학년도 2학기 CSE302-02 컴퓨터네트워크 담당 교수가 같은 학기 인공지능학과 개설목록에서 맡은 다른 과목의 분반 수와 개설학점 합계를 알려줘. CSE302의 다른 분반도 제외해줘. | 2024학년도 2학기 CSE302-02 컴퓨터네트워크 담당 교수의 다른 수업 중, 같은 학기 인공지능학과 기준 전공필수이면서 3학점인 강좌의 과목코드, 분반과 학점을 알려줘. CSE302의 다른 분반도 제외해줘. | 2024학년도 2학기 AI3008-00 설명및신뢰가능한AI에서 중간고사 75점, 기말고사 85점을 받았다면 두 시험이 최종 100점에 기여하는 점수 합은 얼마야? 다른 항목은 제외해줘."
+J036,2025학년도 1학기 EE211-02(확률및랜덤변수)와 2025학년도 1학기 CSE438-00(최신기술콜로키움1) 중 중간고사 비율이 더 큰 강좌의 과목코드·연도·학기·분반·비율을 알려줘. 같으면 둘 다 알려줘.,,"multi_document_reasoning,midterm_max,official_public_facts",True,True,True,correct,,1,True,,,"WITH target_offerings AS (
+    SELECT o.course_code, o.year, o.semester, o.section, s.midterm_percentage
+    FROM course_offerings AS o
+    JOIN syllabi AS s ON s.offering_id = o.offering_id
+    WHERE o.year = 2025
+      AND o.semester = '1'
+      AND (
+          (o.course_code = 'EE211' AND o.section = '02')
+          OR (o.course_code = 'CSE438' AND o.section = '00')
+      )
+)
+SELECT course_code, year, semester, section, midterm_percentage
+FROM target_offerings
+WHERE midterm_percentage = (SELECT MAX(midterm_percentage) FROM target_offerings);",4652,3.38,"2024학년도 2학기 AI3008-00 설명및신뢰가능한AI의 중간고사와 기말고사 반영 비율은 각각 몇 퍼센트야? | 로그인 학생 202210029가 2025학년도 2학기에 수강한 과목 중 교재가 등록된 과목의 과목코드와 교재 제목을 알려줘. | 2024학년도 2학기 AI3008-00 설명및신뢰가능한AI에서 중간고사 75점, 기말고사 85점을 받았다면 두 시험이 최종 100점에 기여하는 점수 합은 얼마야? 다른 항목은 제외해줘. | 2024학년도 2학기 CSE302-02 컴퓨터네트워크 담당 교수가 같은 학기 인공지능학과 개설목록에서 맡은 다른 과목의 분반 수와 개설학점 합계를 알려줘. CSE302의 다른 분반도 제외해줘."
+J037,2026학년도 2학기 AI3100-00(몰입심화학습(AI로봇))와 2025학년도 2학기 ELC281-00(세계신화읽기) 중 과제 비율이 더 작은 강좌의 과목코드·연도·학기·분반·비율을 알려줘. 같으면 둘 다 알려줘.,,"multi_document_reasoning,assignment_min,official_public_facts",True,True,True,correct,,1,True,,,"WITH candidates AS (
+    SELECT o.course_code, o.year, o.semester, o.section,
+           s.assignment_percentage
+    FROM course_offerings AS o
+    JOIN syllabi AS s ON s.offering_id = o.offering_id
+    WHERE (o.year = 2026 AND o.semester = '2'
+           AND o.course_code = 'AI3100' AND o.section = '00')
+       OR (o.year = 2025 AND o.semester = '2'
+           AND o.course_code = 'ELC281' AND o.section = '00')
+)
+SELECT course_code, year, semester, section, assignment_percentage
+FROM candidates
+WHERE assignment_percentage = (
+    SELECT MIN(assignment_percentage)
+    FROM candidates
+);",4555,3.53,"2024학년도 2학기 AI3008-00 설명및신뢰가능한AI의 중간고사와 기말고사 반영 비율은 각각 몇 퍼센트야? | 로그인 학생 202210029가 2025학년도 2학기에 수강한 과목 중 교재가 등록된 과목의 과목코드와 교재 제목을 알려줘. | 2024학년도 2학기 AI3008-00 설명및신뢰가능한AI에서 중간고사 75점, 기말고사 85점을 받았다면 두 시험이 최종 100점에 기여하는 점수 합은 얼마야? 다른 항목은 제외해줘. | 2024학년도 2학기 AI1002-00 인공지능프로그래밍의 요일, 시작·종료 시간과 강의실을 알려줘."
+J038,2025학년도 1학기 ME380-03(시스템동역학)와 2026학년도 2학기 AI4007-08(독립심화학습(인공지능)2) 중 과제 비율이 더 작은 강좌의 과목코드·연도·학기·분반·비율을 알려줘. 같으면 둘 다 알려줘.,,"multi_document_reasoning,assignment_min,official_public_facts",True,True,True,correct,,1,True,,,"WITH candidates AS (
+    SELECT o.course_code, o.year, o.semester, o.section, s.assignment_percentage
+    FROM course_offerings AS o
+    JOIN syllabi AS s ON s.offering_id = o.offering_id
+    WHERE (o.year = 2025 AND o.semester = '1'
+           AND o.course_code = 'ME380' AND o.section = '03')
+       OR (o.year = 2026 AND o.semester = '2'
+           AND o.course_code = 'AI4007' AND o.section = '08')
+)
+SELECT course_code, year, semester, section, assignment_percentage
+FROM candidates
+WHERE assignment_percentage = (SELECT MIN(assignment_percentage) FROM candidates);",4688,3.95,"2024학년도 2학기 AI3008-00 설명및신뢰가능한AI의 중간고사와 기말고사 반영 비율은 각각 몇 퍼센트야? | 로그인 학생 202210029가 2025학년도 2학기에 수강한 과목 중 교재가 등록된 과목의 과목코드와 교재 제목을 알려줘. | 2024학년도 2학기 AI3008-00 설명및신뢰가능한AI에서 중간고사 75점, 기말고사 85점을 받았다면 두 시험이 최종 100점에 기여하는 점수 합은 얼마야? 다른 항목은 제외해줘. | 2024학년도 2학기 AI4001-00 캡스톤디자인 담당 교수가 같은 학기 컴퓨터공학과 개설목록에서 맡은 다른 과목의 코드와 분반을 알려줘. AI4001의 다른 분반도 제외해줘."
+J039,2025학년도 2학기 CSE406-03(캡스톤디자인)와 2025학년도 2학기 CSE442-00(블록체인) 중 과제 비율이 더 작은 강좌의 과목코드·연도·학기·분반·비율을 알려줘. 같으면 둘 다 알려줘.,,"multi_document_reasoning,assignment_min,official_public_facts",False,False,False,row_count_mismatch,,1,True,,,"WITH candidates AS (
+    SELECT o.course_code, o.year, o.semester, o.section,
+           s.assignment_percentage
+    FROM course_offerings AS o
+    JOIN syllabi AS s ON s.offering_id = o.offering_id
+    WHERE (o.course_code = 'CSE406' AND o.section = '03')
+       OR (o.course_code = 'CSE442' AND o.section = '00')
+      AND o.year = 2025
+      AND o.semester = '2'
+)
+SELECT course_code, year, semester, section, assignment_percentage
+FROM candidates
+WHERE assignment_percentage = (
+    SELECT MIN(assignment_percentage)
+    FROM candidates
+);",4719,3.92,"로그인 학생 202210029가 2025학년도 2학기에 수강한 과목 중 교재가 등록된 과목의 과목코드와 교재 제목을 알려줘. | 2024학년도 2학기 AI3008-00 설명및신뢰가능한AI의 중간고사와 기말고사 반영 비율은 각각 몇 퍼센트야? | 2024학년도 2학기 AI3008-00 설명및신뢰가능한AI에서 중간고사 75점, 기말고사 85점을 받았다면 두 시험이 최종 100점에 기여하는 점수 합은 얼마야? 다른 항목은 제외해줘. | 2024학년도 2학기 CSE302-02 컴퓨터네트워크 담당 교수가 같은 학기 인공지능학과 개설목록에서 맡은 다른 과목의 분반 수와 개설학점 합계를 알려줘. CSE302의 다른 분반도 제외해줘."
+J040,2026학년도 1학기 CSE0001-00(소프트웨어가치탐구)와 2025학년도 1학기 CSE204-00(자료구조) 중 과제 비율이 더 작은 강좌의 과목코드·연도·학기·분반·비율을 알려줘. 같으면 둘 다 알려줘.,,"multi_document_reasoning,assignment_min,official_public_facts",True,True,True,correct,,1,True,,,"WITH candidates AS (
+    SELECT o.course_code, o.year, o.semester, o.section,
+           s.assignment_percentage
+    FROM course_offerings AS o
+    JOIN syllabi AS s ON s.offering_id = o.offering_id
+    WHERE (o.year = 2026 AND o.semester = '1'
+           AND o.course_code = 'CSE0001' AND o.section = '00')
+       OR (o.year = 2025 AND o.semester = '1'
+           AND o.course_code = 'CSE204' AND o.section = '00')
+)
+SELECT course_code, year, semester, section, assignment_percentage
+FROM candidates
+WHERE assignment_percentage = (
+    SELECT MIN(assignment_percentage)
+    FROM candidates
+);",4629,3.14,"2024학년도 2학기 AI3008-00 설명및신뢰가능한AI의 중간고사와 기말고사 반영 비율은 각각 몇 퍼센트야? | 로그인 학생 202210029가 2025학년도 2학기에 수강한 과목 중 교재가 등록된 과목의 과목코드와 교재 제목을 알려줘. | 2024학년도 2학기 AI3008-00 설명및신뢰가능한AI에서 중간고사 75점, 기말고사 85점을 받았다면 두 시험이 최종 100점에 기여하는 점수 합은 얼마야? 다른 항목은 제외해줘. | 2024학년도 2학기 CSE302-02 컴퓨터네트워크 담당 교수가 같은 학기 인공지능학과 개설목록에서 맡은 다른 과목의 분반 수와 개설학점 합계를 알려줘. CSE302의 다른 분반도 제외해줘."
+J041,"2025학년도 2학기 CSE103-00(객체지향프로그래밍)와 2026학년도 1학기 CSE406-06(캡스톤디자인)의 출석 비율을 순서대로 알려주고, 두 번째에서 첫 번째를 뺀 차이를 퍼센트포인트로 계산해줘.",,"multi_document_reasoning,attendance_gap,official_public_facts",True,True,True,correct,,1,True,,,"WITH first_course AS (
+    SELECT s.attendance_percentage
+    FROM course_offerings AS o
+    JOIN syllabi AS s ON s.offering_id = o.offering_id
+    WHERE o.year = 2025 AND o.semester = '2'
+      AND o.course_code = 'CSE103' AND o.section = '00'
+), second_course AS (
+    SELECT s.attendance_percentage
+    FROM course_offerings AS o
+    JOIN syllabi AS s ON s.offering_id = o.offering_id
+    WHERE o.year = 2026 AND o.semester = '1'
+      AND o.course_code = 'CSE406' AND o.section = '06'
+)
+SELECT first_course.attendance_percentage AS first_attendance_percentage,
+       second_course.attendance_percentage AS second_attendance_percentage,
+       second_course.attendance_percentage - first_course.attendance_percentage
+           AS difference_percentage_points
+FROM first_course
+CROSS JOIN second_course;",4836,4.69,"2024학년도 2학기 AI3008-00 설명및신뢰가능한AI의 중간고사와 기말고사 반영 비율은 각각 몇 퍼센트야? | 2024학년도 2학기 CSE302-02 컴퓨터네트워크 담당 교수가 같은 학기 인공지능학과 개설목록에서 맡은 다른 과목의 분반 수와 개설학점 합계를 알려줘. CSE302의 다른 분반도 제외해줘. | 2024학년도 2학기 AI1002-00 인공지능프로그래밍의 영어강좌 구분을 영어전체·영어부분·해당없음으로, 산학필수 여부를 예·아니오로 알려줘. | 2024학년도 2학기 AI1002-00 인공지능프로그래밍과 CSE203-00 컴퓨터구조를 모두 담당한 교수 이름을 알려줘."
+J042,"2025학년도 1학기 SWCON103-00(디자인적사고)와 2026학년도 2학기 AI4007-02(독립심화학습(인공지능)2)의 출석 비율을 순서대로 알려주고, 두 번째에서 첫 번째를 뺀 차이를 퍼센트포인트로 계산해줘.",,"multi_document_reasoning,attendance_gap,official_public_facts",True,True,True,correct,,1,True,,,"WITH attendance AS (
+    SELECT o.year, o.semester, o.course_code, o.section,
+           s.attendance_percentage
+    FROM course_offerings AS o
+    JOIN syllabi AS s ON s.offering_id = o.offering_id
+    WHERE (o.year = 2025 AND o.semester = '1'
+           AND o.course_code = 'SWCON103' AND o.section = '00')
+       OR (o.year = 2026 AND o.semester = '2'
+           AND o.course_code = 'AI4007' AND o.section = '02')
+),
+percentages AS (
+    SELECT
+        MAX(CASE WHEN year = 2025 AND semester = '1'
+                      AND course_code = 'SWCON103' AND section = '00'
+                 THEN attendance_percentage END) AS first_percentage,
+        MAX(CASE WHEN year = 2026 AND semester = '2'
+                      AND course_code = 'AI4007' AND section = '02'
+                 THEN attendance_percentage END) AS second_percentage
+    FROM attendance
+)
+SELECT first_percentage,
+       second_percentage,
+       second_percentage - first_percentage AS difference_percentage_points
+FROM percentages;",5052,5.68,"2024학년도 2학기 AI3008-00 설명및신뢰가능한AI의 중간고사와 기말고사 반영 비율은 각각 몇 퍼센트야? | 2024학년도 2학기 AI1002-00 인공지능프로그래밍의 영어강좌 구분을 영어전체·영어부분·해당없음으로, 산학필수 여부를 예·아니오로 알려줘. | 2024학년도 2학기 AI4001-00 캡스톤디자인 담당 교수가 같은 학기 컴퓨터공학과 개설목록에서 맡은 다른 과목의 코드와 분반을 알려줘. AI4001의 다른 분반도 제외해줘. | 2024학년도 2학기 CSE302-02 컴퓨터네트워크 담당 교수가 같은 학기 인공지능학과 개설목록에서 맡은 다른 과목의 분반 수와 개설학점 합계를 알려줘. CSE302의 다른 분반도 제외해줘."
+J043,"2025학년도 2학기 CSE302-01(컴퓨터네트워크)와 2026학년도 1학기 SWCON321-02(데이터분석캡스톤디자인)의 출석 비율을 순서대로 알려주고, 두 번째에서 첫 번째를 뺀 차이를 퍼센트포인트로 계산해줘.",,"multi_document_reasoning,attendance_gap,official_public_facts",True,True,True,correct,,1,True,,,"WITH first_course AS (
+    SELECT s.attendance_percentage
+    FROM course_offerings AS o
+    JOIN syllabi AS s ON s.offering_id = o.offering_id
+    WHERE o.year = 2025
+      AND o.semester = '2'
+      AND o.course_code = 'CSE302'
+      AND o.section = '01'
+), second_course AS (
+    SELECT s.attendance_percentage
+    FROM course_offerings AS o
+    JOIN syllabi AS s ON s.offering_id = o.offering_id
+    WHERE o.year = 2026
+      AND o.semester = '1'
+      AND o.course_code = 'SWCON321'
+      AND o.section = '02'
+)
+SELECT
+    (SELECT attendance_percentage FROM first_course) AS first_attendance_percentage,
+    (SELECT attendance_percentage FROM second_course) AS second_attendance_percentage,
+    (SELECT attendance_percentage FROM second_course)
+      - (SELECT attendance_percentage FROM first_course) AS difference_percentage_points;",5134,6.62,"2024학년도 2학기 CSE302-02 컴퓨터네트워크 담당 교수가 같은 학기 인공지능학과 개설목록에서 맡은 다른 과목의 분반 수와 개설학점 합계를 알려줘. CSE302의 다른 분반도 제외해줘. | 2024학년도 2학기 CSE302-02 컴퓨터네트워크 담당 교수의 다른 수업 중, 같은 학기 인공지능학과 기준 전공필수이면서 3학점인 강좌의 과목코드, 분반과 학점을 알려줘. CSE302의 다른 분반도 제외해줘. | 2024학년도 2학기 AI3008-00 설명및신뢰가능한AI의 중간고사와 기말고사 반영 비율은 각각 몇 퍼센트야? | 2024학년도 2학기 AI1002-00 인공지능프로그래밍의 영어강좌 구분을 영어전체·영어부분·해당없음으로, 산학필수 여부를 예·아니오로 알려줘."
+J044,"2026학년도 2학기 SWCON401-02(소프트웨어융합캡스톤디자인)와 2026학년도 1학기 CSE301-01(운영체제)의 출석 비율을 순서대로 알려주고, 두 번째에서 첫 번째를 뺀 차이를 퍼센트포인트로 계산해줘.",,"multi_document_reasoning,attendance_gap,official_public_facts",True,True,True,correct,,1,True,,,"WITH attendance AS (
+    SELECT
+        (
+            SELECT s.attendance_percentage
+            FROM course_offerings AS o
+            JOIN syllabi AS s ON s.offering_id = o.offering_id
+            WHERE o.year = 2026 AND o.semester = '2'
+              AND o.course_code = 'SWCON401' AND o.section = '02'
+        ) AS first_attendance,
+        (
+            SELECT s.attendance_percentage
+            FROM course_offerings AS o
+            JOIN syllabi AS s ON s.offering_id = o.offering_id
+            WHERE o.year = 2026 AND o.semester = '1'
+              AND o.course_code = 'CSE301' AND o.section = '01'
+        ) AS second_attendance
+)
+SELECT
+    first_attendance AS first_attendance_percentage,
+    second_attendance AS second_attendance_percentage,
+    second_attendance - first_attendance AS difference_percentage_points
+FROM attendance;",5206,7.35,"2024학년도 2학기 CSE302-02 컴퓨터네트워크 담당 교수가 같은 학기 인공지능학과 개설목록에서 맡은 다른 과목의 분반 수와 개설학점 합계를 알려줘. CSE302의 다른 분반도 제외해줘. | 2024학년도 2학기 AI3008-00 설명및신뢰가능한AI의 중간고사와 기말고사 반영 비율은 각각 몇 퍼센트야? | 2024학년도 2학기 CSE302-02 컴퓨터네트워크 담당 교수의 다른 수업 중, 같은 학기 인공지능학과 기준 전공필수이면서 3학점인 강좌의 과목코드, 분반과 학점을 알려줘. CSE302의 다른 분반도 제외해줘. | 2024학년도 2학기 AI4001-00 캡스톤디자인 담당 교수가 같은 학기 컴퓨터공학과 개설목록에서 맡은 다른 과목의 코드와 분반을 알려줘. AI4001의 다른 분반도 제외해줘."
+J045,"2026학년도 1학기 IE419-00(서비스데이터사이언스) 담당 교수의 다른 수업 중, 같은 학기 소프트웨어융합학과 개설목록에서 산학필수인 강좌의 과목코드와 분반을 알려줘. 기준 과목의 다른 분반도 제외해줘.",,"multi_hop,prof_other_industry,official_public_facts",True,True,True,correct,,1,True,,,"WITH anchor_professors AS (
+    SELECT DISTINCT op.professor_id
+    FROM course_offerings AS o
+    JOIN offering_professors AS op ON op.offering_id = o.offering_id
+    WHERE o.year = 2026
+      AND o.semester = '1'
+      AND o.course_code = 'IE419'
+      AND o.section = '00'
+)
+SELECT DISTINCT o.course_code, o.section
+FROM course_offerings AS o
+JOIN offering_professors AS op ON op.offering_id = o.offering_id
+JOIN anchor_professors AS ap ON ap.professor_id = op.professor_id
+JOIN course_offering_categories AS oc ON oc.offering_id = o.offering_id
+JOIN departments AS d ON d.department_id = oc.department_id
+WHERE o.year = 2026
+  AND o.semester = '1'
+  AND d.name = '소프트웨어융합학과'
+  AND o.industry_required = 1
+  AND o.course_code <> 'IE419'
+ORDER BY o.course_code, o.section;",5091,4.57,"2024학년도 2학기 CSE302-02 컴퓨터네트워크 담당 교수의 다른 수업 중, 같은 학기 인공지능학과 기준 전공필수이면서 3학점인 강좌의 과목코드, 분반과 학점을 알려줘. CSE302의 다른 분반도 제외해줘. | 2024학년도 2학기 AI4001-00 캡스톤디자인 담당 교수가 같은 학기 컴퓨터공학과 개설목록에서 맡은 다른 과목의 코드와 분반을 알려줘. AI4001의 다른 분반도 제외해줘. | 2024학년도 2학기 CSE302-02 컴퓨터네트워크 담당 교수가 같은 학기 인공지능학과 개설목록에서 맡은 다른 과목의 분반 수와 개설학점 합계를 알려줘. CSE302의 다른 분반도 제외해줘. | 2024학년도 2학기 인공지능학과 개설목록에서 AI1002 각 분반에 적용된 이수구분을 알려줘."
+J046,"2026학년도 1학기 IE419-00(서비스데이터사이언스) 담당 교수의 다른 수업 중, 같은 학기 소프트웨어융합학과 개설목록에서 3학점인 강좌의 과목코드와 분반을 알려줘. 기준 과목의 다른 분반도 제외해줘.",,"multi_hop,prof_other_3credit,official_public_facts",True,True,True,correct,,1,True,,,"WITH anchor_professors AS (
+    SELECT DISTINCT op.professor_id
+    FROM course_offerings AS o
+    JOIN offering_professors AS op ON op.offering_id = o.offering_id
+    WHERE o.year = 2026
+      AND o.semester = '1'
+      AND o.course_code = 'IE419'
+      AND o.section = '00'
+)
+SELECT DISTINCT o.course_code, o.section
+FROM course_offerings AS o
+JOIN offering_professors AS op ON op.offering_id = o.offering_id
+JOIN anchor_professors AS ap ON ap.professor_id = op.professor_id
+JOIN course_offering_categories AS oc ON oc.offering_id = o.offering_id
+JOIN departments AS d ON d.department_id = oc.department_id
+WHERE o.year = 2026
+  AND o.semester = '1'
+  AND d.name = '소프트웨어융합학과'
+  AND o.credits = 3
+  AND o.course_code <> 'IE419'
+ORDER BY o.course_code, o.section;",5032,3.94,"2024학년도 2학기 CSE302-02 컴퓨터네트워크 담당 교수의 다른 수업 중, 같은 학기 인공지능학과 기준 전공필수이면서 3학점인 강좌의 과목코드, 분반과 학점을 알려줘. CSE302의 다른 분반도 제외해줘. | 2024학년도 2학기 AI4001-00 캡스톤디자인 담당 교수가 같은 학기 컴퓨터공학과 개설목록에서 맡은 다른 과목의 코드와 분반을 알려줘. AI4001의 다른 분반도 제외해줘. | 2024학년도 2학기 CSE302-02 컴퓨터네트워크 담당 교수가 같은 학기 인공지능학과 개설목록에서 맡은 다른 과목의 분반 수와 개설학점 합계를 알려줘. CSE302의 다른 분반도 제외해줘. | 2024학년도 2학기 인공지능학과 개설목록에서 AI1002 각 분반에 적용된 이수구분을 알려줘."
+J047,"2026학년도 1학기 IE419-00(서비스데이터사이언스) 담당 교수가 같은 학기 소프트웨어융합학과 개설목록에서 맡은 다른 과목의 분반 수와 개설학점 합계를 알려줘. 기준 과목 코드는 제외하고, 다른 분반은 각각 합산해줘.",,"multi_hop_aggregation,prof_credit_load,official_public_facts",True,True,True,correct,,1,True,,,"WITH anchor_professors AS (
+    SELECT DISTINCT op.professor_id
+    FROM course_offerings AS o
+    JOIN offering_professors AS op ON op.offering_id = o.offering_id
+    WHERE o.year = 2026
+      AND o.semester = '1'
+      AND o.course_code = 'IE419'
+      AND o.section = '00'
+), target_offerings AS (
+    SELECT DISTINCT o.offering_id, o.credits
+    FROM course_offerings AS o
+    JOIN offering_professors AS op ON op.offering_id = o.offering_id
+    JOIN anchor_professors AS ap ON ap.professor_id = op.professor_id
+    JOIN course_offering_categories AS oc ON oc.offering_id = o.offering_id
+    JOIN departments AS d ON d.department_id = oc.department_id
+    WHERE o.year = 2026
+      AND o.semester = '1'
+      AND d.name = '소프트웨어융합학과'
+      AND o.course_code <> 'IE419'
+)
+SELECT COUNT(*) AS section_count,
+       SUM(credits) AS total_credits
+FROM target_offerings;",5130,4.81,"2024학년도 2학기 CSE302-02 컴퓨터네트워크 담당 교수가 같은 학기 인공지능학과 개설목록에서 맡은 다른 과목의 분반 수와 개설학점 합계를 알려줘. CSE302의 다른 분반도 제외해줘. | 2024학년도 2학기 AI4001-00 캡스톤디자인 담당 교수가 같은 학기 컴퓨터공학과 개설목록에서 맡은 다른 과목의 코드와 분반을 알려줘. AI4001의 다른 분반도 제외해줘. | 2024학년도 2학기 인공지능학과 개설목록에서 전공선택으로 분류된 강좌의 분반 수와 개설학점 합계를 알려줘. | 2024학년도 2학기 CSE302-02 컴퓨터네트워크 담당 교수의 다른 수업 중, 같은 학기 인공지능학과 기준 전공필수이면서 3학점인 강좌의 과목코드, 분반과 학점을 알려줘. CSE302의 다른 분반도 제외해줘."
+J048,"2025학년도 2학기 SWCON253-01(기계학습) 담당 교수의 다른 수업 중, 같은 학기 컴퓨터공학과 개설목록에서 전공필수인 강좌의 과목코드와 분반을 알려줘. 기준 과목의 다른 분반도 제외해줘.",,"multi_hop,prof_other_required,official_public_facts",True,True,True,correct,,1,True,,,"WITH anchor_professors AS (
+    SELECT DISTINCT op.professor_id
+    FROM course_offerings AS o
+    JOIN offering_professors AS op ON op.offering_id = o.offering_id
+    WHERE o.year = 2025
+      AND o.semester = '2'
+      AND o.course_code = 'SWCON253'
+      AND o.section = '01'
+)
+SELECT DISTINCT o.course_code, o.section
+FROM course_offerings AS o
+JOIN offering_professors AS op ON op.offering_id = o.offering_id
+JOIN anchor_professors AS ap ON ap.professor_id = op.professor_id
+JOIN course_offering_categories AS oc ON oc.offering_id = o.offering_id
+JOIN departments AS d ON d.department_id = oc.department_id
+JOIN course_categories AS cc ON cc.category_id = oc.category_id
+WHERE o.year = 2025
+  AND o.semester = '2'
+  AND d.name = '컴퓨터공학과'
+  AND cc.category_name = '전공필수'
+  AND o.course_code <> 'SWCON253'
+ORDER BY o.course_code, o.section;",5026,3.34,"2024학년도 2학기 CSE302-02 컴퓨터네트워크 담당 교수의 다른 수업 중, 같은 학기 인공지능학과 기준 전공필수이면서 3학점인 강좌의 과목코드, 분반과 학점을 알려줘. CSE302의 다른 분반도 제외해줘. | 2024학년도 2학기 AI4001-00 캡스톤디자인 담당 교수가 같은 학기 컴퓨터공학과 개설목록에서 맡은 다른 과목의 코드와 분반을 알려줘. AI4001의 다른 분반도 제외해줘. | 2024학년도 2학기 CSE302-02 컴퓨터네트워크 담당 교수가 같은 학기 인공지능학과 개설목록에서 맡은 다른 과목의 분반 수와 개설학점 합계를 알려줘. CSE302의 다른 분반도 제외해줘. | 2024학년도 2학기 인공지능학과 개설목록에서 AI1002 각 분반에 적용된 이수구분을 알려줘."
+J049,"2025학년도 2학기 SWCON253-01(기계학습) 담당 교수의 다른 수업 중, 같은 학기 컴퓨터공학과 개설목록에서 산학필수인 강좌의 과목코드와 분반을 알려줘. 기준 과목의 다른 분반도 제외해줘.",,"multi_hop,prof_other_industry,official_public_facts",True,True,True,correct,,1,True,,,"WITH anchor_professors AS (
+    SELECT DISTINCT op.professor_id
+    FROM course_offerings AS o
+    JOIN offering_professors AS op ON op.offering_id = o.offering_id
+    WHERE o.year = 2025
+      AND o.semester = '2'
+      AND o.course_code = 'SWCON253'
+      AND o.section = '01'
+)
+SELECT DISTINCT o.course_code, o.section
+FROM course_offerings AS o
+JOIN offering_professors AS op ON op.offering_id = o.offering_id
+JOIN anchor_professors AS ap ON ap.professor_id = op.professor_id
+JOIN course_offering_categories AS oc ON oc.offering_id = o.offering_id
+JOIN departments AS d ON d.department_id = oc.department_id
+WHERE o.year = 2025
+  AND o.semester = '2'
+  AND d.name = '컴퓨터공학과'
+  AND o.industry_required = 1
+  AND o.course_code <> 'SWCON253'
+ORDER BY o.course_code, o.section;",4997,4.15,"2024학년도 2학기 AI4001-00 캡스톤디자인 담당 교수가 같은 학기 컴퓨터공학과 개설목록에서 맡은 다른 과목의 코드와 분반을 알려줘. AI4001의 다른 분반도 제외해줘. | 2024학년도 2학기 CSE302-02 컴퓨터네트워크 담당 교수의 다른 수업 중, 같은 학기 인공지능학과 기준 전공필수이면서 3학점인 강좌의 과목코드, 분반과 학점을 알려줘. CSE302의 다른 분반도 제외해줘. | 2024학년도 2학기 CSE302-02 컴퓨터네트워크 담당 교수가 같은 학기 인공지능학과 개설목록에서 맡은 다른 과목의 분반 수와 개설학점 합계를 알려줘. CSE302의 다른 분반도 제외해줘. | 2024학년도 2학기 인공지능학과 개설목록에서 AI1002 각 분반에 적용된 이수구분을 알려줘."
+J050,"2025학년도 2학기 SWCON253-01(기계학습) 담당 교수의 다른 수업 중, 같은 학기 컴퓨터공학과 개설목록에서 3학점인 강좌의 과목코드와 분반을 알려줘. 기준 과목의 다른 분반도 제외해줘.",,"multi_hop,prof_other_3credit,official_public_facts",True,True,True,correct,,1,True,,,"WITH anchor_professors AS (
+    SELECT DISTINCT op.professor_id
+    FROM course_offerings AS o
+    JOIN offering_professors AS op ON op.offering_id = o.offering_id
+    WHERE o.year = 2025
+      AND o.semester = '2'
+      AND o.course_code = 'SWCON253'
+      AND o.section = '01'
+)
+SELECT DISTINCT o.course_code, o.section
+FROM course_offerings AS o
+JOIN offering_professors AS op ON op.offering_id = o.offering_id
+JOIN anchor_professors AS ap ON ap.professor_id = op.professor_id
+JOIN course_offering_categories AS oc ON oc.offering_id = o.offering_id
+JOIN departments AS d ON d.department_id = oc.department_id
+WHERE o.year = 2025
+  AND o.semester = '2'
+  AND d.name = '컴퓨터공학과'
+  AND o.credits = 3
+  AND o.course_code <> 'SWCON253'
+ORDER BY o.course_code, o.section;",4997,3.4,"2024학년도 2학기 CSE302-02 컴퓨터네트워크 담당 교수의 다른 수업 중, 같은 학기 인공지능학과 기준 전공필수이면서 3학점인 강좌의 과목코드, 분반과 학점을 알려줘. CSE302의 다른 분반도 제외해줘. | 2024학년도 2학기 AI4001-00 캡스톤디자인 담당 교수가 같은 학기 컴퓨터공학과 개설목록에서 맡은 다른 과목의 코드와 분반을 알려줘. AI4001의 다른 분반도 제외해줘. | 2024학년도 2학기 CSE302-02 컴퓨터네트워크 담당 교수가 같은 학기 인공지능학과 개설목록에서 맡은 다른 과목의 분반 수와 개설학점 합계를 알려줘. CSE302의 다른 분반도 제외해줘. | 2024학년도 2학기 인공지능학과 개설목록에서 AI1002 각 분반에 적용된 이수구분을 알려줘."
+J051,2025학년도 2학기 SWCON253-01(기계학습)의 담당 교수가 2026학년도 2학기 컴퓨터공학과 개설목록에서 맡은 다른 과목의 코드와 분반을 알려줘. 기준 과목 코드는 제외해줘.,,"multi_document_multi_hop,prof_future_other,official_public_facts",True,True,True,correct,,1,True,,,"WITH anchor_professors AS (
+    SELECT DISTINCT op.professor_id
+    FROM course_offerings AS o
+    JOIN offering_professors AS op ON op.offering_id = o.offering_id
+    WHERE o.year = 2025
+      AND o.semester = '2'
+      AND o.course_code = 'SWCON253'
+      AND o.section = '01'
+)
+SELECT DISTINCT o.course_code, o.section
+FROM course_offerings AS o
+JOIN offering_professors AS op ON op.offering_id = o.offering_id
+JOIN anchor_professors AS ap ON ap.professor_id = op.professor_id
+JOIN course_offering_categories AS oc ON oc.offering_id = o.offering_id
+JOIN departments AS d ON d.department_id = oc.department_id
+WHERE o.year = 2026
+  AND o.semester = '2'
+  AND d.name = '컴퓨터공학과'
+  AND o.course_code <> 'SWCON253'
+ORDER BY o.course_code, o.section;",4997,5.22,"2024학년도 2학기 AI4001-00 캡스톤디자인 담당 교수가 같은 학기 컴퓨터공학과 개설목록에서 맡은 다른 과목의 코드와 분반을 알려줘. AI4001의 다른 분반도 제외해줘. | 2024학년도 2학기 CSE302-02 컴퓨터네트워크 담당 교수가 같은 학기 인공지능학과 개설목록에서 맡은 다른 과목의 분반 수와 개설학점 합계를 알려줘. CSE302의 다른 분반도 제외해줘. | 2024학년도 2학기 CSE302-02 컴퓨터네트워크 담당 교수의 다른 수업 중, 같은 학기 인공지능학과 기준 전공필수이면서 3학점인 강좌의 과목코드, 분반과 학점을 알려줘. CSE302의 다른 분반도 제외해줘. | 2024학년도 2학기 인공지능학과 개설목록에서 AI1002 각 분반에 적용된 이수구분을 알려줘."
+J052,"2025학년도 1학기 CSE406-05(캡스톤디자인) 담당 교수의 다른 수업 중, 같은 학기 컴퓨터공학과 개설목록에서 산학필수인 강좌의 과목코드와 분반을 알려줘. 기준 과목의 다른 분반도 제외해줘.",,"multi_hop,prof_other_industry,official_public_facts",True,True,True,correct,,1,True,,,"WITH anchor_professors AS (
+    SELECT DISTINCT op.professor_id
+    FROM course_offerings AS o
+    JOIN offering_professors AS op ON op.offering_id = o.offering_id
+    WHERE o.year = 2025
+      AND o.semester = '1'
+      AND o.course_code = 'CSE406'
+      AND o.section = '05'
+)
+SELECT DISTINCT o.course_code, o.section
+FROM course_offerings AS o
+JOIN offering_professors AS op ON op.offering_id = o.offering_id
+JOIN anchor_professors AS ap ON ap.professor_id = op.professor_id
+JOIN course_offering_categories AS oc ON oc.offering_id = o.offering_id
+JOIN departments AS d ON d.department_id = oc.department_id
+WHERE o.year = 2025
+  AND o.semester = '1'
+  AND d.name = '컴퓨터공학과'
+  AND o.industry_required = 1
+  AND o.course_code <> 'CSE406'
+ORDER BY o.course_code, o.section;",5055,5.21,"2024학년도 2학기 AI4001-00 캡스톤디자인 담당 교수가 같은 학기 컴퓨터공학과 개설목록에서 맡은 다른 과목의 코드와 분반을 알려줘. AI4001의 다른 분반도 제외해줘. | 2024학년도 2학기 CSE302-02 컴퓨터네트워크 담당 교수의 다른 수업 중, 같은 학기 인공지능학과 기준 전공필수이면서 3학점인 강좌의 과목코드, 분반과 학점을 알려줘. CSE302의 다른 분반도 제외해줘. | 2024학년도 2학기 CSE302-02 컴퓨터네트워크 담당 교수가 같은 학기 인공지능학과 개설목록에서 맡은 다른 과목의 분반 수와 개설학점 합계를 알려줘. CSE302의 다른 분반도 제외해줘. | 2024학년도 2학기 인공지능학과 개설목록에서 AI1002 각 분반에 적용된 이수구분을 알려줘."
+J053,"2025학년도 1학기 CSE406-05(캡스톤디자인) 담당 교수의 다른 수업 중, 같은 학기 컴퓨터공학과 개설목록에서 3학점인 강좌의 과목코드와 분반을 알려줘. 기준 과목의 다른 분반도 제외해줘.",,"multi_hop,prof_other_3credit,official_public_facts",True,True,True,correct,,1,True,,,"WITH anchor_professors AS (
+    SELECT DISTINCT op.professor_id
+    FROM course_offerings AS o
+    JOIN offering_professors AS op ON op.offering_id = o.offering_id
+    WHERE o.year = 2025
+      AND o.semester = '1'
+      AND o.course_code = 'CSE406'
+      AND o.section = '05'
+)
+SELECT DISTINCT o.course_code, o.section
+FROM course_offerings AS o
+JOIN offering_professors AS op ON op.offering_id = o.offering_id
+JOIN anchor_professors AS ap ON ap.professor_id = op.professor_id
+JOIN course_offering_categories AS oc ON oc.offering_id = o.offering_id
+JOIN departments AS d ON d.department_id = oc.department_id
+WHERE o.year = 2025
+  AND o.semester = '1'
+  AND d.name = '컴퓨터공학과'
+  AND o.credits = 3
+  AND o.course_code <> 'CSE406'
+ORDER BY o.course_code, o.section;",5037,4.04,"2024학년도 2학기 AI4001-00 캡스톤디자인 담당 교수가 같은 학기 컴퓨터공학과 개설목록에서 맡은 다른 과목의 코드와 분반을 알려줘. AI4001의 다른 분반도 제외해줘. | 2024학년도 2학기 CSE302-02 컴퓨터네트워크 담당 교수의 다른 수업 중, 같은 학기 인공지능학과 기준 전공필수이면서 3학점인 강좌의 과목코드, 분반과 학점을 알려줘. CSE302의 다른 분반도 제외해줘. | 2024학년도 2학기 CSE302-02 컴퓨터네트워크 담당 교수가 같은 학기 인공지능학과 개설목록에서 맡은 다른 과목의 분반 수와 개설학점 합계를 알려줘. CSE302의 다른 분반도 제외해줘. | 2024학년도 2학기 인공지능학과 개설목록에서 AI1002 각 분반에 적용된 이수구분을 알려줘."
+J054,"2026학년도 1학기 CSE304-01(알고리즘) 담당 교수의 다른 수업 중, 같은 학기 컴퓨터공학과 개설목록에서 전공필수인 강좌의 과목코드와 분반을 알려줘. 기준 과목의 다른 분반도 제외해줘.",,"multi_hop,prof_other_required,official_public_facts",True,True,True,correct,,1,True,,,"WITH anchor_professors AS (
+    SELECT DISTINCT op.professor_id
+    FROM course_offerings AS o
+    JOIN offering_professors AS op ON op.offering_id = o.offering_id
+    WHERE o.year = 2026
+      AND o.semester = '1'
+      AND o.course_code = 'CSE304'
+      AND o.section = '01'
+)
+SELECT DISTINCT o.course_code, o.section
+FROM course_offerings AS o
+JOIN offering_professors AS op ON op.offering_id = o.offering_id
+JOIN anchor_professors AS ap ON ap.professor_id = op.professor_id
+JOIN course_offering_categories AS oc ON oc.offering_id = o.offering_id
+JOIN departments AS d ON d.department_id = oc.department_id
+JOIN course_categories AS cc ON cc.category_id = oc.category_id
+WHERE o.year = 2026
+  AND o.semester = '1'
+  AND d.name = '컴퓨터공학과'
+  AND cc.category_name = '전공필수'
+  AND o.course_code <> 'CSE304'
+ORDER BY o.course_code, o.section;",5022,3.35,"2024학년도 2학기 CSE302-02 컴퓨터네트워크 담당 교수의 다른 수업 중, 같은 학기 인공지능학과 기준 전공필수이면서 3학점인 강좌의 과목코드, 분반과 학점을 알려줘. CSE302의 다른 분반도 제외해줘. | 2024학년도 2학기 AI4001-00 캡스톤디자인 담당 교수가 같은 학기 컴퓨터공학과 개설목록에서 맡은 다른 과목의 코드와 분반을 알려줘. AI4001의 다른 분반도 제외해줘. | 2024학년도 2학기 CSE302-02 컴퓨터네트워크 담당 교수가 같은 학기 인공지능학과 개설목록에서 맡은 다른 과목의 분반 수와 개설학점 합계를 알려줘. CSE302의 다른 분반도 제외해줘. | 2024학년도 2학기 인공지능학과 개설목록에서 AI1002 각 분반에 적용된 이수구분을 알려줘."
+J055,"2026학년도 1학기 CSE304-01(알고리즘) 담당 교수의 다른 수업 중, 같은 학기 컴퓨터공학과 개설목록에서 산학필수인 강좌의 과목코드와 분반을 알려줘. 기준 과목의 다른 분반도 제외해줘.",,"multi_hop,prof_other_industry,official_public_facts",True,True,True,correct,,1,True,,,"WITH anchor_professors AS (
+    SELECT DISTINCT op.professor_id
+    FROM course_offerings AS o
+    JOIN offering_professors AS op ON op.offering_id = o.offering_id
+    WHERE o.year = 2026
+      AND o.semester = '1'
+      AND o.course_code = 'CSE304'
+      AND o.section = '01'
+)
+SELECT DISTINCT o.course_code, o.section
+FROM course_offerings AS o
+JOIN offering_professors AS op ON op.offering_id = o.offering_id
+JOIN anchor_professors AS ap ON ap.professor_id = op.professor_id
+JOIN course_offering_categories AS oc ON oc.offering_id = o.offering_id
+JOIN departments AS d ON d.department_id = oc.department_id
+WHERE o.year = 2026
+  AND o.semester = '1'
+  AND d.name = '컴퓨터공학과'
+  AND o.industry_required = 1
+  AND o.course_code <> 'CSE304'
+ORDER BY o.course_code, o.section;",5077,4.43,"2024학년도 2학기 CSE302-02 컴퓨터네트워크 담당 교수의 다른 수업 중, 같은 학기 인공지능학과 기준 전공필수이면서 3학점인 강좌의 과목코드, 분반과 학점을 알려줘. CSE302의 다른 분반도 제외해줘. | 2024학년도 2학기 AI4001-00 캡스톤디자인 담당 교수가 같은 학기 컴퓨터공학과 개설목록에서 맡은 다른 과목의 코드와 분반을 알려줘. AI4001의 다른 분반도 제외해줘. | 2024학년도 2학기 CSE302-02 컴퓨터네트워크 담당 교수가 같은 학기 인공지능학과 개설목록에서 맡은 다른 과목의 분반 수와 개설학점 합계를 알려줘. CSE302의 다른 분반도 제외해줘. | 2024학년도 2학기 인공지능학과 개설목록에서 AI1002 각 분반에 적용된 이수구분을 알려줘."
+J056,"2026학년도 1학기 CSE304-01(알고리즘) 담당 교수의 다른 수업 중, 같은 학기 컴퓨터공학과 개설목록에서 3학점인 강좌의 과목코드와 분반을 알려줘. 기준 과목의 다른 분반도 제외해줘.",,"multi_hop,prof_other_3credit,official_public_facts",True,True,True,correct,,1,True,,,"WITH anchor_professors AS (
+    SELECT DISTINCT op.professor_id
+    FROM course_offerings AS o
+    JOIN offering_professors AS op ON op.offering_id = o.offering_id
+    WHERE o.year = 2026
+      AND o.semester = '1'
+      AND o.course_code = 'CSE304'
+      AND o.section = '01'
+)
+SELECT DISTINCT o.course_code, o.section
+FROM course_offerings AS o
+JOIN offering_professors AS op ON op.offering_id = o.offering_id
+JOIN anchor_professors AS ap ON ap.professor_id = op.professor_id
+JOIN course_offering_categories AS oc ON oc.offering_id = o.offering_id
+JOIN departments AS d ON d.department_id = oc.department_id
+WHERE o.year = 2026
+  AND o.semester = '1'
+  AND d.name = '컴퓨터공학과'
+  AND o.credits = 3
+  AND o.course_code <> 'CSE304'
+ORDER BY o.course_code, o.section;",5002,3.32,"2024학년도 2학기 CSE302-02 컴퓨터네트워크 담당 교수의 다른 수업 중, 같은 학기 인공지능학과 기준 전공필수이면서 3학점인 강좌의 과목코드, 분반과 학점을 알려줘. CSE302의 다른 분반도 제외해줘. | 2024학년도 2학기 AI4001-00 캡스톤디자인 담당 교수가 같은 학기 컴퓨터공학과 개설목록에서 맡은 다른 과목의 코드와 분반을 알려줘. AI4001의 다른 분반도 제외해줘. | 2024학년도 2학기 CSE302-02 컴퓨터네트워크 담당 교수가 같은 학기 인공지능학과 개설목록에서 맡은 다른 과목의 분반 수와 개설학점 합계를 알려줘. CSE302의 다른 분반도 제외해줘. | 2024학년도 2학기 인공지능학과 개설목록에서 AI1002 각 분반에 적용된 이수구분을 알려줘."
+J057,"2026학년도 1학기 CSE304-01(알고리즘) 담당 교수가 같은 학기 컴퓨터공학과 개설목록에서 맡은 다른 과목의 분반 수와 개설학점 합계를 알려줘. 기준 과목 코드는 제외하고, 다른 분반은 각각 합산해줘.",,"multi_hop_aggregation,prof_credit_load,official_public_facts",True,True,True,correct,,1,True,,,"WITH anchor_professors AS (
+    SELECT DISTINCT op.professor_id
+    FROM course_offerings AS o
+    JOIN offering_professors AS op ON op.offering_id = o.offering_id
+    WHERE o.year = 2026
+      AND o.semester = '1'
+      AND o.course_code = 'CSE304'
+      AND o.section = '01'
+),
+target_offerings AS (
+    SELECT DISTINCT o.offering_id, o.credits
+    FROM course_offerings AS o
+    JOIN offering_professors AS op ON op.offering_id = o.offering_id
+    JOIN anchor_professors AS ap ON ap.professor_id = op.professor_id
+    JOIN course_offering_categories AS oc ON oc.offering_id = o.offering_id
+    JOIN departments AS d ON d.department_id = oc.department_id
+    WHERE o.year = 2026
+      AND o.semester = '1'
+      AND d.name = '컴퓨터공학과'
+      AND o.course_code <> 'CSE304'
+)
+SELECT COUNT(*) AS section_count,
+       SUM(credits) AS total_credits
+FROM target_offerings;",5099,4.45,"2024학년도 2학기 CSE302-02 컴퓨터네트워크 담당 교수가 같은 학기 인공지능학과 개설목록에서 맡은 다른 과목의 분반 수와 개설학점 합계를 알려줘. CSE302의 다른 분반도 제외해줘. | 2024학년도 2학기 AI4001-00 캡스톤디자인 담당 교수가 같은 학기 컴퓨터공학과 개설목록에서 맡은 다른 과목의 코드와 분반을 알려줘. AI4001의 다른 분반도 제외해줘. | 2024학년도 2학기 인공지능학과 개설목록에서 전공선택으로 분류된 강좌의 분반 수와 개설학점 합계를 알려줘. | 2024학년도 2학기 CSE302-02 컴퓨터네트워크 담당 교수의 다른 수업 중, 같은 학기 인공지능학과 기준 전공필수이면서 3학점인 강좌의 과목코드, 분반과 학점을 알려줘. CSE302의 다른 분반도 제외해줘."
+J058,"2026학년도 1학기 AI4003-00(졸업논문(인공지능)) 담당 교수의 다른 수업 중, 같은 학기 인공지능학과 개설목록에서 전공필수인 강좌의 과목코드와 분반을 알려줘. 기준 과목의 다른 분반도 제외해줘.",,"multi_hop,prof_other_required,official_public_facts",True,True,True,correct,,1,True,,,"WITH anchor_professors AS (
+    SELECT DISTINCT op.professor_id
+    FROM course_offerings AS o
+    JOIN offering_professors AS op ON op.offering_id = o.offering_id
+    WHERE o.year = 2026
+      AND o.semester = '1'
+      AND o.course_code = 'AI4003'
+      AND o.section = '00'
+)
+SELECT DISTINCT o.course_code, o.section
+FROM course_offerings AS o
+JOIN offering_professors AS op ON op.offering_id = o.offering_id
+JOIN anchor_professors AS ap ON ap.professor_id = op.professor_id
+JOIN course_offering_categories AS oc ON oc.offering_id = o.offering_id
+JOIN departments AS d ON d.department_id = oc.department_id
+JOIN course_categories AS cc ON cc.category_id = oc.category_id
+WHERE o.year = 2026
+  AND o.semester = '1'
+  AND d.name = '인공지능학과'
+  AND cc.category_name = '전공필수'
+  AND o.course_code <> 'AI4003'
+ORDER BY o.course_code, o.section;",5020,4.86,"2024학년도 2학기 CSE302-02 컴퓨터네트워크 담당 교수의 다른 수업 중, 같은 학기 인공지능학과 기준 전공필수이면서 3학점인 강좌의 과목코드, 분반과 학점을 알려줘. CSE302의 다른 분반도 제외해줘. | 2024학년도 2학기 AI4001-00 캡스톤디자인 담당 교수가 같은 학기 컴퓨터공학과 개설목록에서 맡은 다른 과목의 코드와 분반을 알려줘. AI4001의 다른 분반도 제외해줘. | 2024학년도 2학기 CSE302-02 컴퓨터네트워크 담당 교수가 같은 학기 인공지능학과 개설목록에서 맡은 다른 과목의 분반 수와 개설학점 합계를 알려줘. CSE302의 다른 분반도 제외해줘. | 2024학년도 2학기 인공지능학과 개설목록에서 AI1002 각 분반에 적용된 이수구분을 알려줘."
+J059,"2026학년도 1학기 AI4003-00(졸업논문(인공지능)) 담당 교수가 같은 학기 인공지능학과 개설목록에서 맡은 다른 과목의 분반 수와 개설학점 합계를 알려줘. 기준 과목 코드는 제외하고, 다른 분반은 각각 합산해줘.",,"multi_hop_aggregation,prof_credit_load,official_public_facts",True,True,True,correct,,1,True,,,"WITH anchor_professors AS (
+    SELECT DISTINCT op.professor_id
+    FROM course_offerings AS o
+    JOIN offering_professors AS op ON op.offering_id = o.offering_id
+    WHERE o.year = 2026
+      AND o.semester = '1'
+      AND o.course_code = 'AI4003'
+      AND o.section = '00'
+),
+target_offerings AS (
+    SELECT DISTINCT o.offering_id, o.credits
+    FROM course_offerings AS o
+    JOIN offering_professors AS op ON op.offering_id = o.offering_id
+    JOIN anchor_professors AS ap ON ap.professor_id = op.professor_id
+    JOIN course_offering_categories AS oc ON oc.offering_id = o.offering_id
+    JOIN departments AS d ON d.department_id = oc.department_id
+    WHERE o.year = 2026
+      AND o.semester = '1'
+      AND d.name = '인공지능학과'
+      AND o.course_code <> 'AI4003'
+)
+SELECT COUNT(*) AS section_count,
+       SUM(credits) AS total_credits
+FROM target_offerings;",5103,4.45,"2024학년도 2학기 CSE302-02 컴퓨터네트워크 담당 교수가 같은 학기 인공지능학과 개설목록에서 맡은 다른 과목의 분반 수와 개설학점 합계를 알려줘. CSE302의 다른 분반도 제외해줘. | 2024학년도 2학기 AI4001-00 캡스톤디자인 담당 교수가 같은 학기 컴퓨터공학과 개설목록에서 맡은 다른 과목의 코드와 분반을 알려줘. AI4001의 다른 분반도 제외해줘. | 2024학년도 2학기 인공지능학과 개설목록에서 전공선택으로 분류된 강좌의 분반 수와 개설학점 합계를 알려줘. | 2024학년도 2학기 CSE302-02 컴퓨터네트워크 담당 교수의 다른 수업 중, 같은 학기 인공지능학과 기준 전공필수이면서 3학점인 강좌의 과목코드, 분반과 학점을 알려줘. CSE302의 다른 분반도 제외해줘."
+J060,"2026학년도 1학기 CSE423-00(정보보호) 담당 교수의 다른 수업 중, 같은 학기 컴퓨터공학과 개설목록에서 전공필수인 강좌의 과목코드와 분반을 알려줘. 기준 과목의 다른 분반도 제외해줘.",,"multi_hop,prof_other_required,official_public_facts",True,True,True,correct,,1,True,,,"WITH anchor_professors AS (
+    SELECT DISTINCT op.professor_id
+    FROM course_offerings AS o
+    JOIN offering_professors AS op ON op.offering_id = o.offering_id
+    WHERE o.year = 2026
+      AND o.semester = '1'
+      AND o.course_code = 'CSE423'
+      AND o.section = '00'
+)
+SELECT DISTINCT o.course_code, o.section
+FROM course_offerings AS o
+JOIN offering_professors AS op ON op.offering_id = o.offering_id
+JOIN anchor_professors AS ap ON ap.professor_id = op.professor_id
+JOIN course_offering_categories AS oc ON oc.offering_id = o.offering_id
+JOIN departments AS d ON d.department_id = oc.department_id
+JOIN course_categories AS cc ON cc.category_id = oc.category_id
+WHERE o.year = 2026
+  AND o.semester = '1'
+  AND d.name = '컴퓨터공학과'
+  AND cc.category_name = '전공필수'
+  AND o.course_code <> 'CSE423'
+ORDER BY o.course_code, o.section;",5032,3.65,"2024학년도 2학기 CSE302-02 컴퓨터네트워크 담당 교수의 다른 수업 중, 같은 학기 인공지능학과 기준 전공필수이면서 3학점인 강좌의 과목코드, 분반과 학점을 알려줘. CSE302의 다른 분반도 제외해줘. | 2024학년도 2학기 AI4001-00 캡스톤디자인 담당 교수가 같은 학기 컴퓨터공학과 개설목록에서 맡은 다른 과목의 코드와 분반을 알려줘. AI4001의 다른 분반도 제외해줘. | 2024학년도 2학기 CSE302-02 컴퓨터네트워크 담당 교수가 같은 학기 인공지능학과 개설목록에서 맡은 다른 과목의 분반 수와 개설학점 합계를 알려줘. CSE302의 다른 분반도 제외해줘. | 2024학년도 2학기 인공지능학과 개설목록에서 AI1002 각 분반에 적용된 이수구분을 알려줘."
+J061,"2026학년도 1학기 CSE423-00(정보보호) 담당 교수가 같은 학기 컴퓨터공학과 개설목록에서 맡은 다른 과목의 분반 수와 개설학점 합계를 알려줘. 기준 과목 코드는 제외하고, 다른 분반은 각각 합산해줘.",,"multi_hop_aggregation,prof_credit_load,official_public_facts",True,True,True,correct,,1,True,,,"WITH anchor_professors AS (
+    SELECT DISTINCT op.professor_id
+    FROM course_offerings AS o
+    JOIN offering_professors AS op ON op.offering_id = o.offering_id
+    WHERE o.year = 2026
+      AND o.semester = '1'
+      AND o.course_code = 'CSE423'
+      AND o.section = '00'
+),
+target_offerings AS (
+    SELECT DISTINCT o.offering_id, o.credits
+    FROM course_offerings AS o
+    JOIN offering_professors AS op ON op.offering_id = o.offering_id
+    JOIN anchor_professors AS ap ON ap.professor_id = op.professor_id
+    JOIN course_offering_categories AS oc ON oc.offering_id = o.offering_id
+    JOIN departments AS d ON d.department_id = oc.department_id
+    WHERE o.year = 2026
+      AND o.semester = '1'
+      AND d.name = '컴퓨터공학과'
+      AND o.course_code <> 'CSE423'
+)
+SELECT COUNT(*) AS section_count,
+       SUM(credits) AS total_credits
+FROM target_offerings;",5112,4.32,"2024학년도 2학기 CSE302-02 컴퓨터네트워크 담당 교수가 같은 학기 인공지능학과 개설목록에서 맡은 다른 과목의 분반 수와 개설학점 합계를 알려줘. CSE302의 다른 분반도 제외해줘. | 2024학년도 2학기 AI4001-00 캡스톤디자인 담당 교수가 같은 학기 컴퓨터공학과 개설목록에서 맡은 다른 과목의 코드와 분반을 알려줘. AI4001의 다른 분반도 제외해줘. | 2024학년도 2학기 인공지능학과 개설목록에서 전공선택으로 분류된 강좌의 분반 수와 개설학점 합계를 알려줘. | 2024학년도 2학기 CSE302-02 컴퓨터네트워크 담당 교수의 다른 수업 중, 같은 학기 인공지능학과 기준 전공필수이면서 3학점인 강좌의 과목코드, 분반과 학점을 알려줘. CSE302의 다른 분반도 제외해줘."
+J062,2025학년도 1학기 SWCON253-00(기계학습)의 담당 교수가 2026학년도 1학기 소프트웨어융합학과 개설목록에서 맡은 다른 과목의 코드와 분반을 알려줘. 기준 과목 코드는 제외해줘.,,"multi_document_multi_hop,prof_future_other,official_public_facts",True,True,True,correct,,1,True,,,"WITH anchor_professors AS (
+    SELECT DISTINCT op.professor_id
+    FROM course_offerings AS o
+    JOIN offering_professors AS op ON op.offering_id = o.offering_id
+    WHERE o.year = 2025
+      AND o.semester = '1'
+      AND o.course_code = 'SWCON253'
+      AND o.section = '00'
+)
+SELECT DISTINCT o.course_code, o.section
+FROM course_offerings AS o
+JOIN offering_professors AS op ON op.offering_id = o.offering_id
+JOIN anchor_professors AS ap ON ap.professor_id = op.professor_id
+JOIN course_offering_categories AS oc ON oc.offering_id = o.offering_id
+JOIN departments AS d ON d.department_id = oc.department_id
+WHERE o.year = 2026
+  AND o.semester = '1'
+  AND d.name = '소프트웨어융합학과'
+  AND o.course_code <> 'SWCON253'
+ORDER BY o.course_code, o.section;",4992,4.44,"2024학년도 2학기 AI4001-00 캡스톤디자인 담당 교수가 같은 학기 컴퓨터공학과 개설목록에서 맡은 다른 과목의 코드와 분반을 알려줘. AI4001의 다른 분반도 제외해줘. | 2024학년도 2학기 CSE302-02 컴퓨터네트워크 담당 교수가 같은 학기 인공지능학과 개설목록에서 맡은 다른 과목의 분반 수와 개설학점 합계를 알려줘. CSE302의 다른 분반도 제외해줘. | 2024학년도 2학기 CSE302-02 컴퓨터네트워크 담당 교수의 다른 수업 중, 같은 학기 인공지능학과 기준 전공필수이면서 3학점인 강좌의 과목코드, 분반과 학점을 알려줘. CSE302의 다른 분반도 제외해줘. | 2024학년도 2학기 인공지능학과 개설목록에서 AI1002 각 분반에 적용된 이수구분을 알려줘."
+J063,2025학년도 1학기 CSE423-00(정보보호)의 담당 교수가 2026학년도 1학기 컴퓨터공학과 개설목록에서 맡은 다른 과목의 코드와 분반을 알려줘. 기준 과목 코드는 제외해줘.,,"multi_document_multi_hop,prof_future_other,official_public_facts",True,True,True,correct,,1,True,,,"WITH anchor_professors AS (
+    SELECT DISTINCT op.professor_id
+    FROM course_offerings AS o
+    JOIN offering_professors AS op ON op.offering_id = o.offering_id
+    WHERE o.year = 2025
+      AND o.semester = '1'
+      AND o.course_code = 'CSE423'
+      AND o.section = '00'
+)
+SELECT DISTINCT o.course_code, o.section
+FROM course_offerings AS o
+JOIN offering_professors AS op ON op.offering_id = o.offering_id
+JOIN anchor_professors AS ap ON ap.professor_id = op.professor_id
+JOIN course_offering_categories AS oc ON oc.offering_id = o.offering_id
+JOIN departments AS d ON d.department_id = oc.department_id
+WHERE o.year = 2026
+  AND o.semester = '1'
+  AND d.name = '컴퓨터공학과'
+  AND o.course_code <> 'CSE423'
+ORDER BY o.course_code, o.section;",5055,3.84,"2024학년도 2학기 AI4001-00 캡스톤디자인 담당 교수가 같은 학기 컴퓨터공학과 개설목록에서 맡은 다른 과목의 코드와 분반을 알려줘. AI4001의 다른 분반도 제외해줘. | 2024학년도 2학기 CSE302-02 컴퓨터네트워크 담당 교수가 같은 학기 인공지능학과 개설목록에서 맡은 다른 과목의 분반 수와 개설학점 합계를 알려줘. CSE302의 다른 분반도 제외해줘. | 2024학년도 2학기 CSE302-02 컴퓨터네트워크 담당 교수의 다른 수업 중, 같은 학기 인공지능학과 기준 전공필수이면서 3학점인 강좌의 과목코드, 분반과 학점을 알려줘. CSE302의 다른 분반도 제외해줘. | 2024학년도 2학기 AI1002-00 인공지능프로그래밍과 CSE203-00 컴퓨터구조를 모두 담당한 교수 이름을 알려줘."
+J064,2025학년도 2학기 CSE497-02(연구연수활동2(컴퓨터공학))의 담당 교수가 2026학년도 2학기 컴퓨터공학과 개설목록에서 맡은 다른 과목의 코드와 분반을 알려줘. 기준 과목 코드는 제외해줘.,,"multi_document_multi_hop,prof_future_other,official_public_facts",True,True,True,correct,,1,True,,,"WITH anchor_professors AS (
+    SELECT DISTINCT op.professor_id
+    FROM course_offerings AS o
+    JOIN offering_professors AS op ON op.offering_id = o.offering_id
+    WHERE o.year = 2025
+      AND o.semester = '2'
+      AND o.course_code = 'CSE497'
+      AND o.section = '02'
+)
+SELECT DISTINCT o.course_code, o.section
+FROM course_offerings AS o
+JOIN offering_professors AS op ON op.offering_id = o.offering_id
+JOIN anchor_professors AS ap ON ap.professor_id = op.professor_id
+JOIN course_offering_categories AS oc ON oc.offering_id = o.offering_id
+JOIN departments AS d ON d.department_id = oc.department_id
+WHERE o.year = 2026
+  AND o.semester = '2'
+  AND d.name = '컴퓨터공학과'
+  AND o.course_code <> 'CSE497'
+ORDER BY o.course_code, o.section;",5005,4.66,"2024학년도 2학기 AI4001-00 캡스톤디자인 담당 교수가 같은 학기 컴퓨터공학과 개설목록에서 맡은 다른 과목의 코드와 분반을 알려줘. AI4001의 다른 분반도 제외해줘. | 2024학년도 2학기 CSE302-02 컴퓨터네트워크 담당 교수가 같은 학기 인공지능학과 개설목록에서 맡은 다른 과목의 분반 수와 개설학점 합계를 알려줘. CSE302의 다른 분반도 제외해줘. | 2024학년도 2학기 CSE302-02 컴퓨터네트워크 담당 교수의 다른 수업 중, 같은 학기 인공지능학과 기준 전공필수이면서 3학점인 강좌의 과목코드, 분반과 학점을 알려줘. CSE302의 다른 분반도 제외해줘. | 2024학년도 2학기 인공지능학과 개설목록에서 AI1002 각 분반에 적용된 이수구분을 알려줘."
+J065,2026학년도 1학기 IE419-00(서비스데이터사이언스)와 2025학년도 2학기 IE306-00(데이터마이닝)를 모두 담당한 교수 이름을 알려줘.,,"multi_document_multi_hop,common_instructor,official_public_facts",True,True,True,correct,,1,True,,,"SELECT p.name
+FROM professors AS p
+WHERE p.professor_id IN (
+    SELECT op.professor_id
+    FROM course_offerings AS o
+    JOIN offering_professors AS op ON op.offering_id = o.offering_id
+    WHERE o.year = 2026 AND o.semester = '1'
+      AND o.course_code = 'IE419' AND o.section = '00'
+    INTERSECT
+    SELECT op.professor_id
+    FROM course_offerings AS o
+    JOIN offering_professors AS op ON op.offering_id = o.offering_id
+    WHERE o.year = 2025 AND o.semester = '2'
+      AND o.course_code = 'IE306' AND o.section = '00'
+)
+ORDER BY p.name;",4830,4.22,"2024학년도 2학기 AI1002-00 인공지능프로그래밍과 CSE203-00 컴퓨터구조를 모두 담당한 교수 이름을 알려줘. | 2024학년도 2학기 AI4001-00 캡스톤디자인 담당 교수가 같은 학기 컴퓨터공학과 개설목록에서 맡은 다른 과목의 코드와 분반을 알려줘. AI4001의 다른 분반도 제외해줘. | 2024학년도 2학기 CSE302-02 컴퓨터네트워크 담당 교수의 다른 수업 중, 같은 학기 인공지능학과 기준 전공필수이면서 3학점인 강좌의 과목코드, 분반과 학점을 알려줘. CSE302의 다른 분반도 제외해줘. | 2024학년도 2학기 AI1002-00 인공지능프로그래밍의 영어강좌 구분을 영어전체·영어부분·해당없음으로, 산학필수 여부를 예·아니오로 알려줘."
+J066,2025학년도 2학기 AI4007-00(독립심화학습(인공지능)2)와 2026학년도 1학기 CSE204-01(자료구조)를 모두 담당한 교수 이름을 알려줘.,,"multi_document_multi_hop,common_instructor,official_public_facts",True,True,True,correct,,1,True,,,"SELECT p.name
+FROM professors AS p
+WHERE p.professor_id IN (
+    SELECT op.professor_id
+    FROM course_offerings AS o
+    JOIN offering_professors AS op ON op.offering_id = o.offering_id
+    WHERE o.year = 2025 AND o.semester = '2'
+      AND o.course_code = 'AI4007' AND o.section = '00'
+    INTERSECT
+    SELECT op.professor_id
+    FROM course_offerings AS o
+    JOIN offering_professors AS op ON op.offering_id = o.offering_id
+    WHERE o.year = 2026 AND o.semester = '1'
+      AND o.course_code = 'CSE204' AND o.section = '01'
+)
+ORDER BY p.name;",4981,3.35,"2024학년도 2학기 AI1002-00 인공지능프로그래밍과 CSE203-00 컴퓨터구조를 모두 담당한 교수 이름을 알려줘. | 2024학년도 2학기 AI4001-00 캡스톤디자인 담당 교수가 같은 학기 컴퓨터공학과 개설목록에서 맡은 다른 과목의 코드와 분반을 알려줘. AI4001의 다른 분반도 제외해줘. | 2024학년도 2학기 CSE302-02 컴퓨터네트워크 담당 교수의 다른 수업 중, 같은 학기 인공지능학과 기준 전공필수이면서 3학점인 강좌의 과목코드, 분반과 학점을 알려줘. CSE302의 다른 분반도 제외해줘. | 2024학년도 2학기 CSE302-02 컴퓨터네트워크 담당 교수가 같은 학기 인공지능학과 개설목록에서 맡은 다른 과목의 분반 수와 개설학점 합계를 알려줘. CSE302의 다른 분반도 제외해줘."
+J067,2025학년도 2학기 SWCON253-01(기계학습)와 2026학년도 2학기 CSE497-03(연구연수활동2(컴퓨터공학))를 모두 담당한 교수 이름을 알려줘.,,"multi_document_multi_hop,common_instructor,official_public_facts",True,True,True,correct,,1,True,,,"SELECT p.name
+FROM professors AS p
+WHERE p.professor_id IN (
+    SELECT op.professor_id
+    FROM course_offerings AS o
+    JOIN offering_professors AS op ON op.offering_id = o.offering_id
+    WHERE o.year = 2025 AND o.semester = '2'
+      AND o.course_code = 'SWCON253' AND o.section = '01'
+    INTERSECT
+    SELECT op.professor_id
+    FROM course_offerings AS o
+    JOIN offering_professors AS op ON op.offering_id = o.offering_id
+    WHERE o.year = 2026 AND o.semester = '2'
+      AND o.course_code = 'CSE497' AND o.section = '03'
+)
+ORDER BY p.name;",4979,3.07,"2024학년도 2학기 AI1002-00 인공지능프로그래밍과 CSE203-00 컴퓨터구조를 모두 담당한 교수 이름을 알려줘. | 2024학년도 2학기 CSE302-02 컴퓨터네트워크 담당 교수의 다른 수업 중, 같은 학기 인공지능학과 기준 전공필수이면서 3학점인 강좌의 과목코드, 분반과 학점을 알려줘. CSE302의 다른 분반도 제외해줘. | 2024학년도 2학기 AI4001-00 캡스톤디자인 담당 교수가 같은 학기 컴퓨터공학과 개설목록에서 맡은 다른 과목의 코드와 분반을 알려줘. AI4001의 다른 분반도 제외해줘. | 2024학년도 2학기 CSE302-02 컴퓨터네트워크 담당 교수가 같은 학기 인공지능학과 개설목록에서 맡은 다른 과목의 분반 수와 개설학점 합계를 알려줘. CSE302의 다른 분반도 제외해줘."
+J068,2025학년도 1학기 CSE406-05(캡스톤디자인)와 2026학년도 2학기 SWCON313-00(가상현실)를 모두 담당한 교수 이름을 알려줘.,,"multi_document_multi_hop,common_instructor,official_public_facts",True,True,True,correct,,1,True,,,"SELECT p.name
+FROM professors AS p
+WHERE p.professor_id IN (
+    SELECT op.professor_id
+    FROM course_offerings AS o
+    JOIN offering_professors AS op ON op.offering_id = o.offering_id
+    WHERE o.year = 2025 AND o.semester = '1'
+      AND o.course_code = 'CSE406' AND o.section = '05'
+    INTERSECT
+    SELECT op.professor_id
+    FROM course_offerings AS o
+    JOIN offering_professors AS op ON op.offering_id = o.offering_id
+    WHERE o.year = 2026 AND o.semester = '2'
+      AND o.course_code = 'SWCON313' AND o.section = '00'
+)
+ORDER BY p.name;",4989,3.73,"2024학년도 2학기 AI1002-00 인공지능프로그래밍과 CSE203-00 컴퓨터구조를 모두 담당한 교수 이름을 알려줘. | 2024학년도 2학기 AI4001-00 캡스톤디자인 담당 교수가 같은 학기 컴퓨터공학과 개설목록에서 맡은 다른 과목의 코드와 분반을 알려줘. AI4001의 다른 분반도 제외해줘. | 2024학년도 2학기 CSE302-02 컴퓨터네트워크 담당 교수의 다른 수업 중, 같은 학기 인공지능학과 기준 전공필수이면서 3학점인 강좌의 과목코드, 분반과 학점을 알려줘. CSE302의 다른 분반도 제외해줘. | 2024학년도 2학기 CSE302-02 컴퓨터네트워크 담당 교수가 같은 학기 인공지능학과 개설목록에서 맡은 다른 과목의 분반 수와 개설학점 합계를 알려줘. CSE302의 다른 분반도 제외해줘."
+J069,2026학년도 1학기 IE419-00(서비스데이터사이언스)와 2026학년도 1학기 SWCON104-01(웹/파이선프로그래밍)의 정규 수업시간이 일주일에 총 몇 분 겹쳐? 시험 일정은 제외하고 요일별 겹치는 구간만 합산해줘.,,"temporal_reasoning,schedule_overlap,official_public_facts",True,True,True,correct,,1,True,,,"WITH course_a AS (
+    SELECT DISTINCT o.offering_id, ts.day, ts.start_time, ts.end_time
+    FROM course_offerings AS o
+    JOIN class_times AS ct ON ct.offering_id = o.offering_id
+    JOIN time_slots AS ts ON ts.time_slot_id = ct.time_slot_id
+    WHERE o.year = 2026 AND o.semester = '1'
+      AND o.course_code = 'IE419' AND o.section = '00'
+      AND o.schedule_status = 'SCHEDULED'
+),
+course_b AS (
+    SELECT DISTINCT o.offering_id, ts.day, ts.start_time, ts.end_time
+    FROM course_offerings AS o
+    JOIN class_times AS ct ON ct.offering_id = o.offering_id
+    JOIN time_slots AS ts ON ts.time_slot_id = ct.time_slot_id
+    WHERE o.year = 2026 AND o.semester = '1'
+      AND o.course_code = 'SWCON104' AND o.section = '01'
+      AND o.schedule_status = 'SCHEDULED'
+)
+SELECT COALESCE(SUM(
+    MAX(
+        0,
+        MIN(
+            CAST(SUBSTR(a.end_time, 1, 2) AS INTEGER) * 60
+                + CAST(SUBSTR(a.end_time, 4, 2) AS INTEGER),
+            CAST(SUBSTR(b.end_time, 1, 2) AS INTEGER) * 60
+                + CAST(SUBSTR(b.end_time, 4, 2) AS INTEGER)
+        )
+        - MAX(
+            CAST(SUBSTR(a.start_time, 1, 2) AS INTEGER) * 60
+                + CAST(SUBSTR(a.start_time, 4, 2) AS INTEGER),
+            CAST(SUBSTR(b.start_time, 1, 2) AS INTEGER) * 60
+                + CAST(SUBSTR(b.start_time, 4, 2) AS INTEGER)
+        )
+    )
+), 0) AS overlapping_minutes
+FROM course_a AS a
+JOIN course_b AS b ON b.day = a.day;",5251,8.92,"2024학년도 2학기 AI1002-00 인공지능프로그래밍의 요일, 시작·종료 시간과 강의실을 알려줘. | 2024학년도 2학기 AI1002-00 인공지능프로그래밍의 영어강좌 구분을 영어전체·영어부분·해당없음으로, 산학필수 여부를 예·아니오로 알려줘. | 2024학년도 2학기 AI1002-00 인공지능프로그래밍과 CSE203-00 컴퓨터구조를 모두 담당한 교수 이름을 알려줘. | 2024학년도 2학기 AI3008-00 설명및신뢰가능한AI에서 중간고사 75점, 기말고사 85점을 받았다면 두 시험이 최종 100점에 기여하는 점수 합은 얼마야? 다른 항목은 제외해줘."
+J070,2025학년도 2학기 AI4007-00(독립심화학습(인공지능)2)와 2025학년도 2학기 SWCON401-08(소프트웨어융합캡스톤디자인)의 정규 수업시간이 일주일에 총 몇 분 겹쳐? 시험 일정은 제외하고 요일별 겹치는 구간만 합산해줘.,,"temporal_reasoning,schedule_overlap,official_public_facts",True,True,True,correct,,1,True,,,"WITH a AS (
+    SELECT DISTINCT ts.day,
+           CAST(substr(ts.start_time, 1, 2) AS INTEGER) * 60
+             + CAST(substr(ts.start_time, 4, 2) AS INTEGER) AS start_min,
+           CAST(substr(ts.end_time, 1, 2) AS INTEGER) * 60
+             + CAST(substr(ts.end_time, 4, 2) AS INTEGER) AS end_min
+    FROM course_offerings AS o
+    JOIN class_times AS ct ON ct.offering_id = o.offering_id
+    JOIN time_slots AS ts ON ts.time_slot_id = ct.time_slot_id
+    WHERE o.year = 2025 AND o.semester = '2'
+      AND o.course_code = 'AI4007' AND o.section = '00'
+),
+b AS (
+    SELECT DISTINCT ts.day,
+           CAST(substr(ts.start_time, 1, 2) AS INTEGER) * 60
+             + CAST(substr(ts.start_time, 4, 2) AS INTEGER) AS start_min,
+           CAST(substr(ts.end_time, 1, 2) AS INTEGER) * 60
+             + CAST(substr(ts.end_time, 4, 2) AS INTEGER) AS end_min
+    FROM course_offerings AS o
+    JOIN class_times AS ct ON ct.offering_id = o.offering_id
+    JOIN time_slots AS ts ON ts.time_slot_id = ct.time_slot_id
+    WHERE o.year = 2025 AND o.semester = '2'
+      AND o.course_code = 'SWCON401' AND o.section = '08'
+)
+SELECT COALESCE(
+           SUM(MIN(a.end_min, b.end_min) - MAX(a.start_min, b.start_min)),
+           0
+       ) AS overlapping_minutes
+FROM a
+JOIN b ON b.day = a.day
+WHERE a.start_min < b.end_min
+  AND b.start_min < a.end_min;",5262,8.23,"2024학년도 2학기 AI1002-00 인공지능프로그래밍의 요일, 시작·종료 시간과 강의실을 알려줘. | 2024학년도 2학기 AI4001-00 캡스톤디자인 담당 교수가 같은 학기 컴퓨터공학과 개설목록에서 맡은 다른 과목의 코드와 분반을 알려줘. AI4001의 다른 분반도 제외해줘. | 2024학년도 2학기 AI1002-00 인공지능프로그래밍의 영어강좌 구분을 영어전체·영어부분·해당없음으로, 산학필수 여부를 예·아니오로 알려줘. | 로그인 학생 202210029가 2025학년도 2학기에 수강한 과목 중 교재가 등록된 과목의 과목코드와 교재 제목을 알려줘."
+J071,2025학년도 2학기 SWCON253-01(기계학습)와 2025학년도 2학기 CSE103-01(객체지향프로그래밍)의 정규 수업시간이 일주일에 총 몇 분 겹쳐? 시험 일정은 제외하고 요일별 겹치는 구간만 합산해줘.,,"temporal_reasoning,schedule_overlap,official_public_facts",True,True,True,correct,,1,True,,,"WITH class_intervals AS (
+    SELECT DISTINCT
+           o.course_code,
+           ts.day,
+           CAST(substr(ts.start_time, 1, 2) AS INTEGER) * 60
+               + CAST(substr(ts.start_time, 4, 2) AS INTEGER) AS start_minute,
+           CAST(substr(ts.end_time, 1, 2) AS INTEGER) * 60
+               + CAST(substr(ts.end_time, 4, 2) AS INTEGER) AS end_minute
+    FROM course_offerings AS o
+    JOIN class_times AS ct ON ct.offering_id = o.offering_id
+    JOIN time_slots AS ts ON ts.time_slot_id = ct.time_slot_id
+    WHERE o.year = 2025
+      AND o.semester = '2'
+      AND (
+          (o.course_code = 'SWCON253' AND o.section = '01')
+          OR (o.course_code = 'CSE103' AND o.section = '01')
+      )
+),
+overlaps AS (
+    SELECT min(a.end_minute, b.end_minute)
+           - max(a.start_minute, b.start_minute) AS overlap_minutes
+    FROM class_intervals AS a
+    JOIN class_intervals AS b ON b.day = a.day
+    WHERE a.course_code = 'SWCON253'
+      AND b.course_code = 'CSE103'
+      AND min(a.end_minute, b.end_minute) > max(a.start_minute, b.start_minute)
+)
+SELECT COALESCE(SUM(overlap_minutes), 0) AS total_overlap_minutes
+FROM overlaps;",5223,11.79,"2024학년도 2학기 AI1002-00 인공지능프로그래밍의 요일, 시작·종료 시간과 강의실을 알려줘. | 로그인 학생 202210029가 2025학년도 2학기에 수강한 과목 중 교재가 등록된 과목의 과목코드와 교재 제목을 알려줘. | 2024학년도 2학기 AI1002-00 인공지능프로그래밍의 영어강좌 구분을 영어전체·영어부분·해당없음으로, 산학필수 여부를 예·아니오로 알려줘. | 2024학년도 2학기 AI1002-00 인공지능프로그래밍과 CSE203-00 컴퓨터구조를 모두 담당한 교수 이름을 알려줘."
+J072,2026학년도 1학기 CSE304-01(알고리즘)와 2026학년도 1학기 EE210-01(신호와시스템)의 정규 수업시간이 일주일에 총 몇 분 겹쳐? 시험 일정은 제외하고 요일별 겹치는 구간만 합산해줘.,,"temporal_reasoning,schedule_overlap,official_public_facts",True,True,True,correct,,1,True,,,"WITH target_offerings AS (
+    SELECT offering_id, course_code
+    FROM course_offerings
+    WHERE year = 2026 AND semester = '1'
+      AND (course_code = 'CSE304' AND section = '01'
+           OR course_code = 'EE210' AND section = '01')
+),
+class_intervals AS (
+    SELECT DISTINCT o.course_code, ts.day, ts.start_time, ts.end_time
+    FROM target_offerings AS o
+    JOIN class_times AS ct ON ct.offering_id = o.offering_id
+    JOIN time_slots AS ts ON ts.time_slot_id = ct.time_slot_id
+),
+overlaps AS (
+    SELECT
+        MAX(
+            0,
+            MIN(
+                CAST(substr(a.end_time, 1, 2) AS INTEGER) * 60
+                    + CAST(substr(a.end_time, 4, 2) AS INTEGER),
+                CAST(substr(b.end_time, 1, 2) AS INTEGER) * 60
+                    + CAST(substr(b.end_time, 4, 2) AS INTEGER)
+            )
+            - MAX(
+                CAST(substr(a.start_time, 1, 2) AS INTEGER) * 60
+                    + CAST(substr(a.start_time, 4, 2) AS INTEGER),
+                CAST(substr(b.start_time, 1, 2) AS INTEGER) * 60
+                    + CAST(substr(b.start_time, 4, 2) AS INTEGER)
+            )
+        ) AS overlap_minutes
+    FROM class_intervals AS a
+    JOIN class_intervals AS b
+      ON b.day = a.day
+    WHERE a.course_code = 'CSE304'
+      AND b.course_code = 'EE210'
+)
+SELECT COALESCE(SUM(overlap_minutes), 0) AS total_overlap_minutes
+FROM overlaps;",5391,7.99,"2024학년도 2학기 AI1002-00 인공지능프로그래밍의 요일, 시작·종료 시간과 강의실을 알려줘. | 2024학년도 2학기 CSE302-02 컴퓨터네트워크 담당 교수의 다른 수업 중, 같은 학기 인공지능학과 기준 전공필수이면서 3학점인 강좌의 과목코드, 분반과 학점을 알려줘. CSE302의 다른 분반도 제외해줘. | 2024학년도 2학기 AI1002-00 인공지능프로그래밍의 영어강좌 구분을 영어전체·영어부분·해당없음으로, 산학필수 여부를 예·아니오로 알려줘. | 2024학년도 2학기 CSE302-02 컴퓨터네트워크 담당 교수가 같은 학기 인공지능학과 개설목록에서 맡은 다른 과목의 분반 수와 개설학점 합계를 알려줘. CSE302의 다른 분반도 제외해줘."
+J073,"다음 세 강좌 중 중간·기말 비율 합계가 70% 이상인 강좌의 과목코드·연도·학기·분반·합계를 알려줘: 2025학년도 1학기 CSE406-01(캡스톤디자인), 2026학년도 1학기 AI4003-00(졸업논문(인공지능)), 2025학년도 1학기 CSE405-00(졸업프로젝트).",,"multi_document_reasoning,exam_threshold_set,official_public_facts",True,True,True,correct,,1,True,,,"SELECT o.course_code, o.year, o.semester, o.section,
+       s.midterm_percentage + s.final_exam_percentage AS exam_percentage_total
+FROM course_offerings AS o
+JOIN syllabi AS s ON s.offering_id = o.offering_id
+WHERE (
+        (o.year = 2025 AND o.semester = '1' AND o.course_code = 'CSE406' AND o.section = '01')
+     OR (o.year = 2026 AND o.semester = '1' AND o.course_code = 'AI4003' AND o.section = '00')
+     OR (o.year = 2025 AND o.semester = '1' AND o.course_code = 'CSE405' AND o.section = '00')
+)
+  AND s.midterm_percentage + s.final_exam_percentage >= 70;",4832,5.43,2024학년도 2학기 AI4001-00 캡스톤디자인 담당 교수가 같은 학기 컴퓨터공학과 개설목록에서 맡은 다른 과목의 코드와 분반을 알려줘. AI4001의 다른 분반도 제외해줘. | 2024학년도 2학기 CSE302-02 컴퓨터네트워크 담당 교수가 같은 학기 인공지능학과 개설목록에서 맡은 다른 과목의 분반 수와 개설학점 합계를 알려줘. CSE302의 다른 분반도 제외해줘. | 2024학년도 2학기 AI3008-00 설명및신뢰가능한AI의 중간고사와 기말고사 반영 비율은 각각 몇 퍼센트야? | 로그인 학생 202210029가 2025학년도 2학기에 수강한 과목 중 교재가 등록된 과목의 과목코드와 교재 제목을 알려줘.
+J074,"이 세 강좌 중 과제 비율이 가장 낮은 강좌의 과목코드·연도·학기·분반·과제 비율을 알려줘. 동률은 모두 포함해줘: 2025학년도 1학기 CSE406-01(캡스톤디자인), 2026학년도 1학기 AI4003-00(졸업논문(인공지능)), 2025학년도 1학기 CSE405-00(졸업프로젝트).",,"multi_document_reasoning,assignment_ranking,official_public_facts",True,True,True,correct,,1,True,,,"WITH candidates AS (
+    SELECT o.course_code, o.year, o.semester, o.section, s.assignment_percentage
+    FROM course_offerings AS o
+    JOIN syllabi AS s ON s.offering_id = o.offering_id
+    WHERE (o.course_code = 'CSE406' AND o.year = 2025 AND o.semester = '1' AND o.section = '01')
+       OR (o.course_code = 'AI4003' AND o.year = 2026 AND o.semester = '1' AND o.section = '00')
+       OR (o.course_code = 'CSE405' AND o.year = 2025 AND o.semester = '1' AND o.section = '00')
+)
+SELECT course_code, year, semester, section, assignment_percentage
+FROM candidates
+WHERE assignment_percentage = (
+    SELECT MIN(assignment_percentage)
+    FROM candidates
+);",4768,4.13,"2024학년도 2학기 AI3008-00 설명및신뢰가능한AI의 중간고사와 기말고사 반영 비율은 각각 몇 퍼센트야? | 로그인 학생 202210029가 2025학년도 2학기에 수강한 과목 중 교재가 등록된 과목의 과목코드와 교재 제목을 알려줘. | 2024학년도 2학기 AI4001-00 캡스톤디자인 담당 교수가 같은 학기 컴퓨터공학과 개설목록에서 맡은 다른 과목의 코드와 분반을 알려줘. AI4001의 다른 분반도 제외해줘. | 2024학년도 2학기 AI3008-00 설명및신뢰가능한AI에서 중간고사 75점, 기말고사 85점을 받았다면 두 시험이 최종 100점에 기여하는 점수 합은 얼마야? 다른 항목은 제외해줘."
+J075,"다음 세 강좌 중 중간·기말 비율 합계가 70% 이상인 강좌의 과목코드·연도·학기·분반·합계를 알려줘: 2026학년도 1학기 IE419-00(서비스데이터사이언스), 2025학년도 2학기 CSE497-02(연구연수활동2(컴퓨터공학)), 2026학년도 1학기 EE209-01(논리회로).",,"multi_document_reasoning,exam_threshold_set,official_public_facts",True,True,True,correct,,1,True,,,"SELECT o.course_code, o.year, o.semester, o.section,
+       s.midterm_percentage + s.final_exam_percentage AS exam_percentage_sum
+FROM course_offerings AS o
+JOIN syllabi AS s ON s.offering_id = o.offering_id
+WHERE (
+        (o.year = 2026 AND o.semester = '1'
+         AND o.course_code = 'IE419' AND o.section = '00')
+     OR (o.year = 2025 AND o.semester = '2'
+         AND o.course_code = 'CSE497' AND o.section = '02')
+     OR (o.year = 2026 AND o.semester = '1'
+         AND o.course_code = 'EE209' AND o.section = '01')
+      )
+  AND s.midterm_percentage + s.final_exam_percentage >= 70;",4932,5.8,"2024학년도 2학기 CSE302-02 컴퓨터네트워크 담당 교수가 같은 학기 인공지능학과 개설목록에서 맡은 다른 과목의 분반 수와 개설학점 합계를 알려줘. CSE302의 다른 분반도 제외해줘. | 2024학년도 2학기 AI3008-00 설명및신뢰가능한AI의 중간고사와 기말고사 반영 비율은 각각 몇 퍼센트야? | 2024학년도 2학기 인공지능학과 개설목록에서 전공선택으로 분류된 강좌의 분반 수와 개설학점 합계를 알려줘. | 2024학년도 2학기 CSE302-02 컴퓨터네트워크 담당 교수의 다른 수업 중, 같은 학기 인공지능학과 기준 전공필수이면서 3학점인 강좌의 과목코드, 분반과 학점을 알려줘. CSE302의 다른 분반도 제외해줘."
+J076,"이 세 강좌 중 과제 비율이 가장 낮은 강좌의 과목코드·연도·학기·분반·과제 비율을 알려줘. 동률은 모두 포함해줘: 2026학년도 1학기 IE419-00(서비스데이터사이언스), 2025학년도 2학기 CSE497-02(연구연수활동2(컴퓨터공학)), 2026학년도 1학기 EE209-01(논리회로).",,"multi_document_reasoning,assignment_ranking,official_public_facts",True,True,True,correct,,1,True,,,"WITH target_courses AS (
+    SELECT o.course_code, o.year, o.semester, o.section, s.assignment_percentage
+    FROM course_offerings AS o
+    JOIN syllabi AS s ON s.offering_id = o.offering_id
+    WHERE (o.course_code = 'IE419' AND o.year = 2026 AND o.semester = '1' AND o.section = '00')
+       OR (o.course_code = 'CSE497' AND o.year = 2025 AND o.semester = '2' AND o.section = '02')
+       OR (o.course_code = 'EE209' AND o.year = 2026 AND o.semester = '1' AND o.section = '01')
+)
+SELECT course_code, year, semester, section, assignment_percentage
+FROM target_courses
+WHERE assignment_percentage = (
+    SELECT MIN(assignment_percentage)
+    FROM target_courses
+);",4727,4.06,"2024학년도 2학기 AI3008-00 설명및신뢰가능한AI의 중간고사와 기말고사 반영 비율은 각각 몇 퍼센트야? | 로그인 학생 202210029가 2025학년도 2학기에 수강한 과목 중 교재가 등록된 과목의 과목코드와 교재 제목을 알려줘. | 2024학년도 2학기 AI3008-00 설명및신뢰가능한AI에서 중간고사 75점, 기말고사 85점을 받았다면 두 시험이 최종 100점에 기여하는 점수 합은 얼마야? 다른 항목은 제외해줘. | 2024학년도 2학기 CSE302-02 컴퓨터네트워크 담당 교수가 같은 학기 인공지능학과 개설목록에서 맡은 다른 과목의 분반 수와 개설학점 합계를 알려줘. CSE302의 다른 분반도 제외해줘."
+J077,"다음 세 강좌 중 중간·기말 비율 합계가 70% 이상인 강좌의 과목코드·연도·학기·분반·합계를 알려줘: 2025학년도 2학기 CSE302-01(컴퓨터네트워크), 2026학년도 1학기 SWCON321-02(데이터분석캡스톤디자인), 2026학년도 2학기 CSE406-16(캡스톤디자인).",,"multi_document_reasoning,exam_threshold_set,official_public_facts",True,True,True,correct,,1,True,,,"SELECT o.course_code,
+       o.year,
+       o.semester,
+       o.section,
+       s.midterm_percentage + s.final_exam_percentage AS exam_percentage_total
+FROM course_offerings AS o
+JOIN syllabi AS s ON s.offering_id = o.offering_id
+WHERE (
+        (o.year = 2025 AND o.semester = '2' AND o.course_code = 'CSE302' AND o.section = '01')
+     OR (o.year = 2026 AND o.semester = '1' AND o.course_code = 'SWCON321' AND o.section = '02')
+     OR (o.year = 2026 AND o.semester = '2' AND o.course_code = 'CSE406' AND o.section = '16')
+)
+AND s.midterm_percentage + s.final_exam_percentage >= 70;",4979,5.23,"2024학년도 2학기 CSE302-02 컴퓨터네트워크 담당 교수가 같은 학기 인공지능학과 개설목록에서 맡은 다른 과목의 분반 수와 개설학점 합계를 알려줘. CSE302의 다른 분반도 제외해줘. | 2024학년도 2학기 CSE302-02 컴퓨터네트워크 담당 교수의 다른 수업 중, 같은 학기 인공지능학과 기준 전공필수이면서 3학점인 강좌의 과목코드, 분반과 학점을 알려줘. CSE302의 다른 분반도 제외해줘. | 2024학년도 2학기 인공지능학과 개설목록에서 전공선택으로 분류된 강좌의 분반 수와 개설학점 합계를 알려줘. | 2024학년도 2학기 AI3008-00 설명및신뢰가능한AI의 중간고사와 기말고사 반영 비율은 각각 몇 퍼센트야?"
+J078,"이 세 강좌 중 과제 비율이 가장 낮은 강좌의 과목코드·연도·학기·분반·과제 비율을 알려줘. 동률은 모두 포함해줘: 2025학년도 2학기 CSE302-01(컴퓨터네트워크), 2026학년도 1학기 SWCON321-02(데이터분석캡스톤디자인), 2026학년도 2학기 CSE406-16(캡스톤디자인).",,"multi_document_reasoning,assignment_ranking,official_public_facts",True,True,True,correct,,1,True,,,"WITH targets(course_code, year, semester, section) AS (
+    VALUES
+        ('CSE302', 2025, '2', '01'),
+        ('SWCON321', 2026, '1', '02'),
+        ('CSE406', 2026, '2', '16')
+),
+candidates AS (
+    SELECT o.course_code, o.year, o.semester, o.section,
+           s.assignment_percentage
+    FROM targets AS t
+    JOIN course_offerings AS o
+      ON o.course_code = t.course_code
+     AND o.year = t.year
+     AND o.semester = t.semester
+     AND o.section = t.section
+    JOIN syllabi AS s ON s.offering_id = o.offering_id
+)
+SELECT course_code, year, semester, section, assignment_percentage
+FROM candidates
+WHERE assignment_percentage = (
+    SELECT MIN(assignment_percentage)
+    FROM candidates
+);",4999,4.41,"2024학년도 2학기 CSE302-02 컴퓨터네트워크 담당 교수가 같은 학기 인공지능학과 개설목록에서 맡은 다른 과목의 분반 수와 개설학점 합계를 알려줘. CSE302의 다른 분반도 제외해줘. | 2024학년도 2학기 CSE302-02 컴퓨터네트워크 담당 교수의 다른 수업 중, 같은 학기 인공지능학과 기준 전공필수이면서 3학점인 강좌의 과목코드, 분반과 학점을 알려줘. CSE302의 다른 분반도 제외해줘. | 2024학년도 2학기 AI3008-00 설명및신뢰가능한AI의 중간고사와 기말고사 반영 비율은 각각 몇 퍼센트야? | 로그인 학생 202210029가 2025학년도 2학기에 수강한 과목 중 교재가 등록된 과목의 과목코드와 교재 제목을 알려줘."
+J079,"다음 세 강좌 중 중간·기말 비율 합계가 70% 이상인 강좌의 과목코드·연도·학기·분반·합계를 알려줘: 2025학년도 1학기 CSE327-00(소프트웨어공학), 2025학년도 1학기 CSE496-06(연구연수활동1(컴퓨터공학)), 2025학년도 1학기 CSE304-00(알고리즘).",,"multi_document_reasoning,exam_threshold_set,official_public_facts",True,True,True,correct,,1,True,,,"SELECT o.course_code, o.year, o.semester, o.section,
+       s.midterm_percentage + s.final_exam_percentage AS exam_percentage_total
+FROM course_offerings AS o
+JOIN syllabi AS s ON s.offering_id = o.offering_id
+WHERE o.year = 2025
+  AND o.semester = '1'
+  AND (
+      (o.course_code = 'CSE327' AND o.section = '00')
+      OR (o.course_code = 'CSE496' AND o.section = '06')
+      OR (o.course_code = 'CSE304' AND o.section = '00')
+  )
+  AND s.midterm_percentage + s.final_exam_percentage >= 70;",4861,3.88,"2024학년도 2학기 CSE302-02 컴퓨터네트워크 담당 교수가 같은 학기 인공지능학과 개설목록에서 맡은 다른 과목의 분반 수와 개설학점 합계를 알려줘. CSE302의 다른 분반도 제외해줘. | 2024학년도 2학기 CSE302-02 컴퓨터네트워크 담당 교수의 다른 수업 중, 같은 학기 인공지능학과 기준 전공필수이면서 3학점인 강좌의 과목코드, 분반과 학점을 알려줘. CSE302의 다른 분반도 제외해줘. | 로그인 학생 202210029가 2025학년도 2학기에 수강한 과목 중 교재가 등록된 과목의 과목코드와 교재 제목을 알려줘. | 2024학년도 2학기 AI3008-00 설명및신뢰가능한AI의 중간고사와 기말고사 반영 비율은 각각 몇 퍼센트야?"
+J080,"이 세 강좌 중 과제 비율이 가장 낮은 강좌의 과목코드·연도·학기·분반·과제 비율을 알려줘. 동률은 모두 포함해줘: 2025학년도 1학기 CSE327-00(소프트웨어공학), 2025학년도 1학기 CSE496-06(연구연수활동1(컴퓨터공학)), 2025학년도 1학기 CSE304-00(알고리즘).",,"multi_document_reasoning,assignment_ranking,official_public_facts",True,True,True,correct,,1,True,,,"WITH candidates AS (
+    SELECT o.course_code, o.year, o.semester, o.section, s.assignment_percentage
+    FROM course_offerings AS o
+    JOIN syllabi AS s ON s.offering_id = o.offering_id
+    WHERE o.year = 2025
+      AND o.semester = '1'
+      AND (
+          (o.course_code = 'CSE327' AND o.section = '00')
+          OR (o.course_code = 'CSE496' AND o.section = '06')
+          OR (o.course_code = 'CSE304' AND o.section = '00')
+      )
+)
+SELECT course_code, year, semester, section, assignment_percentage
+FROM candidates
+WHERE assignment_percentage = (SELECT MIN(assignment_percentage) FROM candidates);",4823,3.84,"로그인 학생 202210029가 2025학년도 2학기에 수강한 과목 중 교재가 등록된 과목의 과목코드와 교재 제목을 알려줘. | 2024학년도 2학기 AI3008-00 설명및신뢰가능한AI의 중간고사와 기말고사 반영 비율은 각각 몇 퍼센트야? | 2024학년도 2학기 CSE302-02 컴퓨터네트워크 담당 교수가 같은 학기 인공지능학과 개설목록에서 맡은 다른 과목의 분반 수와 개설학점 합계를 알려줘. CSE302의 다른 분반도 제외해줘. | 2024학년도 2학기 CSE302-02 컴퓨터네트워크 담당 교수의 다른 수업 중, 같은 학기 인공지능학과 기준 전공필수이면서 3학점인 강좌의 과목코드, 분반과 학점을 알려줘. CSE302의 다른 분반도 제외해줘."
+J081,"2026학년도 1학기 소프트웨어융합학과 원천 개설목록에서 전공필수로 분류된 강좌의 전체 분반 수와 개설학점 총합을 알려줘. 같은 과목의 서로 다른 분반은 각각 1개 강좌로 세고, 각 분반의 학점을 모두 합산해줘.",,"classification_aggregation,department_required_load,official_public_facts",True,True,True,correct,,1,True,,,"WITH target_offerings AS (
+    SELECT DISTINCT o.offering_id, o.credits
+    FROM course_offerings AS o
+    JOIN course_offering_categories AS oc
+      ON oc.offering_id = o.offering_id
+    JOIN departments AS d
+      ON d.department_id = oc.department_id
+    JOIN course_categories AS cc
+      ON cc.category_id = oc.category_id
+    WHERE o.year = 2026
+      AND o.semester = '1'
+      AND d.name = '소프트웨어융합학과'
+      AND cc.category_name = '전공필수'
+)
+SELECT COUNT(*) AS section_count,
+       SUM(credits) AS total_credits
+FROM target_offerings;",4879,4.25,"2024학년도 2학기 인공지능학과 개설목록에서 전공선택으로 분류된 강좌의 분반 수와 개설학점 합계를 알려줘. | 2024학년도 2학기 CSE302-02 컴퓨터네트워크 담당 교수가 같은 학기 인공지능학과 개설목록에서 맡은 다른 과목의 분반 수와 개설학점 합계를 알려줘. CSE302의 다른 분반도 제외해줘. | 2024학년도 2학기 인공지능학과 개설목록에서 AI1002 각 분반에 적용된 이수구분을 알려줘. | 2024학년도 2학기 CSE302-02 컴퓨터네트워크 담당 교수의 다른 수업 중, 같은 학기 인공지능학과 기준 전공필수이면서 3학점인 강좌의 과목코드, 분반과 학점을 알려줘. CSE302의 다른 분반도 제외해줘."
+J082,"2025학년도 2학기 인공지능학과 원천 개설목록에서 전공필수로 분류된 강좌의 전체 분반 수와 개설학점 총합을 알려줘. 같은 과목의 서로 다른 분반은 각각 1개 강좌로 세고, 각 분반의 학점을 모두 합산해줘.",,"classification_aggregation,department_required_load,official_public_facts",True,True,True,correct,,1,True,,,"WITH target_offerings AS (
+    SELECT DISTINCT o.offering_id, o.credits
+    FROM course_offerings AS o
+    JOIN course_offering_categories AS oc ON oc.offering_id = o.offering_id
+    JOIN departments AS d ON d.department_id = oc.department_id
+    JOIN course_categories AS cc ON cc.category_id = oc.category_id
+    WHERE o.year = 2025
+      AND o.semester = '2'
+      AND d.name = '인공지능학과'
+      AND cc.category_name = '전공필수'
+)
+SELECT COUNT(*) AS section_count,
+       SUM(credits) AS total_credits
+FROM target_offerings;",4736,4.11,2024학년도 2학기 인공지능학과 개설목록에서 전공선택으로 분류된 강좌의 분반 수와 개설학점 합계를 알려줘. | 2024학년도 2학기 CSE302-02 컴퓨터네트워크 담당 교수가 같은 학기 인공지능학과 개설목록에서 맡은 다른 과목의 분반 수와 개설학점 합계를 알려줘. CSE302의 다른 분반도 제외해줘. | 2024학년도 2학기 인공지능학과 개설목록에서 AI1002 각 분반에 적용된 이수구분을 알려줘. | 로그인 학생 202210029가 2025학년도 2학기에 수강한 과목 중 교재가 등록된 과목의 과목코드와 교재 제목을 알려줘.
+J083,"2025학년도 2학기 소프트웨어융합학과 원천 개설목록에서 전공필수로 분류된 강좌의 전체 분반 수와 개설학점 총합을 알려줘. 같은 과목의 서로 다른 분반은 각각 1개 강좌로 세고, 각 분반의 학점을 모두 합산해줘.",,"classification_aggregation,department_required_load,official_public_facts",True,True,True,correct,,1,True,,,"WITH target_offerings AS (
+    SELECT DISTINCT o.offering_id, o.credits
+    FROM course_offerings AS o
+    JOIN course_offering_categories AS oc ON oc.offering_id = o.offering_id
+    JOIN departments AS d ON d.department_id = oc.department_id
+    JOIN course_categories AS cc ON cc.category_id = oc.category_id
+    WHERE o.year = 2025
+      AND o.semester = '2'
+      AND d.name = '소프트웨어융합학과'
+      AND cc.category_name = '전공필수'
+)
+SELECT COUNT(*) AS section_count,
+       SUM(credits) AS total_credits
+FROM target_offerings;",4664,3.82,2024학년도 2학기 인공지능학과 개설목록에서 전공선택으로 분류된 강좌의 분반 수와 개설학점 합계를 알려줘. | 2024학년도 2학기 CSE302-02 컴퓨터네트워크 담당 교수가 같은 학기 인공지능학과 개설목록에서 맡은 다른 과목의 분반 수와 개설학점 합계를 알려줘. CSE302의 다른 분반도 제외해줘. | 로그인 학생 202210029가 2025학년도 2학기에 수강한 과목 중 교재가 등록된 과목의 과목코드와 교재 제목을 알려줘. | 2024학년도 2학기 인공지능학과 개설목록에서 AI1002 각 분반에 적용된 이수구분을 알려줘.
+J084,"2025학년도 1학기 컴퓨터공학과 원천 개설목록에서 전공필수로 분류된 강좌의 전체 분반 수와 개설학점 총합을 알려줘. 같은 과목의 서로 다른 분반은 각각 1개 강좌로 세고, 각 분반의 학점을 모두 합산해줘.",,"classification_aggregation,department_required_load,official_public_facts",True,True,True,correct,,1,True,,,"SELECT COUNT(DISTINCT o.offering_id) AS section_count,
+       SUM(o.credits) AS total_credits
+FROM course_offerings AS o
+JOIN course_offering_categories AS oc ON oc.offering_id = o.offering_id
+JOIN departments AS d ON d.department_id = oc.department_id
+JOIN course_categories AS cc ON cc.category_id = oc.category_id
+WHERE o.year = 2025
+  AND o.semester = '1'
+  AND d.name = '컴퓨터공학과'
+  AND cc.category_name = '전공필수';",4749,2.82,2024학년도 2학기 인공지능학과 개설목록에서 전공선택으로 분류된 강좌의 분반 수와 개설학점 합계를 알려줘. | 2024학년도 2학기 CSE302-02 컴퓨터네트워크 담당 교수가 같은 학기 인공지능학과 개설목록에서 맡은 다른 과목의 분반 수와 개설학점 합계를 알려줘. CSE302의 다른 분반도 제외해줘. | 2024학년도 2학기 AI4001-00 캡스톤디자인 담당 교수가 같은 학기 컴퓨터공학과 개설목록에서 맡은 다른 과목의 코드와 분반을 알려줘. AI4001의 다른 분반도 제외해줘. | 2024학년도 2학기 인공지능학과 개설목록에서 AI1002 각 분반에 적용된 이수구분을 알려줘.
+J085,"2025학년도 2학기 CSE406-01(캡스톤디자인)에서 중간고사 80점, 기말고사 90점(각 100점 만점)을 받았다고 가정하면 두 시험이 최종 100점에 기여하는 점수 합은? 다른 항목과 추가 보정은 제외해줘.",,"arithmetic_reasoning,weighted_exam_score,official_rule_with_hypothetical_inputs",True,True,True,correct,,1,True,,,"SELECT ROUND(
+           80 * s.midterm_percentage / 100.0
+         + 90 * s.final_exam_percentage / 100.0,
+           2
+       ) AS exam_contribution_points
+FROM course_offerings AS o
+JOIN syllabi AS s ON s.offering_id = o.offering_id
+WHERE o.year = 2025 AND o.semester = '2'
+  AND o.course_code = 'CSE406' AND o.section = '01';",4527,2.58,"2024학년도 2학기 AI3008-00 설명및신뢰가능한AI에서 중간고사 75점, 기말고사 85점을 받았다면 두 시험이 최종 100점에 기여하는 점수 합은 얼마야? 다른 항목은 제외해줘. | 로그인 학생 202210029가 2025학년도 2학기에 수강한 과목 중 교재가 등록된 과목의 과목코드와 교재 제목을 알려줘. | 2024학년도 2학기 AI3008-00 설명및신뢰가능한AI의 중간고사와 기말고사 반영 비율은 각각 몇 퍼센트야? | 2024학년도 2학기 AI4001-00 캡스톤디자인 담당 교수가 같은 학기 컴퓨터공학과 개설목록에서 맡은 다른 과목의 코드와 분반을 알려줘. AI4001의 다른 분반도 제외해줘."
+J086,"2026학년도 1학기 CSE438-00(최신기술콜로키움1)에서 중간고사 80점, 기말고사 90점(각 100점 만점)을 받았다고 가정하면 두 시험이 최종 100점에 기여하는 점수 합은? 다른 항목과 추가 보정은 제외해줘.",,"arithmetic_reasoning,weighted_exam_score,official_rule_with_hypothetical_inputs",True,True,True,correct,,1,True,,,"SELECT ROUND(
+           80 * s.midterm_percentage / 100.0
+         + 90 * s.final_exam_percentage / 100.0,
+           2
+       ) AS exam_contribution_points
+FROM course_offerings AS o
+JOIN syllabi AS s ON s.offering_id = o.offering_id
+WHERE o.year = 2026
+  AND o.semester = '1'
+  AND o.course_code = 'CSE438'
+  AND o.section = '00';",4435,2.37,"2024학년도 2학기 AI3008-00 설명및신뢰가능한AI에서 중간고사 75점, 기말고사 85점을 받았다면 두 시험이 최종 100점에 기여하는 점수 합은 얼마야? 다른 항목은 제외해줘. | 2024학년도 2학기 AI3008-00 설명및신뢰가능한AI의 중간고사와 기말고사 반영 비율은 각각 몇 퍼센트야? | 로그인 학생 202210029가 2025학년도 2학기에 수강한 과목 중 교재가 등록된 과목의 과목코드와 교재 제목을 알려줘. | 2024학년도 2학기 AI1002-00 인공지능프로그래밍의 영어강좌 구분을 영어전체·영어부분·해당없음으로, 산학필수 여부를 예·아니오로 알려줘."
+J087,"2025학년도 2학기 AI4007-00(독립심화학습(인공지능)2)에서 중간고사 80점, 기말고사 90점(각 100점 만점)을 받았다고 가정하면 두 시험이 최종 100점에 기여하는 점수 합은? 다른 항목과 추가 보정은 제외해줘.",,"arithmetic_reasoning,weighted_exam_score,official_rule_with_hypothetical_inputs",True,True,True,correct,,1,True,,,"SELECT ROUND(
+           80 * s.midterm_percentage / 100.0
+         + 90 * s.final_exam_percentage / 100.0,
+           2
+       ) AS exam_contribution_points
+FROM course_offerings AS o
+JOIN syllabi AS s ON s.offering_id = o.offering_id
+WHERE o.year = 2025 AND o.semester = '2'
+  AND o.course_code = 'AI4007' AND o.section = '00';",4541,2.52,"2024학년도 2학기 AI3008-00 설명및신뢰가능한AI에서 중간고사 75점, 기말고사 85점을 받았다면 두 시험이 최종 100점에 기여하는 점수 합은 얼마야? 다른 항목은 제외해줘. | 로그인 학생 202210029가 2025학년도 2학기에 수강한 과목 중 교재가 등록된 과목의 과목코드와 교재 제목을 알려줘. | 2024학년도 2학기 AI3008-00 설명및신뢰가능한AI의 중간고사와 기말고사 반영 비율은 각각 몇 퍼센트야? | 2024학년도 2학기 AI4001-00 캡스톤디자인 담당 교수가 같은 학기 컴퓨터공학과 개설목록에서 맡은 다른 과목의 코드와 분반을 알려줘. AI4001의 다른 분반도 제외해줘."
+J088,"2025학년도 2학기 SWCON201-00(오픈소스SW개발방법및도구)에서 중간고사 80점, 기말고사 90점(각 100점 만점)을 받았다고 가정하면 두 시험이 최종 100점에 기여하는 점수 합은? 다른 항목과 추가 보정은 제외해줘.",,"arithmetic_reasoning,weighted_exam_score,official_rule_with_hypothetical_inputs",True,True,True,correct,,1,True,,,"SELECT ROUND(
+           80 * s.midterm_percentage / 100.0
+         + 90 * s.final_exam_percentage / 100.0,
+           2
+       ) AS exam_contribution_points
+FROM course_offerings AS o
+JOIN syllabi AS s ON s.offering_id = o.offering_id
+WHERE o.year = 2025 AND o.semester = '2'
+  AND o.course_code = 'SWCON201' AND o.section = '00';",4431,5.09,"2024학년도 2학기 AI3008-00 설명및신뢰가능한AI에서 중간고사 75점, 기말고사 85점을 받았다면 두 시험이 최종 100점에 기여하는 점수 합은 얼마야? 다른 항목은 제외해줘. | 로그인 학생 202210029가 2025학년도 2학기에 수강한 과목 중 교재가 등록된 과목의 과목코드와 교재 제목을 알려줘. | 2024학년도 2학기 AI3008-00 설명및신뢰가능한AI의 중간고사와 기말고사 반영 비율은 각각 몇 퍼센트야? | 2024학년도 2학기 AI1002-00 인공지능프로그래밍의 영어강좌 구분을 영어전체·영어부분·해당없음으로, 산학필수 여부를 예·아니오로 알려줘."
+J089,[가상 학생 202210001] 내 가상 수강이력에서 완료됐고 재수강으로 대체되지 않은 기록의 학점 합계는 얼마야?,202210001,"fixture_personalized,fixture_earned,simulated_student_fixture",True,True,True,correct,,1,True,,,"SELECT COALESCE(SUM(o.credits), 0) AS completed_credits
+FROM enrollments AS e
+JOIN course_offerings AS o ON o.offering_id = e.offering_id
+WHERE e.student_id = 202210001
+  AND e.status = '완료'
+  AND e.retaken = 0;",4296,2.5,로그인 학생 202210029가 완료했고 재수강으로 대체되지 않은 과목의 총 이수학점은 얼마야? | 로그인 학생 202210029의 수강기록을 상태별로 나눠 각 기록 수를 알려줘. | 로그인 학생 202210029가 완료한 과목 중 가장 낮은 성적을 받은 과목명과 성적을 알려줘. 동률은 모두 포함해줘. | 로그인 학생 202210029에게 적용되는 전공 졸업요건의 총 이수학점은 얼마야?
+J090,[가상 학생 202210002] 내 가상 수강이력 중 재수강으로 대체된 과거 기록은 몇 건이야?,202210002,"fixture_personalized,fixture_retake,simulated_student_fixture",True,True,True,correct,,1,True,,,"SELECT COUNT(*) AS replaced_past_record_count
+FROM enrollments
+WHERE student_id = 202210002
+  AND retaken = 1;",4254,4.92,로그인 학생 202210029의 수강기록을 상태별로 나눠 각 기록 수를 알려줘. | 로그인 학생 202210029가 완료했고 재수강으로 대체되지 않은 과목의 총 이수학점은 얼마야? | 로그인 학생 202210029가 완료한 과목 중 가장 낮은 성적을 받은 과목명과 성적을 알려줘. 동률은 모두 포함해줘. | 로그인 학생 202210029에게 적용되는 전공 졸업요건의 총 이수학점은 얼마야?
+J091,[가상 학생 202310003] 내 가상 수강이력을 완료·미이수 등 기록된 상태별로 나눠 각각 몇 건인지 알려줘.,202310003,"fixture_personalized,fixture_status,simulated_student_fixture",True,True,True,correct,,1,True,,,"SELECT e.status, COUNT(*) AS enrollment_count
+FROM enrollments AS e
+WHERE e.student_id = 202310003
+GROUP BY e.status
+ORDER BY e.status;",4361,1.94,로그인 학생 202210029의 수강기록을 상태별로 나눠 각 기록 수를 알려줘. | 로그인 학생 202210029가 완료한 과목 중 가장 낮은 성적을 받은 과목명과 성적을 알려줘. 동률은 모두 포함해줘. | 로그인 학생 202210029가 완료했고 재수강으로 대체되지 않은 과목의 총 이수학점은 얼마야? | 로그인 학생 202210034가 아직 완료하지 않은 지정 필수과목의 과목코드와 과목명을 알려줘.
+J092,[가상 학생 202510004] 내 가상 수강이력에서 완료됐고 재수강으로 대체되지 않은 기록의 학점 합계는 얼마야?,202510004,"fixture_personalized,fixture_earned,simulated_student_fixture",True,True,True,correct,,1,True,,,"SELECT COALESCE(SUM(o.credits), 0) AS completed_credits
+FROM enrollments AS e
+JOIN course_offerings AS o ON o.offering_id = e.offering_id
+WHERE e.student_id = 202510004
+  AND e.status = '완료'
+  AND e.retaken = 0;",4328,2.29,로그인 학생 202210029가 완료했고 재수강으로 대체되지 않은 과목의 총 이수학점은 얼마야? | 로그인 학생 202210029의 수강기록을 상태별로 나눠 각 기록 수를 알려줘. | 로그인 학생 202210029가 완료한 과목 중 가장 낮은 성적을 받은 과목명과 성적을 알려줘. 동률은 모두 포함해줘. | 로그인 학생 202210029가 2025학년도 2학기에 수강한 과목 중 교재가 등록된 과목의 과목코드와 교재 제목을 알려줘.
+J093,[가상 학생 202410005] 내 가상 수강이력 중 재수강으로 대체된 과거 기록은 몇 건이야?,202410005,"fixture_personalized,fixture_retake,simulated_student_fixture",True,True,True,correct,,1,True,,,"SELECT COUNT(*) AS replaced_past_record_count
+FROM enrollments
+WHERE student_id = 202410005
+  AND retaken = 1;",4288,2.43,로그인 학생 202210029의 수강기록을 상태별로 나눠 각 기록 수를 알려줘. | 로그인 학생 202210029가 완료했고 재수강으로 대체되지 않은 과목의 총 이수학점은 얼마야? | 로그인 학생 202210029가 완료한 과목 중 가장 낮은 성적을 받은 과목명과 성적을 알려줘. 동률은 모두 포함해줘. | 2024학번 학생에게 적용되는 CSE204 자료구조의 필수 선수과목 이름과 최소 성적 기준을 알려줘.
+J094,[가상 학생 202410006] 내 가상 수강이력을 완료·미이수 등 기록된 상태별로 나눠 각각 몇 건인지 알려줘.,202410006,"fixture_personalized,fixture_status,simulated_student_fixture",True,True,True,correct,,1,True,,,"SELECT e.status, COUNT(*) AS enrollment_count
+FROM enrollments AS e
+WHERE e.student_id = 202410006
+GROUP BY e.status
+ORDER BY e.status;",4529,3.13,로그인 학생 202210029의 수강기록을 상태별로 나눠 각 기록 수를 알려줘. | 로그인 학생 202210029가 완료한 과목 중 가장 낮은 성적을 받은 과목명과 성적을 알려줘. 동률은 모두 포함해줘. | 2024학번 학생에게 적용되는 CSE204 자료구조의 필수 선수과목 이름과 최소 성적 기준을 알려줘. | 2022학번과 2024학번의 교양 기본구조를 비교하면 2024학번의 총 교양 최소학점과 배분이수 최소학점은 각각 몇 학점 줄었어?
+J095,"2023학번 일반 신입학생의 후마니타스 기본구조표에서 총 교양학점, 배분이수 학점, 최소 영역 수, 영역당 학점은 각각 얼마야? 면제·대체·편입 예외는 제외해줘.",,"official_rule,general_cohort_rule,official_public_facts",True,True,True,correct,,1,True,,,"SELECT gr.total_general_credits AS total_general_credits,
+       gc.min_credits AS distribution_credits,
+       gc.min_areas AS minimum_areas,
+       gc.per_area_min_credits AS credits_per_area
+FROM general_education_requirements AS gr
+JOIN general_education_requirement_categories AS gc
+  ON gc.general_requirement_id = gr.general_requirement_id
+ AND gc.requirement_code = 'DISTRIBUTION'
+WHERE 2023 BETWEEN gr.cohort_start AND COALESCE(gr.cohort_end, 9999);",4898,3.08,"2022학번 일반 신입학생이 배분이수 9학점을 취득했고 영역당 3학점 기준을 채운 영역이 2개라면, 부족 학점, 부족 영역 수와 두 조건 충족 여부를 알려줘. | 2022학번과 2024학번의 교양 기본구조를 비교하면 2024학번의 총 교양 최소학점과 배분이수 최소학점은 각각 몇 학점 줄었어? | 로그인 학생 202210029의 졸업요건 영역별 최소학점, 이수학점과 잔여학점을 알려줘. | 로그인 학생 202210029가 완료했고 재수강으로 대체되지 않은 과목의 총 이수학점은 얼마야?"
+J096,"2024학번 일반 신입학생의 후마니타스 기본구조표에서 총 교양학점, 배분이수 학점, 최소 영역 수, 영역당 학점은 각각 얼마야? 면제·대체·편입 예외는 제외해줘.",,"official_rule,general_cohort_rule,official_public_facts",True,True,True,correct,,1,True,,,"SELECT gr.total_general_credits,
+       gc.min_credits AS distribution_credits,
+       gc.min_areas AS minimum_areas,
+       gc.per_area_min_credits AS credits_per_area
+FROM general_education_requirements AS gr
+JOIN general_education_requirement_categories AS gc
+  ON gc.general_requirement_id = gr.general_requirement_id
+ AND gc.requirement_code = 'DISTRIBUTION'
+WHERE 2024 BETWEEN gr.cohort_start AND COALESCE(gr.cohort_end, 9999);",4798,3.1,"2022학번 일반 신입학생이 배분이수 9학점을 취득했고 영역당 3학점 기준을 채운 영역이 2개라면, 부족 학점, 부족 영역 수와 두 조건 충족 여부를 알려줘. | 2022학번과 2024학번의 교양 기본구조를 비교하면 2024학번의 총 교양 최소학점과 배분이수 최소학점은 각각 몇 학점 줄었어? | 2024학번 학생에게 적용되는 CSE204 자료구조의 필수 선수과목 이름과 최소 성적 기준을 알려줘. | 2024학년도 2학기 인공지능학과 개설목록에서 전공선택으로 분류된 강좌의 분반 수와 개설학점 합계를 알려줘."
+J097,2023학번과 2024학번 기본구조표를 비교하면 2024학번의 총 교양 최소학점과 배분이수 최소학점은 각각 몇 학점 줄었어? 면제·대체 예외는 제외해줘.,,"cross_rule_reasoning,general_cohort_difference,official_public_facts",True,True,True,correct,,1,True,,,"WITH cohort_requirements AS (
+    SELECT 2023 AS admission_year,
+           gr.total_general_credits,
+           gc.min_credits AS distribution_credits
+    FROM general_education_requirements AS gr
+    JOIN general_education_requirement_categories AS gc
+      ON gc.general_requirement_id = gr.general_requirement_id
+     AND gc.requirement_code = 'DISTRIBUTION'
+    WHERE 2023 BETWEEN gr.cohort_start AND COALESCE(gr.cohort_end, 9999)
+
+    UNION ALL
+
+    SELECT 2024 AS admission_year,
+           gr.total_general_credits,
+           gc.min_credits AS distribution_credits
+    FROM general_education_requirements AS gr
+    JOIN general_education_requirement_categories AS gc
+      ON gc.general_requirement_id = gr.general_requirement_id
+     AND gc.requirement_code = 'DISTRIBUTION'
+    WHERE 2024 BETWEEN gr.cohort_start AND COALESCE(gr.cohort_end, 9999)
+)
+SELECT MAX(CASE WHEN admission_year = 2023 THEN total_general_credits END)
+         - MAX(CASE WHEN admission_year = 2024 THEN total_general_credits END)
+           AS total_general_credit_reduction,
+       MAX(CASE WHEN admission_year = 2023 THEN distribution_credits END)
+         - MAX(CASE WHEN admission_year = 2024 THEN distribution_credits END)
+           AS distribution_credit_reduction
+FROM cohort_requirements;",4973,5.71,"2022학번과 2024학번의 교양 기본구조를 비교하면 2024학번의 총 교양 최소학점과 배분이수 최소학점은 각각 몇 학점 줄었어? | 2022학번 일반 신입학생이 배분이수 9학점을 취득했고 영역당 3학점 기준을 채운 영역이 2개라면, 부족 학점, 부족 영역 수와 두 조건 충족 여부를 알려줘. | 2024학년도 2학기 인공지능학과 개설목록에서 전공선택으로 분류된 강좌의 분반 수와 개설학점 합계를 알려줘. | 2024학번 학생에게 적용되는 CSE204 자료구조의 필수 선수과목 이름과 최소 성적 기준을 알려줘."
+J098,"2024학번 일반 신입학생이 배분이수 6학점을 취득했고, 영역당 3학점 기준을 채운 영역은 2개라고 가정하자. 기본구조표 기준 부족 학점·부족 영역 수와 두 조건 충족 여부(1/0)는? 편입·면제 예외는 제외해줘.",,"rule_reasoning,distribution_rule_application,official_rule_with_hypothetical_inputs",True,True,True,correct,,1,True,,,"WITH distribution_rule AS (
+    SELECT gc.min_credits, gc.min_areas
+    FROM general_education_requirements AS gr
+    JOIN general_education_requirement_categories AS gc
+      ON gc.general_requirement_id = gr.general_requirement_id
+     AND gc.requirement_code = 'DISTRIBUTION'
+    WHERE 2024 BETWEEN gr.cohort_start AND COALESCE(gr.cohort_end, 9999)
+), earned AS (
+    SELECT 6 AS earned_credits, 2 AS completed_areas
+)
+SELECT MAX(dr.min_credits - e.earned_credits, 0) AS remaining_credits,
+       MAX(dr.min_areas - e.completed_areas, 0) AS remaining_areas,
+       CASE WHEN e.earned_credits >= dr.min_credits
+                  AND e.completed_areas >= dr.min_areas
+            THEN 1 ELSE 0 END AS meets_both
+FROM distribution_rule AS dr
+CROSS JOIN earned AS e;",4858,3.22,"2022학번 일반 신입학생이 배분이수 9학점을 취득했고 영역당 3학점 기준을 채운 영역이 2개라면, 부족 학점, 부족 영역 수와 두 조건 충족 여부를 알려줘. | 2022학번과 2024학번의 교양 기본구조를 비교하면 2024학번의 총 교양 최소학점과 배분이수 최소학점은 각각 몇 학점 줄었어? | 2024학번 학생에게 적용되는 CSE204 자료구조의 필수 선수과목 이름과 최소 성적 기준을 알려줘. | 2024학년도 2학기 인공지능학과 개설목록에서 전공선택으로 분류된 강좌의 분반 수와 개설학점 합계를 알려줘."
+J099,"2024학번 일반 신입학생이 배분이수 9학점을 취득했고, 영역당 3학점 기준을 채운 영역은 2개라고 가정하자. 기본구조표 기준 부족 학점·부족 영역 수와 두 조건 충족 여부(1/0)는? 편입·면제 예외는 제외해줘.",,"rule_reasoning,distribution_rule_application,official_rule_with_hypothetical_inputs",True,True,True,correct,,1,True,,,"WITH distribution_rule AS (
+    SELECT gc.min_credits, gc.min_areas
+    FROM general_education_requirements AS gr
+    JOIN general_education_requirement_categories AS gc
+      ON gc.general_requirement_id = gr.general_requirement_id
+     AND gc.requirement_code = 'DISTRIBUTION'
+    WHERE 2024 BETWEEN gr.cohort_start AND COALESCE(gr.cohort_end, 9999)
+), earned AS (
+    SELECT 9 AS earned_credits, 2 AS completed_areas
+)
+SELECT MAX(dr.min_credits - e.earned_credits, 0) AS remaining_credits,
+       MAX(dr.min_areas - e.completed_areas, 0) AS remaining_areas,
+       CASE WHEN e.earned_credits >= dr.min_credits
+                  AND e.completed_areas >= dr.min_areas
+            THEN 1 ELSE 0 END AS meets_both
+FROM distribution_rule AS dr
+CROSS JOIN earned AS e;",4861,3.63,"2022학번 일반 신입학생이 배분이수 9학점을 취득했고 영역당 3학점 기준을 채운 영역이 2개라면, 부족 학점, 부족 영역 수와 두 조건 충족 여부를 알려줘. | 2022학번과 2024학번의 교양 기본구조를 비교하면 2024학번의 총 교양 최소학점과 배분이수 최소학점은 각각 몇 학점 줄었어? | 2024학번 학생에게 적용되는 CSE204 자료구조의 필수 선수과목 이름과 최소 성적 기준을 알려줘. | 2024학년도 2학기 인공지능학과 개설목록에서 전공선택으로 분류된 강좌의 분반 수와 개설학점 합계를 알려줘."
+J100,"2024학번 일반 신입학생이 배분이수 12학점을 취득했고, 영역당 3학점 기준을 채운 영역은 4개라고 가정하자. 기본구조표 기준 부족 학점·부족 영역 수와 두 조건 충족 여부(1/0)는? 편입·면제 예외는 제외해줘.",,"rule_reasoning,distribution_rule_application,official_rule_with_hypothetical_inputs",True,True,True,correct,,1,True,,,"WITH distribution_rule AS (
+    SELECT gc.min_credits, gc.min_areas
+    FROM general_education_requirements AS gr
+    JOIN general_education_requirement_categories AS gc
+      ON gc.general_requirement_id = gr.general_requirement_id
+     AND gc.requirement_code = 'DISTRIBUTION'
+    WHERE 2024 BETWEEN gr.cohort_start AND COALESCE(gr.cohort_end, 9999)
+), earned AS (
+    SELECT 12 AS earned_credits, 4 AS completed_areas
+)
+SELECT MAX(dr.min_credits - e.earned_credits, 0) AS remaining_credits,
+       MAX(dr.min_areas - e.completed_areas, 0) AS remaining_areas,
+       CASE WHEN e.earned_credits >= dr.min_credits
+                  AND e.completed_areas >= dr.min_areas
+            THEN 1 ELSE 0 END AS meets_both
+FROM distribution_rule AS dr
+CROSS JOIN earned AS e;",4866,3.28,"2022학번 일반 신입학생이 배분이수 9학점을 취득했고 영역당 3학점 기준을 채운 영역이 2개라면, 부족 학점, 부족 영역 수와 두 조건 충족 여부를 알려줘. | 2022학번과 2024학번의 교양 기본구조를 비교하면 2024학번의 총 교양 최소학점과 배분이수 최소학점은 각각 몇 학점 줄었어? | 2024학번 학생에게 적용되는 CSE204 자료구조의 필수 선수과목 이름과 최소 성적 기준을 알려줘. | 2024학년도 2학기 인공지능학과 개설목록에서 전공선택으로 분류된 강좌의 분반 수와 개설학점 합계를 알려줘."

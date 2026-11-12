@@ -11,6 +11,8 @@ from __future__ import annotations
 
 import re
 import sqlite3
+import math
+from collections import Counter
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -224,6 +226,109 @@ def select_fewshot(
     return kept[:max_examples] if max_examples else kept
 
 
+TASK_TAG_KEYWORDS = {
+    "professor": {"교수", "담당", "강의한", "수업한"},
+    "offering_department": {"개설목록", "개설학과", "이수구분", "전공필수", "전공선택"},
+    "course_offering": {"개설", "과목", "강좌", "분반", "학기"},
+    "prerequisite": {"선수과목", "선수", "수강 가능", "수강할 수"},
+    "syllabus": {"강의계획서", "교재", "주차별", "중간고사", "기말고사", "과제", "평가비율"},
+    "graduation": {"졸업요건", "졸업", "이수학점", "잔여학점", "부족학점"},
+    "general_education": {"교양", "배분이수", "필수교과", "자유이수"},
+    "student_history": {"수강기록", "수강이력", "재수강", "성적", "학적"},
+    "schedule": {"수업시간", "요일", "강의실", "시간표"},
+    "aggregation": {"몇 개", "개수", "합계", "총합", "평균", "비율", "비교", "감소", "증가"},
+}
+
+RELEVANCE_WEIGHTS = {
+    "tfidf_cosine": 0.65,
+    "entity_match": 0.20,
+    "task_tag_match": 0.15,
+}
+
+
+def _normalize_retrieval_text(text: str) -> str:
+    return re.sub(r"[^0-9a-z가-힣]+", "", text.lower())
+
+
+def _char_ngrams(text: str, min_n: int = 2, max_n: int = 4) -> Counter[str]:
+    normalized = _normalize_retrieval_text(text)
+    return Counter(
+        normalized[i : i + n]
+        for n in range(min_n, max_n + 1)
+        for i in range(max(0, len(normalized) - n + 1))
+    )
+
+
+def _tfidf_cosine(question: str, title: str, corpus_titles: list[str]) -> float:
+    """문자 n-gram TF-IDF 벡터의 cosine similarity를 계산한다."""
+    corpus_counts = [_char_ngrams(text) for text in corpus_titles]
+    q_counts = _char_ngrams(question)
+    t_counts = _char_ngrams(title)
+    if not q_counts or not t_counts:
+        return 0.0
+
+    document_frequency = Counter()
+    for counts in corpus_counts:
+        document_frequency.update(counts.keys())
+    n_documents = max(1, len(corpus_counts))
+
+    def vector(counts: Counter[str]) -> dict[str, float]:
+        total = sum(counts.values()) or 1
+        return {
+            term: (count / total) * (math.log((1 + n_documents) / (1 + document_frequency[term])) + 1)
+            for term, count in counts.items()
+        }
+
+    q_vector = vector(q_counts)
+    t_vector = vector(t_counts)
+    dot = sum(value * t_vector.get(term, 0.0) for term, value in q_vector.items())
+    q_norm = math.sqrt(sum(value * value for value in q_vector.values()))
+    t_norm = math.sqrt(sum(value * value for value in t_vector.values()))
+    return dot / (q_norm * t_norm) if q_norm and t_norm else 0.0
+
+
+def _entities(text: str) -> set[str]:
+    lowered = text.lower()
+    features: set[str] = set()
+    patterns = {
+        "course_code": r"[a-z]{2,}\d+[a-z0-9]*",
+        "year": r"20\d{2}",
+        "semester": r"\b\d{1,2}학기",
+        "section": r"(?<=-)\d{2}\b|\b\d{2}\s*분반",
+    }
+    for kind, pattern in patterns.items():
+        values = re.findall(pattern, lowered)
+        if values:
+            features.add(f"type:{kind}")
+            features.update(f"{kind}:{value}" for value in values)
+    return features
+
+
+def _task_tags(text: str) -> set[str]:
+    lowered = text.lower()
+    return {
+        tag for tag, keywords in TASK_TAG_KEYWORDS.items()
+        if any(keyword in lowered for keyword in keywords)
+    }
+
+
+def _overlap_ratio(left: set[str], right: set[str]) -> float:
+    union = left | right
+    return len(left & right) / len(union) if union else 0.0
+
+
+def _relevance_score(question: str, title: str, corpus_titles: list[str]) -> float:
+    """TF-IDF cosine과 구체 조건·학사 task 태그를 결합한 관련도 점수."""
+    text_similarity = _tfidf_cosine(question, title, corpus_titles)
+    entity_similarity = _overlap_ratio(_entities(question), _entities(title))
+    task_similarity = _overlap_ratio(_task_tags(question), _task_tags(title))
+    return (
+        RELEVANCE_WEIGHTS["tfidf_cosine"] * text_similarity
+        + RELEVANCE_WEIGHTS["entity_match"] * entity_similarity
+        + RELEVANCE_WEIGHTS["task_tag_match"] * task_similarity
+    )
+
+
 class PromptBuilder:
     def __init__(
         self,
@@ -233,17 +338,42 @@ class PromptBuilder:
         db_path: Path = DATABASE_PATH,
         current_term: str = CURRENT_TERM,
         exclude_titles: list[str] | None = None,
+        sample_queries_path: Path = SAMPLE_QUERIES_PATH,
+        fewshot_selection: str = "fixed",
     ):
+        if fewshot_selection not in {"fixed", "relevant"}:
+            raise ValueError("fewshot_selection 은 'fixed' 또는 'relevant' 이어야 합니다.")
         self.db_path = db_path
+        self.sample_queries_path = sample_queries_path
+        self.fewshot_selection = fewshot_selection
+        self.max_fewshot = max_fewshot
         self.schema = load_schema(db_path)
         self.value_hints = extract_value_hints(db_path)
         self.rules = build_domain_rules(db_path, current_term)
-        available = fewshot_runs_on(load_sample_queries(), db_path) if use_fewshot else []
-        self.fewshot = select_fewshot(available, exclude_sqls, max_fewshot, exclude_titles) if use_fewshot else []
-        kept = {e.title for e in self.fewshot}
-        self.excluded_fewshot = [e.title for e in available if e.title not in kept]
+        available = fewshot_runs_on(load_sample_queries(sample_queries_path), db_path) if use_fewshot else []
+        self.candidate_fewshot = (
+            select_fewshot(available, exclude_sqls, None, exclude_titles) if use_fewshot else []
+        )
+        self.fewshot = (
+            self.candidate_fewshot[:max_fewshot] if use_fewshot and fewshot_selection == "fixed" and max_fewshot
+            else self.candidate_fewshot if use_fewshot and fewshot_selection == "fixed"
+            else []
+        )
+        candidates = {e.title for e in self.candidate_fewshot}
+        self.excluded_fewshot = [e.title for e in available if e.title not in candidates]
 
-    def system_prompt(self) -> str:
+    def fewshot_for(self, question: str) -> list[FewShotExample]:
+        if self.fewshot_selection == "fixed":
+            return self.fewshot
+        corpus_titles = [example.title for example in self.candidate_fewshot]
+        ranked = sorted(
+            enumerate(self.candidate_fewshot),
+            key=lambda pair: (-_relevance_score(question, pair[1].title, corpus_titles), pair[0]),
+        )
+        limit = self.max_fewshot or len(ranked)
+        return [example for _, example in ranked[:limit]]
+
+    def system_prompt(self, question: str | None = None) -> str:
         parts = [
             "너는 경희대학교 소프트웨어융합대학 학사 데이터용 SQLite Text2SQL 변환기다.",
             "사용자의 한국어 질문을 아래 스키마에 대해 실행 가능한 SQLite 쿼리로 바꾼다.",
@@ -252,8 +382,9 @@ class PromptBuilder:
             "\n## 도메인 규칙\n" + self.rules,
             "\n## " + OUTPUT_FORMAT,
         ]
-        if self.fewshot:
-            shots = "\n\n".join(f"질문: {e.title}\n```sql\n{e.sql}\n```" for e in self.fewshot)
+        selected = self.fewshot_for(question) if question is not None else self.fewshot
+        if selected:
+            shots = "\n\n".join(f"질문: {e.title}\n```sql\n{e.sql}\n```" for e in selected)
             parts.append("\n## 예시\n" + shots)
         return "\n".join(parts)
 

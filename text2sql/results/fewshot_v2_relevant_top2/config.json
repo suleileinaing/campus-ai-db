@@ -1,0 +1,22 @@
+{
+  "model": "gpt-6-luna",
+  "fewshot": true,
+  "fewshot_file": "database/fewshot/sample_queries_v2.sql",
+  "fewshot_selection": "relevant",
+  "fewshot_retrieval": {
+    "method": "character_ngram_tfidf_cosine_with_entity_and_task_tags",
+    "weights": {
+      "tfidf_cosine": 0.65,
+      "entity_match": 0.2,
+      "task_tag_match": 0.15
+    }
+  },
+  "n_fewshot": 2,
+  "candidate_pool_size": 20,
+  "fewshot_titles": [],
+  "excluded_fewshot": [],
+  "temperature": null,
+  "max_repairs": 2,
+  "gold": "text2sql/gold/실행평가_100문항_집계질문수정_20261111.json",
+  "n_items": 100
+}

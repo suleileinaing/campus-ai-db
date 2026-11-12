@@ -1,0 +1,15 @@
+{
+  "model": "gpt-6-luna",
+  "fewshot": false,
+  "fewshot_file": "/Users/yumihoon/Documents/2026-2/ Capstone Design/CampusAI Database/database/sample_queries.sql",
+  "fewshot_selection": "none",
+  "fewshot_retrieval": null,
+  "n_fewshot": 0,
+  "candidate_pool_size": 0,
+  "fewshot_titles": [],
+  "excluded_fewshot": [],
+  "temperature": null,
+  "max_repairs": 2,
+  "gold": "text2sql/gold/실행평가_100문항_집계질문수정_20261111.json",
+  "n_items": 100
+}

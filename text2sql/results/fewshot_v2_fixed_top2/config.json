@@ -1,0 +1,18 @@
+{
+  "model": "gpt-6-luna",
+  "fewshot": true,
+  "fewshot_file": "database/fewshot/sample_queries_v2.sql",
+  "fewshot_selection": "fixed",
+  "fewshot_retrieval": null,
+  "n_fewshot": 2,
+  "candidate_pool_size": 20,
+  "fewshot_titles": [
+    "2024학년도 2학기 AI1002-00 인공지능프로그래밍과 CSE203-00 컴퓨터구조를 모두 담당한 교수 이름을 알려줘.",
+    "2024학년도 2학기 AI1002-00 인공지능프로그래밍의 요일, 시작·종료 시간과 강의실을 알려줘."
+  ],
+  "excluded_fewshot": [],
+  "temperature": null,
+  "max_repairs": 2,
+  "gold": "text2sql/gold/실행평가_100문항_집계질문수정_20261111.json",
+  "n_items": 100
+}

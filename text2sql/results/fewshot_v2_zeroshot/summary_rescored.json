@@ -1,0 +1,30 @@
+{
+  "overall": {
+    "n": 16,
+    "exec_ok": 16,
+    "first_try_exec_ok": 16,
+    "strict": 5,
+    "relaxed": 6,
+    "subset": 13
+  },
+  "by_tag": {
+    "(태그 없음)": {
+      "n": 16,
+      "exec_ok": 16,
+      "first_try_exec_ok": 16,
+      "strict": 5,
+      "relaxed": 6,
+      "subset": 13
+    }
+  },
+  "diagnosis": {
+    "correct": 5,
+    "missing_columns": 7,
+    "value_mismatch": 2,
+    "row_count_mismatch": 1,
+    "order_mismatch": 1
+  },
+  "gold_invalid": [],
+  "avg_tokens": 3444.8,
+  "avg_latency_sec": 4.42
+}

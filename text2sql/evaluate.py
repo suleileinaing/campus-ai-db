@@ -18,11 +18,11 @@ from datetime import datetime
 from pathlib import Path
 
 from .compare import compare_results, gold_is_ordered
-from .config import RESULTS_DIR, Settings
+from .config import RESULTS_DIR, SAMPLE_QUERIES_PATH, Settings
 from .executor import SQLExecutor
 from .gold_loader import GoldItem, load_gold
 from .pipeline import Text2SQL
-from .prompt import PromptBuilder
+from .prompt import RELEVANCE_WEIGHTS, PromptBuilder
 
 
 def gold_warnings(item: GoldItem) -> list[str]:
@@ -59,7 +59,12 @@ def score_record(rec: dict, gold_rows, gold_columns, pred_rows, ordered: bool) -
                pred_row_count=cmp.pred_row_count)
 
 
-def evaluate(items: list[GoldItem], engine: Text2SQL, executor: SQLExecutor, out_dir: Path) -> dict:
+def evaluate(
+    items: list[GoldItem],
+    engine: Text2SQL,
+    executor: SQLExecutor,
+    out_dir: Path,
+) -> dict:
     out_dir.mkdir(parents=True, exist_ok=True)
     records = []
     for idx, item in enumerate(items, 1):
@@ -89,6 +94,7 @@ def evaluate(items: list[GoldItem], engine: Text2SQL, executor: SQLExecutor, out
                 "exec_error_kind": res.error_kind if res and not res.ok else None,
                 "total_tokens": out.total_tokens,
                 "latency_sec": round(sum(a.latency_sec for a in out.attempts), 2),
+                "fewshot_titles": out.fewshot_titles,
                 "pred_columns": res.columns if res else [],
                 "pred_rows": [list(r) for r in res.rows] if res else [],
                 "attempts": [a.__dict__ for a in out.attempts],
@@ -122,19 +128,28 @@ def evaluate(items: list[GoldItem], engine: Text2SQL, executor: SQLExecutor, out
     return write_outputs(records, out_dir)
 
 
-def write_outputs(records: list[dict], out_dir: Path, suffix: str = "") -> dict:
+def write_outputs(
+    records: list[dict],
+    out_dir: Path,
+    suffix: str = "",
+) -> dict:
     with (out_dir / f"results{suffix}.jsonl").open("w", encoding="utf-8") as f:
         for r in records:
             f.write(json.dumps(r, ensure_ascii=False, default=str) + "\n")
 
     csv_cols = ["id", "question", "student_id", "tags", "strict", "relaxed", "subset", "diagnosis", "missing_columns",
                 "n_attempts", "first_try_exec_ok", "exec_error", "gold_sql", "pred_sql",
-                "total_tokens", "latency_sec"]
+                "total_tokens", "latency_sec", "fewshot_titles"]
     with (out_dir / f"results{suffix}.csv").open("w", encoding="utf-8-sig", newline="") as f:
         w = csv.DictWriter(f, fieldnames=csv_cols, extrasaction="ignore")
         w.writeheader()
         for r in records:
-            w.writerow({**r, "tags": ",".join(r["tags"]), "missing_columns": ",".join(r.get("missing_columns") or [])})
+            w.writerow({
+                **r,
+                "tags": ",".join(r["tags"]),
+                "missing_columns": ",".join(r.get("missing_columns") or []),
+                "fewshot_titles": " | ".join(r.get("fewshot_titles") or []),
+            })
 
     summary = summarize(records)
     (out_dir / f"summary{suffix}.md").write_text(render_summary(summary, records), encoding="utf-8")
@@ -166,12 +181,14 @@ def summarize(records: list[dict]) -> dict:
             by_tag[t].append(r)
     toks = [r.get("total_tokens", 0) for r in records if r.get("total_tokens")]
     lats = [r.get("latency_sec", 0) for r in records if r.get("latency_sec")]
+    total_tokens = sum(toks)
     return {
         "overall": _group_stats(records),
         "by_tag": {t: _group_stats(rs) for t, rs in sorted(by_tag.items())},
         "diagnosis": dict(Counter(r["diagnosis"] for r in records)),
         "gold_invalid": [r["id"] for r in records if r["diagnosis"] == "gold_invalid"],
         "avg_tokens": round(sum(toks) / len(toks), 1) if toks else 0,
+        "total_tokens": total_tokens,
         "avg_latency_sec": round(sum(lats) / len(lats), 2) if lats else 0,
     }
 
@@ -188,6 +205,7 @@ def render_summary(s: dict, records: list[dict]) -> str:
         f"| 정답률 relaxed | {_pct(o['relaxed'], o['n'])} |",
         f"| 정답률 subset (정답 일부 컬럼 누락 허용) | {_pct(o['subset'], o['n'])} |",
         f"| 평균 토큰 | {s['avg_tokens']} |",
+        f"| 총 토큰 | {s['total_tokens']} |",
         f"| 평균 응답시간(초) | {s['avg_latency_sec']} |", "",
         "## 유형별", "", "| 태그 | n | strict | relaxed | subset | 실행 성공 |", "|---|---|---|---|---|---|",
     ]
@@ -235,6 +253,10 @@ def main() -> None:
     ap.add_argument("--run-name", default=None)
     ap.add_argument("--no-fewshot", action="store_true")
     ap.add_argument("--max-fewshot", type=int, default=None)
+    ap.add_argument("--fewshot-file", default=str(SAMPLE_QUERIES_PATH),
+                    help="few-shot 예시 SQL 파일")
+    ap.add_argument("--fewshot-selection", choices=("fixed", "relevant"), default="fixed",
+                    help="fixed: 파일 앞에서 K개, relevant: 문항별 관련도 상위 K개")
     ap.add_argument("--exclude-fewshot", action="append", default=[], metavar="TITLE",
                     help="평가 문항과 겹치는 few-shot 예시 제목(sample_queries.sql 의 '-- N.' 뒤 제목). 여러 번 지정 가능")
     ap.add_argument("--limit", type=int, default=None, help="앞에서부터 N개만(크레딧 절약용)")
@@ -250,6 +272,8 @@ def main() -> None:
         exclude_sqls=[s for i in items for s in (i.gold_sql, i.reference_sql) if s],
         exclude_titles=args.exclude_fewshot,
         max_fewshot=args.max_fewshot,
+        sample_queries_path=Path(args.fewshot_file),
+        fewshot_selection=args.fewshot_selection,
     )
     if args.oracle:
         from .tests.mock_llm import OracleLLM
@@ -266,8 +290,21 @@ def main() -> None:
     (out_dir).mkdir(parents=True, exist_ok=True)
     (out_dir / "system_prompt.txt").write_text(prompt.system_prompt(), encoding="utf-8")
     (out_dir / "config.json").write_text(json.dumps({
-        "model": model_name, "fewshot": not args.no_fewshot, "n_fewshot": len(prompt.fewshot),
-        "fewshot_titles": [e.title for e in prompt.fewshot], "excluded_fewshot": prompt.excluded_fewshot,
+        "model": model_name,
+        "fewshot": not args.no_fewshot,
+        "fewshot_file": str(args.fewshot_file),
+        "fewshot_selection": "none" if args.no_fewshot else args.fewshot_selection,
+        "fewshot_retrieval": (
+            {
+                "method": "character_ngram_tfidf_cosine_with_entity_and_task_tags",
+                "weights": RELEVANCE_WEIGHTS,
+            }
+            if not args.no_fewshot and args.fewshot_selection == "relevant" else None
+        ),
+        "n_fewshot": 0 if args.no_fewshot else args.max_fewshot,
+        "candidate_pool_size": len(prompt.candidate_fewshot),
+        "fewshot_titles": [e.title for e in prompt.fewshot] if args.fewshot_selection == "fixed" else [],
+        "excluded_fewshot": prompt.excluded_fewshot,
         "temperature": settings.temperature, "max_repairs": settings.max_repair_attempts,
         "gold": str(args.gold), "n_items": len(items),
     }, ensure_ascii=False, indent=2), encoding="utf-8")
