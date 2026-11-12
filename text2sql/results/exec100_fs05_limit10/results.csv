@@ -1,0 +1,274 @@
+﻿id,question,student_id,tags,strict,relaxed,subset,diagnosis,missing_columns,n_attempts,first_try_exec_ok,exec_error,gold_sql,pred_sql,total_tokens,latency_sec
+J001,"2026학년도 2학기 SWCON331-00(로봇프로그래밍) 담당 교수의 다른 수업 중, 같은 학기 소프트웨어융합학과 기준 전공필수이면서 3학점인 강좌가 있어? 해당 과목코드·분반·학점을 모두 알려줘. 기준 과목의 다른 분반도 제외해줘.",,"multi_hop,professor_required_credit_chain,official_public_facts",True,True,True,correct,,1,True,,,"SELECT o.course_code, o.section, o.credits
+FROM course_offerings AS o
+WHERE o.year = 2026
+  AND o.semester = '2'
+  AND o.course_code <> 'SWCON331'
+  AND o.credits = 3
+  AND EXISTS (
+      SELECT 1
+      FROM offering_professors AS op
+      JOIN offering_professors AS base_op
+        ON base_op.professor_id = op.professor_id
+      JOIN course_offerings AS base
+        ON base.offering_id = base_op.offering_id
+      WHERE op.offering_id = o.offering_id
+        AND base.course_code = 'SWCON331'
+        AND base.section = '00'
+        AND base.year = 2026
+        AND base.semester = '2'
+  )
+  AND EXISTS (
+      SELECT 1
+      FROM course_offering_categories AS oc
+      WHERE oc.offering_id = o.offering_id
+        AND oc.department_id = 8
+        AND oc.category_id = 2
+  )
+ORDER BY o.course_code, o.section;",4541,3.21
+J002,"2026학년도 2학기 SWCON253-00(기계학습) 담당 교수의 다른 수업 중, 같은 학기 소프트웨어융합학과 기준 전공필수이면서 3학점인 강좌가 있어? 해당 과목코드·분반·학점을 모두 알려줘. 기준 과목의 다른 분반도 제외해줘.",,"multi_hop,professor_required_credit_chain,official_public_facts",True,True,True,correct,,1,True,,,"SELECT o.course_code, o.section, o.credits
+FROM course_offerings AS o
+WHERE o.year = 2026
+  AND o.semester = '2'
+  AND o.course_code <> 'SWCON253'
+  AND o.credits = 3
+  AND EXISTS (
+      SELECT 1
+      FROM offering_professors AS op
+      JOIN offering_professors AS base_op
+        ON base_op.professor_id = op.professor_id
+      JOIN course_offerings AS base
+        ON base.offering_id = base_op.offering_id
+      WHERE op.offering_id = o.offering_id
+        AND base.course_code = 'SWCON253'
+        AND base.section = '00'
+        AND base.year = 2026
+        AND base.semester = '2'
+  )
+  AND EXISTS (
+      SELECT 1
+      FROM course_offering_categories AS oc
+      JOIN departments AS d ON d.department_id = oc.department_id
+      JOIN course_categories AS c ON c.category_id = oc.category_id
+      WHERE oc.offering_id = o.offering_id
+        AND d.name = '소프트웨어융합학과'
+        AND c.category_name = '전공필수'
+  )
+ORDER BY o.course_code, o.section;",4575,3.56
+J003,"2026학년도 2학기 CSE304-00(알고리즘) 담당 교수의 다른 수업 중, 같은 학기 컴퓨터공학과 기준 전공필수이면서 3학점인 강좌가 있어? 해당 과목코드·분반·학점을 모두 알려줘. 기준 과목의 다른 분반도 제외해줘.",,"multi_hop,professor_required_credit_chain,official_public_facts",True,True,True,correct,,1,True,,,"SELECT
+    o.course_code,
+    o.section,
+    o.credits
+FROM course_offerings AS o
+WHERE o.year = 2026
+  AND o.semester = '2'
+  AND o.course_code <> 'CSE304'
+  AND o.credits = 3
+  AND EXISTS (
+      SELECT 1
+      FROM offering_professors AS op
+      JOIN offering_professors AS base_op
+        ON base_op.professor_id = op.professor_id
+      JOIN course_offerings AS base
+        ON base.offering_id = base_op.offering_id
+      WHERE op.offering_id = o.offering_id
+        AND base.course_code = 'CSE304'
+        AND base.section = '00'
+        AND base.year = 2026
+        AND base.semester = '2'
+  )
+  AND EXISTS (
+      SELECT 1
+      FROM course_offering_categories AS oc
+      WHERE oc.offering_id = o.offering_id
+        AND oc.department_id = 11
+        AND oc.category_id = 2
+  )
+ORDER BY o.course_code, o.section;",4540,3.21
+J004,"2026학년도 2학기 SWCON253-02(기계학습) 담당 교수의 다른 수업 중, 같은 학기 컴퓨터공학과 기준 전공필수이면서 3학점인 강좌가 있어? 해당 과목코드·분반·학점을 모두 알려줘. 기준 과목의 다른 분반도 제외해줘.",,"multi_hop,professor_required_credit_chain,official_public_facts",True,True,True,correct,,1,True,,,"SELECT
+    o.course_code,
+    o.section,
+    o.credits
+FROM course_offerings AS o
+WHERE o.year = 2026
+  AND o.semester = '2'
+  AND o.course_code <> 'SWCON253'
+  AND o.credits = 3
+  AND EXISTS (
+      SELECT 1
+      FROM offering_professors AS op
+      JOIN offering_professors AS base_op
+        ON base_op.professor_id = op.professor_id
+      JOIN course_offerings AS base
+        ON base.offering_id = base_op.offering_id
+      WHERE op.offering_id = o.offering_id
+        AND base.course_code = 'SWCON253'
+        AND base.section = '02'
+        AND base.year = 2026
+        AND base.semester = '2'
+  )
+  AND EXISTS (
+      SELECT 1
+      FROM course_offering_categories AS oc
+      WHERE oc.offering_id = o.offering_id
+        AND oc.department_id = 11
+        AND oc.category_id = 2
+  )
+ORDER BY o.course_code, o.section;",4540,3.49
+J005,"2026학년도 2학기 SWCON331-00(로봇프로그래밍) 담당 교수의 같은 학기 다른 수업 중 소프트웨어융합학과 기준 전공필수이고, 공식 강의계획서에 과제 반영 비율이 30% 이상으로 기재된 강좌의 과목코드·분반·과제 비율을 알려줘. 기준 과목의 다른 분반도 제외하고, 미기재 비율은 0으로 보지 마.",,"multi_document_multi_hop_reasoning,professor_assessment_filter,official_public_facts",True,True,True,correct,,1,True,,,"SELECT
+    o.course_code,
+    o.section,
+    s.assignment_percentage
+FROM course_offerings AS o
+JOIN syllabi AS s ON s.offering_id = o.offering_id
+WHERE o.year = 2026
+  AND o.semester = '2'
+  AND o.course_code <> 'SWCON331'
+  AND s.assignment_percentage IS NOT NULL
+  AND s.assignment_percentage >= 30
+  AND EXISTS (
+      SELECT 1
+      FROM offering_professors AS op
+      JOIN offering_professors AS base_op
+        ON base_op.professor_id = op.professor_id
+      JOIN course_offerings AS base
+        ON base.offering_id = base_op.offering_id
+      WHERE op.offering_id = o.offering_id
+        AND base.course_code = 'SWCON331'
+        AND base.section = '00'
+        AND base.year = 2026
+        AND base.semester = '2'
+  )
+  AND EXISTS (
+      SELECT 1
+      FROM course_offering_categories AS oc
+      WHERE oc.offering_id = o.offering_id
+        AND oc.department_id = 8
+        AND oc.category_id = 2
+  )
+ORDER BY o.course_code, o.section;",4597,3.74
+J006,"2026학년도 2학기 SWCON253-00(기계학습) 담당 교수의 같은 학기 다른 수업 중 소프트웨어융합학과 기준 전공필수이고, 공식 강의계획서에 과제 반영 비율이 30% 이상으로 기재된 강좌의 과목코드·분반·과제 비율을 알려줘. 기준 과목의 다른 분반도 제외하고, 미기재 비율은 0으로 보지 마.",,"multi_document_multi_hop_reasoning,professor_assessment_filter,official_public_facts",True,True,True,correct,,1,True,,,"SELECT
+    o.course_code,
+    o.section,
+    s.assignment_percentage
+FROM course_offerings AS o
+JOIN syllabi AS s ON s.offering_id = o.offering_id
+WHERE o.year = 2026
+  AND o.semester = '2'
+  AND o.course_code <> 'SWCON253'
+  AND s.assignment_percentage IS NOT NULL
+  AND s.assignment_percentage >= 30
+  AND EXISTS (
+      SELECT 1
+      FROM offering_professors AS op
+      JOIN offering_professors AS base_op
+        ON base_op.professor_id = op.professor_id
+      JOIN course_offerings AS base
+        ON base.offering_id = base_op.offering_id
+      WHERE op.offering_id = o.offering_id
+        AND base.course_code = 'SWCON253'
+        AND base.section = '00'
+        AND base.year = 2026
+        AND base.semester = '2'
+  )
+  AND EXISTS (
+      SELECT 1
+      FROM course_offering_categories AS oc
+      JOIN departments AS d ON d.department_id = oc.department_id
+      JOIN course_categories AS c ON c.category_id = oc.category_id
+      WHERE oc.offering_id = o.offering_id
+        AND d.name = '소프트웨어융합학과'
+        AND c.category_name = '전공필수'
+  )
+ORDER BY o.course_code, o.section;",4631,4.5
+J007,"2026학년도 2학기 CSE304-00(알고리즘) 담당 교수의 같은 학기 다른 수업 중 컴퓨터공학과 기준 전공필수이고, 공식 강의계획서에 과제 반영 비율이 30% 이상으로 기재된 강좌의 과목코드·분반·과제 비율을 알려줘. 기준 과목의 다른 분반도 제외하고, 미기재 비율은 0으로 보지 마.",,"multi_document_multi_hop_reasoning,professor_assessment_filter,official_public_facts",True,True,True,correct,,1,True,,,"SELECT
+    o.course_code,
+    o.section,
+    s.assignment_percentage
+FROM course_offerings AS o
+JOIN syllabi AS s ON s.offering_id = o.offering_id
+WHERE o.year = 2026
+  AND o.semester = '2'
+  AND o.course_code <> 'CSE304'
+  AND s.assignment_percentage IS NOT NULL
+  AND s.assignment_percentage >= 30
+  AND EXISTS (
+      SELECT 1
+      FROM offering_professors AS op
+      JOIN offering_professors AS base_op
+        ON base_op.professor_id = op.professor_id
+      JOIN course_offerings AS base
+        ON base.offering_id = base_op.offering_id
+      WHERE op.offering_id = o.offering_id
+        AND base.course_code = 'CSE304'
+        AND base.section = '00'
+        AND base.year = 2026
+        AND base.semester = '2'
+  )
+  AND EXISTS (
+      SELECT 1
+      FROM course_offering_categories AS oc
+      JOIN course_categories AS cc ON cc.category_id = oc.category_id
+      WHERE oc.offering_id = o.offering_id
+        AND oc.department_id = 11
+        AND cc.category_name = '전공필수'
+  )
+ORDER BY o.course_code, o.section;",4610,3.58
+J008,"2026학년도 2학기 SWCON253-02(기계학습) 담당 교수의 같은 학기 다른 수업 중 컴퓨터공학과 기준 전공필수이고, 공식 강의계획서에 과제 반영 비율이 30% 이상으로 기재된 강좌의 과목코드·분반·과제 비율을 알려줘. 기준 과목의 다른 분반도 제외하고, 미기재 비율은 0으로 보지 마.",,"multi_document_multi_hop_reasoning,professor_assessment_filter,official_public_facts",True,True,True,correct,,1,True,,,"SELECT
+    o.course_code,
+    o.section,
+    s.assignment_percentage
+FROM course_offerings AS o
+JOIN syllabi AS s ON s.offering_id = o.offering_id
+WHERE o.year = 2026
+  AND o.semester = '2'
+  AND o.course_code <> 'SWCON253'
+  AND s.assignment_percentage IS NOT NULL
+  AND s.assignment_percentage >= 30
+  AND EXISTS (
+      SELECT 1
+      FROM offering_professors AS op
+      JOIN offering_professors AS base_op
+        ON base_op.professor_id = op.professor_id
+      JOIN course_offerings AS base
+        ON base.offering_id = base_op.offering_id
+      WHERE op.offering_id = o.offering_id
+        AND base.course_code = 'SWCON253'
+        AND base.section = '02'
+        AND base.year = 2026
+        AND base.semester = '2'
+  )
+  AND EXISTS (
+      SELECT 1
+      FROM course_offering_categories AS oc
+      WHERE oc.offering_id = o.offering_id
+        AND oc.department_id = 11
+        AND oc.category_id = 2
+  )
+ORDER BY o.course_code, o.section;",4592,3.64
+J009,2026학년도 2학기 EE209-02(논리회로)의 담당 교수 이름과 학점을 알려줘.,,"single_document,teacher_credits,official_public_facts",True,True,True,correct,,1,True,,,"SELECT
+    GROUP_CONCAT(p.name, ', ') AS professors,
+    o.credits
+FROM course_offerings AS o
+LEFT JOIN offering_professors AS op ON op.offering_id = o.offering_id
+LEFT JOIN professors AS p ON p.professor_id = op.professor_id
+WHERE o.course_code = 'EE209'
+  AND o.section = '02'
+  AND o.year = 2026
+  AND o.semester = '2'
+GROUP BY o.offering_id;",4359,3.01
+J010,2026학년도 2학기 EE209-02(논리회로)의 영어강좌 구분(영어전체/영어부분/해당없음)과 산학필수 여부(예/아니오)를 알려줘.,,"single_document,english_industry,official_public_facts",True,True,True,correct,,1,True,,,"SELECT
+    CASE english_type
+        WHEN 'FULL' THEN '영어전체'
+        WHEN 'PARTIAL' THEN '영어부분'
+        ELSE '해당없음'
+    END AS 영어강좌_구분,
+    CASE industry_required
+        WHEN 1 THEN '예'
+        ELSE '아니오'
+    END AS 산학필수_여부
+FROM course_offerings
+WHERE year = 2026
+  AND semester = '2'
+  AND course_code = 'EE209'
+  AND section = '02';",4396,2.76

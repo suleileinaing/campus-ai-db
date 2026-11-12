@@ -212,10 +212,15 @@ def select_fewshot(
     examples: list[FewShotExample],
     exclude_sqls: list[str] | None = None,
     max_examples: int | None = None,
+    exclude_titles: list[str] | None = None,
 ) -> list[FewShotExample]:
-    """gold SQL 과 같은 예시는 제외해서 평가 누수를 막는다."""
+    """gold/참고 SQL 과 같거나 제목으로 지정한 예시는 제외해서 평가 누수를 막는다."""
     excluded = {normalize_sql(s) for s in (exclude_sqls or [])}
-    kept = [e for e in examples if normalize_sql(e.sql) not in excluded]
+    titles = {t.strip() for t in (exclude_titles or [])}
+    unknown = titles - {e.title for e in examples}
+    if unknown:
+        raise ValueError(f"없는 few-shot 제목: {sorted(unknown)}")
+    kept = [e for e in examples if normalize_sql(e.sql) not in excluded and e.title not in titles]
     return kept[:max_examples] if max_examples else kept
 
 
@@ -227,15 +232,16 @@ class PromptBuilder:
         max_fewshot: int | None = None,
         db_path: Path = DATABASE_PATH,
         current_term: str = CURRENT_TERM,
+        exclude_titles: list[str] | None = None,
     ):
         self.db_path = db_path
         self.schema = load_schema(db_path)
         self.value_hints = extract_value_hints(db_path)
         self.rules = build_domain_rules(db_path, current_term)
-        self.fewshot = (
-            select_fewshot(fewshot_runs_on(load_sample_queries(), db_path), exclude_sqls, max_fewshot)
-            if use_fewshot else []
-        )
+        available = fewshot_runs_on(load_sample_queries(), db_path) if use_fewshot else []
+        self.fewshot = select_fewshot(available, exclude_sqls, max_fewshot, exclude_titles) if use_fewshot else []
+        kept = {e.title for e in self.fewshot}
+        self.excluded_fewshot = [e.title for e in available if e.title not in kept]
 
     def system_prompt(self) -> str:
         parts = [

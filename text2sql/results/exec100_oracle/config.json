@@ -1,0 +1,23 @@
+{
+  "model": "oracle",
+  "fewshot": true,
+  "n_fewshot": 11,
+  "fewshot_titles": [
+    "Who teaches a course in a specific semester?",
+    "What prerequisites apply to a course and admission year?",
+    "What is taught each week for one offering?",
+    "Which classes begin Monday at 13:30 in a specific semester?",
+    "How is a course evaluated?",
+    "Which textbook is used for a course?",
+    "Which courses are marked as industry-required (산학필수)?",
+    "How many credits has a student completed?",
+    "How many credits remain in each graduation category?",
+    "Which required courses has a student not completed yet?",
+    "How much of the industry-required requirement has a student completed?"
+  ],
+  "excluded_fewshot": [],
+  "temperature": null,
+  "max_repairs": 2,
+  "gold": "text2sql/gold/실행평가_100문항.json",
+  "n_items": 100
+}

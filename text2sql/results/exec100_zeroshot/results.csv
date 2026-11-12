@@ -1,0 +1,2141 @@
+﻿id,question,student_id,tags,strict,relaxed,subset,diagnosis,missing_columns,n_attempts,first_try_exec_ok,exec_error,gold_sql,pred_sql,total_tokens,latency_sec
+J001,"2026학년도 2학기 SWCON331-00(로봇프로그래밍) 담당 교수의 다른 수업 중, 같은 학기 소프트웨어융합학과 기준 전공필수이면서 3학점인 강좌가 있어? 해당 과목코드·분반·학점을 모두 알려줘. 기준 과목의 다른 분반도 제외해줘.",,"multi_hop,professor_required_credit_chain,official_public_facts",True,True,True,correct,,1,True,,,"SELECT co.course_code, co.section, co.credits
+FROM course_offerings AS co
+WHERE co.year = 2026
+  AND co.semester = '2'
+  AND co.course_code <> 'SWCON331'
+  AND co.credits = 3
+  AND EXISTS (
+      SELECT 1
+      FROM offering_professors AS op
+      JOIN offering_professors AS base_op
+        ON base_op.professor_id = op.professor_id
+      JOIN course_offerings AS base_co
+        ON base_co.offering_id = base_op.offering_id
+      WHERE op.offering_id = co.offering_id
+        AND base_co.course_code = 'SWCON331'
+        AND base_co.section = '00'
+        AND base_co.year = 2026
+        AND base_co.semester = '2'
+  )
+  AND EXISTS (
+      SELECT 1
+      FROM course_offering_categories AS coc
+      JOIN departments AS d
+        ON d.department_id = coc.department_id
+      JOIN course_categories AS cc
+        ON cc.category_id = coc.category_id
+      WHERE coc.offering_id = co.offering_id
+        AND d.name = '소프트웨어융합학과'
+        AND cc.category_name = '전공필수'
+  );",3936,3.99
+J002,"2026학년도 2학기 SWCON253-00(기계학습) 담당 교수의 다른 수업 중, 같은 학기 소프트웨어융합학과 기준 전공필수이면서 3학점인 강좌가 있어? 해당 과목코드·분반·학점을 모두 알려줘. 기준 과목의 다른 분반도 제외해줘.",,"multi_hop,professor_required_credit_chain,official_public_facts",True,True,True,correct,,1,True,,,"SELECT DISTINCT co.course_code, co.section, co.credits
+FROM course_offerings AS co
+JOIN offering_professors AS op
+  ON op.offering_id = co.offering_id
+WHERE co.year = 2026
+  AND co.semester = '2'
+  AND co.credits = 3
+  AND co.course_code <> 'SWCON253'
+  AND op.professor_id IN (
+      SELECT base_op.professor_id
+      FROM course_offerings AS base
+      JOIN offering_professors AS base_op
+        ON base_op.offering_id = base.offering_id
+      WHERE base.course_code = 'SWCON253'
+        AND base.section = '00'
+        AND base.year = 2026
+        AND base.semester = '2'
+  )
+  AND EXISTS (
+      SELECT 1
+      FROM course_offering_categories AS coc
+      WHERE coc.offering_id = co.offering_id
+        AND coc.department_id = 8
+        AND coc.category_id = 2
+  )
+ORDER BY co.course_code, co.section;",3889,3.87
+J003,"2026학년도 2학기 CSE304-00(알고리즘) 담당 교수의 다른 수업 중, 같은 학기 컴퓨터공학과 기준 전공필수이면서 3학점인 강좌가 있어? 해당 과목코드·분반·학점을 모두 알려줘. 기준 과목의 다른 분반도 제외해줘.",,"multi_hop,professor_required_credit_chain,official_public_facts",True,True,True,correct,,1,True,,,"SELECT co.course_code, co.section, co.credits
+FROM course_offerings AS co
+WHERE co.year = 2026
+  AND co.semester = '2'
+  AND co.credits = 3
+  AND co.course_code <> 'CSE304'
+  AND EXISTS (
+      SELECT 1
+      FROM course_offering_categories AS coc
+      WHERE coc.offering_id = co.offering_id
+        AND coc.department_id = 11
+        AND coc.category_id = 2
+  )
+  AND EXISTS (
+      SELECT 1
+      FROM offering_professors AS op
+      JOIN offering_professors AS base_op
+        ON base_op.professor_id = op.professor_id
+      JOIN course_offerings AS base
+        ON base.offering_id = base_op.offering_id
+      WHERE op.offering_id = co.offering_id
+        AND base.course_code = 'CSE304'
+        AND base.section = '00'
+        AND base.year = 2026
+        AND base.semester = '2'
+  )
+ORDER BY co.course_code, co.section;",3950,4.35
+J004,"2026학년도 2학기 SWCON253-02(기계학습) 담당 교수의 다른 수업 중, 같은 학기 컴퓨터공학과 기준 전공필수이면서 3학점인 강좌가 있어? 해당 과목코드·분반·학점을 모두 알려줘. 기준 과목의 다른 분반도 제외해줘.",,"multi_hop,professor_required_credit_chain,official_public_facts",True,True,True,correct,,1,True,,,"SELECT co.course_code, co.section, co.credits
+FROM course_offerings AS co
+WHERE co.year = 2026
+  AND co.semester = '2'
+  AND co.credits = 3
+  AND co.course_code <> 'SWCON253'
+  AND EXISTS (
+      SELECT 1
+      FROM offering_professors AS op
+      JOIN offering_professors AS base_op
+        ON base_op.professor_id = op.professor_id
+      JOIN course_offerings AS base
+        ON base.offering_id = base_op.offering_id
+      WHERE op.offering_id = co.offering_id
+        AND base.course_code = 'SWCON253'
+        AND base.section = '02'
+        AND base.year = 2026
+        AND base.semester = '2'
+  )
+  AND EXISTS (
+      SELECT 1
+      FROM course_offering_categories AS coc
+      WHERE coc.offering_id = co.offering_id
+        AND coc.department_id = 11
+        AND coc.category_id = 2
+  )
+ORDER BY co.course_code, co.section;",3893,3.23
+J005,"2026학년도 2학기 SWCON331-00(로봇프로그래밍) 담당 교수의 같은 학기 다른 수업 중 소프트웨어융합학과 기준 전공필수이고, 공식 강의계획서에 과제 반영 비율이 30% 이상으로 기재된 강좌의 과목코드·분반·과제 비율을 알려줘. 기준 과목의 다른 분반도 제외하고, 미기재 비율은 0으로 보지 마.",,"multi_document_multi_hop_reasoning,professor_assessment_filter,official_public_facts",True,True,True,correct,,1,True,,,"SELECT co.course_code, co.section, s.assignment_percentage
+FROM course_offerings AS co
+JOIN syllabi AS s ON s.offering_id = co.offering_id
+WHERE co.year = 2026
+  AND co.semester = '2'
+  AND co.course_code <> 'SWCON331'
+  AND s.assignment_percentage IS NOT NULL
+  AND s.assignment_percentage >= 30
+  AND EXISTS (
+      SELECT 1
+      FROM offering_professors AS op
+      JOIN offering_professors AS base_op
+        ON base_op.professor_id = op.professor_id
+      JOIN course_offerings AS base
+        ON base.offering_id = base_op.offering_id
+      WHERE op.offering_id = co.offering_id
+        AND base.course_code = 'SWCON331'
+        AND base.section = '00'
+        AND base.year = 2026
+        AND base.semester = '2'
+  )
+  AND EXISTS (
+      SELECT 1
+      FROM course_offering_categories AS coc
+      JOIN departments AS d ON d.department_id = coc.department_id
+      JOIN course_categories AS cc ON cc.category_id = coc.category_id
+      WHERE coc.offering_id = co.offering_id
+        AND d.name = '소프트웨어융합학과'
+        AND cc.category_name = '전공필수'
+  );",3978,5.18
+J006,"2026학년도 2학기 SWCON253-00(기계학습) 담당 교수의 같은 학기 다른 수업 중 소프트웨어융합학과 기준 전공필수이고, 공식 강의계획서에 과제 반영 비율이 30% 이상으로 기재된 강좌의 과목코드·분반·과제 비율을 알려줘. 기준 과목의 다른 분반도 제외하고, 미기재 비율은 0으로 보지 마.",,"multi_document_multi_hop_reasoning,professor_assessment_filter,official_public_facts",True,True,True,correct,,1,True,,,"SELECT co.course_code,
+       co.section,
+       s.assignment_percentage
+FROM course_offerings AS co
+JOIN syllabi AS s ON s.offering_id = co.offering_id
+WHERE co.year = 2026
+  AND co.semester = '2'
+  AND co.course_code <> 'SWCON253'
+  AND s.assignment_percentage IS NOT NULL
+  AND s.assignment_percentage >= 30
+  AND EXISTS (
+      SELECT 1
+      FROM offering_professors AS op
+      JOIN offering_professors AS base_op
+        ON base_op.professor_id = op.professor_id
+      JOIN course_offerings AS base
+        ON base.offering_id = base_op.offering_id
+      WHERE op.offering_id = co.offering_id
+        AND base.course_code = 'SWCON253'
+        AND base.section = '00'
+        AND base.year = 2026
+        AND base.semester = '2'
+  )
+  AND EXISTS (
+      SELECT 1
+      FROM course_offering_categories AS coc
+      JOIN departments AS d ON d.department_id = coc.department_id
+      JOIN course_categories AS cc ON cc.category_id = coc.category_id
+      WHERE coc.offering_id = co.offering_id
+        AND d.name = '소프트웨어융합학과'
+        AND cc.category_name = '전공필수'
+  );",3977,4.09
+J007,"2026학년도 2학기 CSE304-00(알고리즘) 담당 교수의 같은 학기 다른 수업 중 컴퓨터공학과 기준 전공필수이고, 공식 강의계획서에 과제 반영 비율이 30% 이상으로 기재된 강좌의 과목코드·분반·과제 비율을 알려줘. 기준 과목의 다른 분반도 제외하고, 미기재 비율은 0으로 보지 마.",,"multi_document_multi_hop_reasoning,professor_assessment_filter,official_public_facts",True,True,True,correct,,1,True,,,"WITH target_professors AS (
+    SELECT op.professor_id
+    FROM course_offerings AS co
+    JOIN offering_professors AS op ON op.offering_id = co.offering_id
+    WHERE co.year = 2026
+      AND co.semester = '2'
+      AND co.course_code = 'CSE304'
+      AND co.section = '00'
+)
+SELECT co.course_code, co.section, s.assignment_percentage
+FROM course_offerings AS co
+JOIN syllabi AS s ON s.offering_id = co.offering_id
+WHERE co.year = 2026
+  AND co.semester = '2'
+  AND co.course_code <> 'CSE304'
+  AND s.assignment_percentage IS NOT NULL
+  AND s.assignment_percentage >= 30
+  AND EXISTS (
+      SELECT 1
+      FROM offering_professors AS op
+      JOIN target_professors AS tp ON tp.professor_id = op.professor_id
+      WHERE op.offering_id = co.offering_id
+  )
+  AND EXISTS (
+      SELECT 1
+      FROM course_offering_categories AS coc
+      WHERE coc.offering_id = co.offering_id
+        AND coc.department_id = 11
+        AND coc.category_id = 2
+  )
+ORDER BY co.course_code, co.section;",4052,6.47
+J008,"2026학년도 2학기 SWCON253-02(기계학습) 담당 교수의 같은 학기 다른 수업 중 컴퓨터공학과 기준 전공필수이고, 공식 강의계획서에 과제 반영 비율이 30% 이상으로 기재된 강좌의 과목코드·분반·과제 비율을 알려줘. 기준 과목의 다른 분반도 제외하고, 미기재 비율은 0으로 보지 마.",,"multi_document_multi_hop_reasoning,professor_assessment_filter,official_public_facts",True,True,True,correct,,1,True,,,"SELECT co.course_code, co.section, sy.assignment_percentage
+FROM course_offerings AS co
+JOIN syllabi AS sy ON sy.offering_id = co.offering_id
+WHERE co.year = 2026
+  AND co.semester = '2'
+  AND co.course_code <> 'SWCON253'
+  AND sy.assignment_percentage IS NOT NULL
+  AND sy.assignment_percentage >= 30
+  AND EXISTS (
+      SELECT 1
+      FROM course_offering_categories AS coc
+      JOIN course_categories AS cc ON cc.category_id = coc.category_id
+      JOIN departments AS d ON d.department_id = coc.department_id
+      WHERE coc.offering_id = co.offering_id
+        AND d.name = '컴퓨터공학과'
+        AND cc.category_name = '전공필수'
+  )
+  AND EXISTS (
+      SELECT 1
+      FROM offering_professors AS op
+      JOIN offering_professors AS base_op
+        ON base_op.professor_id = op.professor_id
+      JOIN course_offerings AS base_co
+        ON base_co.offering_id = base_op.offering_id
+      WHERE op.offering_id = co.offering_id
+        AND base_co.year = 2026
+        AND base_co.semester = '2'
+        AND base_co.course_code = 'SWCON253'
+        AND base_co.section = '02'
+  );",3977,4.07
+J009,2026학년도 2학기 EE209-02(논리회로)의 담당 교수 이름과 학점을 알려줘.,,"single_document,teacher_credits,official_public_facts",True,True,True,correct,,1,True,,,"SELECT p.name, co.credits
+FROM course_offerings AS co
+JOIN offering_professors AS op ON op.offering_id = co.offering_id
+JOIN professors AS p ON p.professor_id = op.professor_id
+WHERE co.year = 2026
+  AND co.semester = '2'
+  AND co.course_code = 'EE209'
+  AND co.section = '02';",3696,2.08
+J010,2026학년도 2학기 EE209-02(논리회로)의 영어강좌 구분(영어전체/영어부분/해당없음)과 산학필수 여부(예/아니오)를 알려줘.,,"single_document,english_industry,official_public_facts",True,True,True,correct,,1,True,,,"SELECT
+    CASE english_type
+        WHEN 'FULL' THEN '영어전체'
+        WHEN 'PARTIAL' THEN '영어부분'
+        ELSE '해당없음'
+    END AS 영어강좌구분,
+    CASE industry_required
+        WHEN 1 THEN '예'
+        ELSE '아니오'
+    END AS 산학필수여부
+FROM course_offerings
+WHERE year = 2026
+  AND semester = '2'
+  AND course_code = 'EE209'
+  AND section = '02';",3751,2.62
+J011,"2026학년도 1학기 SWCON367-01(게임콘텐츠캡스톤디자인) 담당 교수의 같은 학기 소프트웨어융합학과 개설목록 내 다른 3학점 강좌 중, 중간·기말 비율이 모두 기재된 강좌끼리 비교하면 시험 비율 합계가 가장 낮은 강좌는? 과목코드·분반·합계를 알려주고 동률은 모두 포함해줘. 기준 과목 코드는 제외해줘.",,"multi_document_multi_hop_reasoning,professor_assessment_ranking,official_public_facts",True,True,True,correct,,1,True,,,"WITH candidates AS (
+    SELECT
+        co.course_code,
+        co.section,
+        s.midterm_percentage + s.final_exam_percentage AS exam_percentage_total
+    FROM course_offerings AS co
+    JOIN syllabi AS s ON s.offering_id = co.offering_id
+    WHERE co.year = 2026
+      AND co.semester = '1'
+      AND co.course_code <> 'SWCON367'
+      AND co.credits = 3
+      AND s.midterm_percentage IS NOT NULL
+      AND s.final_exam_percentage IS NOT NULL
+      AND EXISTS (
+          SELECT 1
+          FROM course_offering_categories AS coc
+          JOIN departments AS d ON d.department_id = coc.department_id
+          WHERE coc.offering_id = co.offering_id
+            AND d.name = '소프트웨어융합학과'
+      )
+      AND EXISTS (
+          SELECT 1
+          FROM offering_professors AS op
+          JOIN offering_professors AS base_op
+            ON base_op.professor_id = op.professor_id
+          JOIN course_offerings AS base
+            ON base.offering_id = base_op.offering_id
+          WHERE op.offering_id = co.offering_id
+            AND base.year = 2026
+            AND base.semester = '1'
+            AND base.course_code = 'SWCON367'
+            AND base.section = '01'
+      )
+)
+SELECT course_code, section, exam_percentage_total
+FROM candidates
+WHERE exam_percentage_total = (
+    SELECT MIN(exam_percentage_total)
+    FROM candidates
+)
+ORDER BY course_code, section;",4153,6.92
+J012,2026학년도 1학기 CSE301-01(운영체제)의 담당 교수 이름과 학점을 알려줘.,,"single_document,teacher_credits,official_public_facts",True,True,True,correct,,1,True,,,"SELECT p.name, co.credits
+FROM course_offerings AS co
+JOIN offering_professors AS op ON op.offering_id = co.offering_id
+JOIN professors AS p ON p.professor_id = op.professor_id
+WHERE co.year = 2026
+  AND co.semester = '1'
+  AND co.course_code = 'CSE301'
+  AND co.section = '01';",3698,2.31
+J013,2026학년도 1학기 CSE301-01(운영체제)의 영어강좌 구분(영어전체/영어부분/해당없음)과 산학필수 여부(예/아니오)를 알려줘.,,"single_document,english_industry,official_public_facts",True,True,True,correct,,1,True,,,"SELECT
+    CASE english_type
+        WHEN 'FULL' THEN '영어전체'
+        WHEN 'PARTIAL' THEN '영어부분'
+        ELSE '해당없음'
+    END AS 영어강좌_구분,
+    CASE industry_required
+        WHEN 1 THEN '예'
+        ELSE '아니오'
+    END AS 산학필수_여부
+FROM course_offerings
+WHERE year = 2026
+  AND semester = '1'
+  AND course_code = 'CSE301'
+  AND section = '01';",3755,3.67
+J014,"2026학년도 1학기 SWCON366-00(3D데이터처리) 담당 교수의 같은 학기 소프트웨어융합학과 개설목록 내 다른 3학점 강좌 중, 중간·기말 비율이 모두 기재된 강좌끼리 비교하면 시험 비율 합계가 가장 낮은 강좌는? 과목코드·분반·합계를 알려주고 동률은 모두 포함해줘. 기준 과목 코드는 제외해줘.",,"multi_document_multi_hop_reasoning,professor_assessment_ranking,official_public_facts",True,True,True,correct,,1,True,,,"WITH candidates AS (
+    SELECT
+        co.course_code,
+        co.section,
+        s.midterm_percentage + s.final_exam_percentage AS exam_percentage_sum
+    FROM course_offerings AS co
+    JOIN courses AS c ON c.course_code = co.course_code
+    JOIN syllabi AS s ON s.offering_id = co.offering_id
+    WHERE co.year = 2026
+      AND co.semester = '1'
+      AND c.department_id = 8
+      AND co.credits = 3
+      AND co.course_code <> 'SWCON366'
+      AND s.midterm_percentage IS NOT NULL
+      AND s.final_exam_percentage IS NOT NULL
+      AND EXISTS (
+          SELECT 1
+          FROM offering_professors AS op
+          JOIN offering_professors AS base_op
+            ON base_op.professor_id = op.professor_id
+          JOIN course_offerings AS base
+            ON base.offering_id = base_op.offering_id
+          WHERE op.offering_id = co.offering_id
+            AND base.course_code = 'SWCON366'
+            AND base.section = '00'
+            AND base.year = 2026
+            AND base.semester = '1'
+      )
+)
+SELECT course_code, section, exam_percentage_sum
+FROM candidates
+WHERE exam_percentage_sum = (
+    SELECT MIN(exam_percentage_sum)
+    FROM candidates
+)
+ORDER BY course_code, section;",4096,6.5
+J015,2025학년도 1학기 EE211-02(확률및랜덤변수)의 담당 교수 이름과 학점을 알려줘.,,"single_document,teacher_credits,official_public_facts",True,True,True,correct,,1,True,,,"SELECT p.name AS professor_name, co.credits
+FROM course_offerings AS co
+JOIN offering_professors AS op ON op.offering_id = co.offering_id
+JOIN professors AS p ON p.professor_id = op.professor_id
+WHERE co.year = 2025
+  AND co.semester = '1'
+  AND co.course_code = 'EE211'
+  AND co.section = '02';",3702,2.25
+J016,2025학년도 1학기 EE211-02(확률및랜덤변수)의 영어강좌 구분(영어전체/영어부분/해당없음)과 산학필수 여부(예/아니오)를 알려줘.,,"single_document,english_industry,official_public_facts",True,True,True,correct,,1,True,,,"SELECT
+    CASE english_type
+        WHEN 'FULL' THEN '영어전체'
+        WHEN 'PARTIAL' THEN '영어부분'
+        ELSE '해당없음'
+    END AS 영어강좌_구분,
+    CASE industry_required
+        WHEN 1 THEN '예'
+        ELSE '아니오'
+    END AS 산학필수_여부
+FROM course_offerings
+WHERE year = 2025
+  AND semester = '1'
+  AND course_code = 'EE211'
+  AND section = '02';",3756,2.42
+J017,"2026학년도 1학기 SWCON401-06(소프트웨어융합캡스톤디자인) 담당 교수의 같은 학기 소프트웨어융합학과 개설목록 내 다른 3학점 강좌 중, 중간·기말 비율이 모두 기재된 강좌끼리 비교하면 시험 비율 합계가 가장 낮은 강좌는? 과목코드·분반·합계를 알려주고 동률은 모두 포함해줘. 기준 과목 코드는 제외해줘.",,"multi_document_multi_hop_reasoning,professor_assessment_ranking,official_public_facts",True,True,True,correct,,1,True,,,"WITH candidates AS (
+    SELECT
+        co.course_code,
+        co.section,
+        s.midterm_percentage + s.final_exam_percentage AS exam_percentage_sum
+    FROM course_offerings AS co
+    JOIN courses AS c ON c.course_code = co.course_code
+    JOIN syllabi AS s ON s.offering_id = co.offering_id
+    WHERE co.year = 2026
+      AND co.semester = '1'
+      AND c.department_id = 8
+      AND co.course_code <> 'SWCON401'
+      AND co.credits = 3
+      AND s.midterm_percentage IS NOT NULL
+      AND s.final_exam_percentage IS NOT NULL
+      AND EXISTS (
+          SELECT 1
+          FROM offering_professors AS op
+          JOIN offering_professors AS base_op
+            ON base_op.professor_id = op.professor_id
+          JOIN course_offerings AS base
+            ON base.offering_id = base_op.offering_id
+          WHERE op.offering_id = co.offering_id
+            AND base.year = 2026
+            AND base.semester = '1'
+            AND base.course_code = 'SWCON401'
+            AND base.section = '06'
+      )
+)
+SELECT
+    course_code,
+    section,
+    exam_percentage_sum
+FROM candidates
+WHERE exam_percentage_sum = (
+    SELECT MIN(exam_percentage_sum)
+    FROM candidates
+)
+ORDER BY course_code, section;",4047,5.57
+J018,2026학년도 2학기 AI4007-07(독립심화학습(인공지능)2)의 담당 교수 이름과 학점을 알려줘.,,"single_document,teacher_credits,official_public_facts",True,True,True,correct,,1,True,,,"SELECT p.name, co.credits
+FROM course_offerings AS co
+JOIN offering_professors AS op ON op.offering_id = co.offering_id
+JOIN professors AS p ON p.professor_id = op.professor_id
+WHERE co.year = 2026
+  AND co.semester = '2'
+  AND co.course_code = 'AI4007'
+  AND co.section = '07';",3706,2.19
+J019,2026학년도 2학기 AI4007-07(독립심화학습(인공지능)2)의 영어강좌 구분(영어전체/영어부분/해당없음)과 산학필수 여부(예/아니오)를 알려줘.,,"single_document,english_industry,official_public_facts",True,True,True,correct,,1,True,,,"SELECT
+    CASE english_type
+        WHEN 'FULL' THEN '영어전체'
+        WHEN 'PARTIAL' THEN '영어부분'
+        ELSE '해당없음'
+    END AS 영어강좌_구분,
+    CASE industry_required
+        WHEN 1 THEN '예'
+        ELSE '아니오'
+    END AS 산학필수_여부
+FROM course_offerings
+WHERE year = 2026
+  AND semester = '2'
+  AND course_code = 'AI4007'
+  AND section = '07';",3763,2.61
+J020,"2026학년도 1학기 IE215-00(데이터사이언스) 담당 교수의 같은 학기 소프트웨어융합학과 개설목록 내 다른 3학점 강좌 중, 중간·기말 비율이 모두 기재된 강좌끼리 비교하면 시험 비율 합계가 가장 낮은 강좌는? 과목코드·분반·합계를 알려주고 동률은 모두 포함해줘. 기준 과목 코드는 제외해줘.",,"multi_document_multi_hop_reasoning,professor_assessment_ranking,official_public_facts",True,True,True,correct,,1,True,,,"WITH candidates AS (
+    SELECT
+        co.course_code,
+        co.section,
+        s.midterm_percentage + s.final_exam_percentage AS exam_percentage_sum
+    FROM course_offerings AS co
+    JOIN syllabi AS s ON s.offering_id = co.offering_id
+    WHERE co.year = 2026
+      AND co.semester = '1'
+      AND co.credits = 3
+      AND co.course_code <> 'IE215'
+      AND s.midterm_percentage IS NOT NULL
+      AND s.final_exam_percentage IS NOT NULL
+      AND EXISTS (
+          SELECT 1
+          FROM course_offering_categories AS coc
+          WHERE coc.offering_id = co.offering_id
+            AND coc.department_id = 8
+      )
+      AND EXISTS (
+          SELECT 1
+          FROM offering_professors AS op
+          JOIN offering_professors AS base_op
+            ON base_op.professor_id = op.professor_id
+          JOIN course_offerings AS base
+            ON base.offering_id = base_op.offering_id
+          WHERE op.offering_id = co.offering_id
+            AND base.course_code = 'IE215'
+            AND base.section = '00'
+            AND base.year = 2026
+            AND base.semester = '1'
+      )
+)
+SELECT course_code, section, exam_percentage_sum
+FROM candidates
+WHERE exam_percentage_sum = (
+    SELECT MIN(exam_percentage_sum)
+    FROM candidates
+)
+ORDER BY course_code, section;",4076,4.85
+J021,"2025학년도 1학기 CSE406-01(캡스톤디자인)와 2026학년도 1학기 CSE406-01(캡스톤디자인)의 기말고사 비율을 순서대로 알려주고, 두 번째에서 첫 번째를 뺀 차이를 퍼센트포인트로 계산해줘.",,"multi_document_reasoning,exam_change,official_public_facts",True,True,True,correct,,1,True,,,"SELECT
+    s1.final_exam_percentage AS ""2025학년도 1학기 기말고사 비율"",
+    s2.final_exam_percentage AS ""2026학년도 1학기 기말고사 비율"",
+    s2.final_exam_percentage - s1.final_exam_percentage AS ""차이(퍼센트포인트)""
+FROM course_offerings AS o1
+JOIN syllabi AS s1 ON s1.offering_id = o1.offering_id
+JOIN course_offerings AS o2
+    ON o2.course_code = o1.course_code
+    AND o2.section = o1.section
+JOIN syllabi AS s2 ON s2.offering_id = o2.offering_id
+WHERE o1.course_code = 'CSE406'
+  AND o1.section = '01'
+  AND o1.year = 2025
+  AND o1.semester = '1'
+  AND o2.year = 2026
+  AND o2.semester = '1';",3872,3.16
+J022,"2025학년도 1학기 CSE406-01(캡스톤디자인)와 2026학년도 1학기 CSE406-06(캡스톤디자인)의 기말고사 비율을 순서대로 알려주고, 두 번째에서 첫 번째를 뺀 차이를 퍼센트포인트로 계산해줘.",,"multi_document_reasoning,exam_change,official_public_facts",True,True,True,correct,,1,True,,,"WITH exam_percentages AS (
+    SELECT
+        MAX(CASE
+            WHEN co.year = 2025 AND co.section = '01'
+            THEN s.final_exam_percentage
+        END) AS first_percentage,
+        MAX(CASE
+            WHEN co.year = 2026 AND co.section = '06'
+            THEN s.final_exam_percentage
+        END) AS second_percentage
+    FROM course_offerings AS co
+    JOIN syllabi AS s ON s.offering_id = co.offering_id
+    WHERE co.course_code = 'CSE406'
+      AND co.semester = '1'
+      AND (
+          (co.year = 2025 AND co.section = '01')
+          OR (co.year = 2026 AND co.section = '06')
+      )
+)
+SELECT
+    first_percentage AS ""2025학년도 1학기 CSE406-01 기말고사 비율"",
+    second_percentage AS ""2026학년도 1학기 CSE406-06 기말고사 비율"",
+    second_percentage - first_percentage AS ""차이(퍼센트포인트)""
+FROM exam_percentages;",3898,3.7
+J023,"2026학년도 2학기 CSE406-16(캡스톤디자인)와 2025학년도 2학기 CSE406-06(캡스톤디자인)의 기말고사 비율을 순서대로 알려주고, 두 번째에서 첫 번째를 뺀 차이를 퍼센트포인트로 계산해줘.",,"multi_document_reasoning,exam_change,official_public_facts",True,True,True,correct,,1,True,,,"WITH exam_weights AS (
+    SELECT
+        (
+            SELECT s.final_exam_percentage
+            FROM course_offerings AS co
+            JOIN syllabi AS s ON s.offering_id = co.offering_id
+            WHERE co.course_code = 'CSE406'
+              AND co.section = '16'
+              AND co.year = 2026
+              AND co.semester = '2'
+        ) AS first_percentage,
+        (
+            SELECT s.final_exam_percentage
+            FROM course_offerings AS co
+            JOIN syllabi AS s ON s.offering_id = co.offering_id
+            WHERE co.course_code = 'CSE406'
+              AND co.section = '06'
+              AND co.year = 2025
+              AND co.semester = '2'
+        ) AS second_percentage
+)
+SELECT
+    first_percentage AS ""2026학년도 2학기 CSE406-16 기말고사 비율"",
+    second_percentage AS ""2025학년도 2학기 CSE406-06 기말고사 비율"",
+    second_percentage - first_percentage AS ""차이(퍼센트포인트)""
+FROM exam_weights;",3901,3.7
+J024,"2026학년도 2학기 AI4007-01(독립심화학습(인공지능)2)와 2025학년도 2학기 AI4007-00(독립심화학습(인공지능)2)의 기말고사 비율을 순서대로 알려주고, 두 번째에서 첫 번째를 뺀 차이를 퍼센트포인트로 계산해줘.",,"multi_document_reasoning,exam_change,official_public_facts",True,True,True,correct,,1,True,,,"WITH exam_rates AS (
+    SELECT
+        MAX(CASE WHEN co.year = 2026 AND co.section = '01'
+                 THEN s.final_exam_percentage END) AS first_percentage,
+        MAX(CASE WHEN co.year = 2025 AND co.section = '00'
+                 THEN s.final_exam_percentage END) AS second_percentage
+    FROM course_offerings AS co
+    JOIN syllabi AS s ON s.offering_id = co.offering_id
+    WHERE co.course_code = 'AI4007'
+      AND co.semester = '2'
+      AND ((co.year = 2026 AND co.section = '01')
+        OR (co.year = 2025 AND co.section = '00'))
+)
+SELECT
+    first_percentage AS ""2026학년도 2학기 AI4007-01 기말고사 비율"",
+    second_percentage AS ""2025학년도 2학기 AI4007-00 기말고사 비율"",
+    second_percentage - first_percentage AS ""차이(퍼센트포인트)""
+FROM exam_rates;",3896,3.29
+J025,"2025학년도 1학기 CSE406-01(캡스톤디자인)와 2026학년도 1학기 AI4003-00(졸업논문(인공지능))의 과제보고서 비율을 순서대로 알려주고, 두 번째에서 첫 번째를 뺀 차이를 퍼센트포인트로 계산해줘.",,"multi_document_reasoning,assignment_gap,official_public_facts",True,True,True,correct,,1,True,,,"WITH percentages AS (
+    SELECT
+        MAX(CASE
+            WHEN co.year = 2025 AND co.course_code = 'CSE406' AND co.section = '01'
+            THEN s.assignment_percentage
+        END) AS first_percentage,
+        MAX(CASE
+            WHEN co.year = 2026 AND co.course_code = 'AI4003' AND co.section = '00'
+            THEN s.assignment_percentage
+        END) AS second_percentage
+    FROM course_offerings AS co
+    JOIN syllabi AS s ON s.offering_id = co.offering_id
+    WHERE co.semester = '1'
+      AND (
+          (co.year = 2025 AND co.course_code = 'CSE406' AND co.section = '01')
+          OR
+          (co.year = 2026 AND co.course_code = 'AI4003' AND co.section = '00')
+      )
+)
+SELECT
+    first_percentage AS ""캡스톤디자인 과제보고서 비율(%)"",
+    second_percentage AS ""졸업논문(인공지능) 과제보고서 비율(%)"",
+    second_percentage - first_percentage AS ""차이(퍼센트포인트)""
+FROM percentages;",3921,3.47
+J026,"2025학년도 2학기 CSE302-01(컴퓨터네트워크)와 2026학년도 1학기 SWCON321-02(데이터분석캡스톤디자인)의 과제보고서 비율을 순서대로 알려주고, 두 번째에서 첫 번째를 뺀 차이를 퍼센트포인트로 계산해줘.",,"multi_document_reasoning,assignment_gap,official_public_facts",True,True,True,correct,,1,True,,,"WITH percentages AS (
+    SELECT
+        (
+            SELECT s.assignment_percentage
+            FROM course_offerings AS co
+            JOIN syllabi AS s ON s.offering_id = co.offering_id
+            WHERE co.year = 2025
+              AND co.semester = '2'
+              AND co.course_code = 'CSE302'
+              AND co.section = '01'
+        ) AS first_percentage,
+        (
+            SELECT s.assignment_percentage
+            FROM course_offerings AS co
+            JOIN syllabi AS s ON s.offering_id = co.offering_id
+            WHERE co.year = 2026
+              AND co.semester = '1'
+              AND co.course_code = 'SWCON321'
+              AND co.section = '02'
+        ) AS second_percentage
+)
+SELECT
+    first_percentage AS ""컴퓨터네트워크 과제보고서 비율"",
+    second_percentage AS ""데이터분석캡스톤디자인 과제보고서 비율"",
+    second_percentage - first_percentage AS ""차이(퍼센트포인트)""
+FROM percentages;",3889,5.66
+J027,"2025학년도 1학기 CSE450-00(모바일/웹서비스프로그래밍)와 2025학년도 2학기 CSE406-06(캡스톤디자인)의 과제보고서 비율을 순서대로 알려주고, 두 번째에서 첫 번째를 뺀 차이를 퍼센트포인트로 계산해줘.",,"multi_document_reasoning,assignment_gap,official_public_facts",True,True,True,correct,,1,True,,,"WITH ratios AS (
+    SELECT
+        (
+            SELECT s.assignment_percentage
+            FROM course_offerings AS co
+            JOIN syllabi AS s ON s.offering_id = co.offering_id
+            WHERE co.year = 2025
+              AND co.semester = '1'
+              AND co.course_code = 'CSE450'
+              AND co.section = '00'
+        ) AS first_percentage,
+        (
+            SELECT s.assignment_percentage
+            FROM course_offerings AS co
+            JOIN syllabi AS s ON s.offering_id = co.offering_id
+            WHERE co.year = 2025
+              AND co.semester = '2'
+              AND co.course_code = 'CSE406'
+              AND co.section = '06'
+        ) AS second_percentage
+)
+SELECT
+    first_percentage AS ""모바일/웹서비스프로그래밍 과제보고서 비율(%)"",
+    second_percentage AS ""캡스톤디자인 과제보고서 비율(%)"",
+    second_percentage - first_percentage AS ""차이(퍼센트포인트)""
+FROM ratios;",3893,3.36
+J028,"2025학년도 2학기 CSE403-00(졸업논문(컴퓨터공학전공))와 2025학년도 1학기 AI1001-00(인공지능개론)의 과제보고서 비율을 순서대로 알려주고, 두 번째에서 첫 번째를 뺀 차이를 퍼센트포인트로 계산해줘.",,"multi_document_reasoning,assignment_gap,official_public_facts",True,True,True,correct,,1,True,,,"WITH percentages AS (
+    SELECT
+        MAX(CASE
+            WHEN co.course_code = 'CSE403'
+             AND co.year = 2025 AND co.semester = '2' AND co.section = '00'
+            THEN s.assignment_percentage
+        END) AS first_percentage,
+        MAX(CASE
+            WHEN co.course_code = 'AI1001'
+             AND co.year = 2025 AND co.semester = '1' AND co.section = '00'
+            THEN s.assignment_percentage
+        END) AS second_percentage
+    FROM course_offerings AS co
+    JOIN syllabi AS s ON s.offering_id = co.offering_id
+    WHERE co.year = 2025
+      AND co.section = '00'
+      AND (
+          (co.course_code = 'CSE403' AND co.semester = '2')
+          OR (co.course_code = 'AI1001' AND co.semester = '1')
+      )
+)
+SELECT
+    first_percentage AS ""졸업논문 과제보고서 비율"",
+    second_percentage AS ""인공지능개론 과제보고서 비율"",
+    second_percentage - first_percentage AS ""차이(퍼센트포인트)""
+FROM percentages;",3924,4.37
+J029,"2025학년도 1학기 EE211-02(확률및랜덤변수)와 2025학년도 1학기 CSE438-00(최신기술콜로키움1)의 중간·기말 비율 합계를 각각 구하고, 두 번째 합계에서 첫 번째 합계를 뺀 차이도 알려줘.",,"multi_document_reasoning,combined_exam_gap,official_public_facts",True,True,True,correct,,1,True,,,"WITH totals AS (
+    SELECT
+        MAX(CASE
+            WHEN co.course_code = 'EE211' AND co.section = '02'
+            THEN s.midterm_percentage + s.final_exam_percentage
+        END) AS first_total,
+        MAX(CASE
+            WHEN co.course_code = 'CSE438' AND co.section = '00'
+            THEN s.midterm_percentage + s.final_exam_percentage
+        END) AS second_total
+    FROM course_offerings AS co
+    LEFT JOIN syllabi AS s ON s.offering_id = co.offering_id
+    WHERE co.year = 2025
+      AND co.semester = '1'
+      AND (
+          (co.course_code = 'EE211' AND co.section = '02')
+          OR (co.course_code = 'CSE438' AND co.section = '00')
+      )
+)
+SELECT
+    first_total AS ""EE211-02 중간·기말 합계(%)"",
+    second_total AS ""CSE438-00 중간·기말 합계(%)"",
+    second_total - first_total AS ""두 번째 - 첫 번째 차이(%p)""
+FROM totals;",3997,6.51
+J030,"2026학년도 2학기 AI3003-00(자연언어학습)와 2025학년도 1학기 CSE428-00(컴퓨터그래픽스)의 중간·기말 비율 합계를 각각 구하고, 두 번째 합계에서 첫 번째 합계를 뺀 차이도 알려줘.",,"multi_document_reasoning,combined_exam_gap,official_public_facts",True,True,True,correct,,1,True,,,"WITH totals AS (
+    SELECT
+        MAX(CASE
+            WHEN co.course_code = 'AI3003'
+             AND co.year = 2026 AND co.semester = '2'
+            THEN s.midterm_percentage + s.final_exam_percentage
+        END) AS first_total,
+        MAX(CASE
+            WHEN co.course_code = 'CSE428'
+             AND co.year = 2025 AND co.semester = '1'
+            THEN s.midterm_percentage + s.final_exam_percentage
+        END) AS second_total
+    FROM course_offerings AS co
+    JOIN syllabi AS s ON s.offering_id = co.offering_id
+    WHERE co.section = '00'
+      AND (
+          (co.course_code = 'AI3003' AND co.year = 2026 AND co.semester = '2')
+          OR
+          (co.course_code = 'CSE428' AND co.year = 2025 AND co.semester = '1')
+      )
+)
+SELECT
+    first_total AS ""자연언어학습 중간·기말 비율 합계"",
+    second_total AS ""컴퓨터그래픽스 중간·기말 비율 합계"",
+    second_total - first_total AS ""두 번째 합계 - 첫 번째 합계""
+FROM totals;",4028,6.19
+J031,"2025학년도 1학기 CSE496-06(연구연수활동1(컴퓨터공학))와 2025학년도 1학기 CSE304-00(알고리즘)의 중간·기말 비율 합계를 각각 구하고, 두 번째 합계에서 첫 번째 합계를 뺀 차이도 알려줘.",,"multi_document_reasoning,combined_exam_gap,official_public_facts",True,True,True,correct,,1,True,,,"WITH totals AS (
+    SELECT
+        MAX(CASE
+            WHEN co.course_code = 'CSE496' AND co.section = '06'
+            THEN s.midterm_percentage + s.final_exam_percentage
+        END) AS first_total,
+        MAX(CASE
+            WHEN co.course_code = 'CSE304' AND co.section = '00'
+            THEN s.midterm_percentage + s.final_exam_percentage
+        END) AS second_total
+    FROM course_offerings AS co
+    JOIN syllabi AS s ON s.offering_id = co.offering_id
+    WHERE co.year = 2025
+      AND co.semester = '1'
+      AND (
+          (co.course_code = 'CSE496' AND co.section = '06')
+          OR (co.course_code = 'CSE304' AND co.section = '00')
+      )
+)
+SELECT
+    first_total AS ""CSE496-06 중간·기말 합계"",
+    second_total AS ""CSE304-00 중간·기말 합계"",
+    second_total - first_total AS ""차이(%p)""
+FROM totals;",4019,6.17
+J032,"2025학년도 1학기 CSE405-00(졸업프로젝트)와 2026학년도 1학기 IE419-00(서비스데이터사이언스)의 중간·기말 비율 합계를 각각 구하고, 두 번째 합계에서 첫 번째 합계를 뺀 차이도 알려줘.",,"multi_document_reasoning,combined_exam_gap,official_public_facts",True,True,True,correct,,1,True,,,"WITH totals AS (
+    SELECT
+        MAX(CASE
+            WHEN co.year = 2025 AND co.course_code = 'CSE405'
+            THEN s.midterm_percentage + s.final_exam_percentage
+        END) AS first_total,
+        MAX(CASE
+            WHEN co.year = 2026 AND co.course_code = 'IE419'
+            THEN s.midterm_percentage + s.final_exam_percentage
+        END) AS second_total
+    FROM course_offerings AS co
+    JOIN syllabi AS s ON s.offering_id = co.offering_id
+    WHERE co.semester = '1'
+      AND co.section = '00'
+      AND (
+          (co.year = 2025 AND co.course_code = 'CSE405')
+          OR (co.year = 2026 AND co.course_code = 'IE419')
+      )
+)
+SELECT
+    first_total AS ""졸업프로젝트 중간·기말 합계(%)"",
+    second_total AS ""서비스데이터사이언스 중간·기말 합계(%)"",
+    second_total - first_total AS ""두 번째 − 첫 번째(%p)""
+FROM totals;",3965,4.86
+J033,2026학년도 2학기 EE209-02(논리회로)와 2026학년도 1학기 CSE204-01(자료구조) 중 중간고사 비율이 더 큰 강좌의 과목코드·연도·학기·분반·비율을 알려줘. 같으면 둘 다 알려줘.,,"multi_document_reasoning,midterm_max,official_public_facts",True,True,True,correct,,1,True,,,"WITH target_offerings AS (
+    SELECT co.course_code, co.year, co.semester, co.section,
+           s.midterm_percentage
+    FROM course_offerings AS co
+    JOIN syllabi AS s ON s.offering_id = co.offering_id
+    WHERE (co.course_code = 'EE209' AND co.year = 2026
+           AND co.semester = '2' AND co.section = '02')
+       OR (co.course_code = 'CSE204' AND co.year = 2026
+           AND co.semester = '1' AND co.section = '01')
+)
+SELECT course_code, year, semester, section, midterm_percentage
+FROM target_offerings
+WHERE midterm_percentage = (
+    SELECT MAX(midterm_percentage)
+    FROM target_offerings
+);",3828,2.81
+J034,2026학년도 2학기 EE211-00(확률및랜덤변수)와 2026학년도 2학기 AI4007-00(독립심화학습(인공지능)2) 중 중간고사 비율이 더 큰 강좌의 과목코드·연도·학기·분반·비율을 알려줘. 같으면 둘 다 알려줘.,,"multi_document_reasoning,midterm_max,official_public_facts",True,True,True,correct,,1,True,,,"WITH candidates AS (
+    SELECT co.course_code, co.year, co.semester, co.section,
+           s.midterm_percentage
+    FROM course_offerings AS co
+    JOIN syllabi AS s ON s.offering_id = co.offering_id
+    WHERE co.year = 2026
+      AND co.semester = '2'
+      AND co.section = '00'
+      AND co.course_code IN ('EE211', 'AI4007')
+)
+SELECT course_code, year, semester, section, midterm_percentage
+FROM candidates
+WHERE midterm_percentage = (
+    SELECT MAX(midterm_percentage)
+    FROM candidates
+);",3804,3.35
+J035,2026학년도 2학기 SWCON401-02(소프트웨어융합캡스톤디자인)와 2026학년도 1학기 CSE301-01(운영체제) 중 중간고사 비율이 더 큰 강좌의 과목코드·연도·학기·분반·비율을 알려줘. 같으면 둘 다 알려줘.,,"multi_document_reasoning,midterm_max,official_public_facts",True,True,True,correct,,1,True,,,"WITH target_offerings AS (
+    SELECT co.course_code, co.year, co.semester, co.section,
+           s.midterm_percentage
+    FROM course_offerings AS co
+    JOIN syllabi AS s ON s.offering_id = co.offering_id
+    WHERE (co.course_code = 'SWCON401'
+           AND co.year = 2026 AND co.semester = '2' AND co.section = '02')
+       OR (co.course_code = 'CSE301'
+           AND co.year = 2026 AND co.semester = '1' AND co.section = '01')
+)
+SELECT course_code, year, semester, section, midterm_percentage
+FROM target_offerings
+WHERE midterm_percentage = (
+    SELECT MAX(midterm_percentage)
+    FROM target_offerings
+);",3836,2.75
+J036,2025학년도 1학기 EE211-02(확률및랜덤변수)와 2025학년도 1학기 CSE438-00(최신기술콜로키움1) 중 중간고사 비율이 더 큰 강좌의 과목코드·연도·학기·분반·비율을 알려줘. 같으면 둘 다 알려줘.,,"multi_document_reasoning,midterm_max,official_public_facts",True,True,True,correct,,1,True,,,"WITH candidates AS (
+    SELECT co.course_code, co.year, co.semester, co.section,
+           s.midterm_percentage
+    FROM course_offerings AS co
+    JOIN syllabi AS s ON s.offering_id = co.offering_id
+    WHERE co.year = 2025
+      AND co.semester = '1'
+      AND (
+          (co.course_code = 'EE211' AND co.section = '02')
+          OR (co.course_code = 'CSE438' AND co.section = '00')
+      )
+)
+SELECT course_code, year, semester, section, midterm_percentage
+FROM candidates
+WHERE midterm_percentage = (
+    SELECT MAX(midterm_percentage)
+    FROM candidates
+);",3819,3.03
+J037,2026학년도 2학기 AI3100-00(몰입심화학습(AI로봇))와 2025학년도 2학기 ELC281-00(세계신화읽기) 중 과제 비율이 더 작은 강좌의 과목코드·연도·학기·분반·비율을 알려줘. 같으면 둘 다 알려줘.,,"multi_document_reasoning,assignment_min,official_public_facts",True,True,True,correct,,1,True,,,"WITH candidates AS (
+    SELECT co.course_code, co.year, co.semester, co.section,
+           s.assignment_percentage
+    FROM course_offerings AS co
+    JOIN syllabi AS s ON s.offering_id = co.offering_id
+    WHERE (co.course_code = 'AI3100'
+           AND co.year = 2026 AND co.semester = '2' AND co.section = '00')
+       OR (co.course_code = 'ELC281'
+           AND co.year = 2025 AND co.semester = '2' AND co.section = '00')
+)
+SELECT course_code, year, semester, section, assignment_percentage
+FROM candidates
+WHERE assignment_percentage = (
+    SELECT MIN(assignment_percentage)
+    FROM candidates
+);",3826,2.56
+J038,2025학년도 1학기 ME380-03(시스템동역학)와 2026학년도 2학기 AI4007-08(독립심화학습(인공지능)2) 중 과제 비율이 더 작은 강좌의 과목코드·연도·학기·분반·비율을 알려줘. 같으면 둘 다 알려줘.,,"multi_document_reasoning,assignment_min,official_public_facts",True,True,True,correct,,1,True,,,"WITH target_offerings AS (
+    SELECT co.course_code, co.year, co.semester, co.section,
+           s.assignment_percentage
+    FROM course_offerings AS co
+    JOIN syllabi AS s ON s.offering_id = co.offering_id
+    WHERE (co.course_code = 'ME380'
+           AND co.year = 2025
+           AND co.semester = '1'
+           AND co.section = '03')
+       OR (co.course_code = 'AI4007'
+           AND co.year = 2026
+           AND co.semester = '2'
+           AND co.section = '08')
+)
+SELECT course_code, year, semester, section, assignment_percentage
+FROM target_offerings
+WHERE assignment_percentage = (
+    SELECT MIN(assignment_percentage)
+    FROM target_offerings
+);",3837,2.61
+J039,2025학년도 2학기 CSE406-03(캡스톤디자인)와 2025학년도 2학기 CSE442-00(블록체인) 중 과제 비율이 더 작은 강좌의 과목코드·연도·학기·분반·비율을 알려줘. 같으면 둘 다 알려줘.,,"multi_document_reasoning,assignment_min,official_public_facts",True,True,True,correct,,1,True,,,"WITH target_offerings AS (
+    SELECT co.course_code, co.year, co.semester, co.section,
+           s.assignment_percentage
+    FROM course_offerings AS co
+    JOIN syllabi AS s ON s.offering_id = co.offering_id
+    WHERE co.year = 2025
+      AND co.semester = '2'
+      AND (
+          (co.course_code = 'CSE406' AND co.section = '03')
+          OR (co.course_code = 'CSE442' AND co.section = '00')
+      )
+)
+SELECT course_code, year, semester, section, assignment_percentage
+FROM target_offerings
+WHERE assignment_percentage = (
+    SELECT MIN(assignment_percentage)
+    FROM target_offerings
+);",3816,2.65
+J040,2026학년도 1학기 CSE0001-00(소프트웨어가치탐구)와 2025학년도 1학기 CSE204-00(자료구조) 중 과제 비율이 더 작은 강좌의 과목코드·연도·학기·분반·비율을 알려줘. 같으면 둘 다 알려줘.,,"multi_document_reasoning,assignment_min,official_public_facts",True,True,True,correct,,1,True,,,"WITH target_offerings AS (
+    SELECT co.course_code, co.year, co.semester, co.section,
+           s.assignment_percentage
+    FROM course_offerings AS co
+    JOIN syllabi AS s ON s.offering_id = co.offering_id
+    WHERE (co.course_code = 'CSE0001'
+           AND co.year = 2026 AND co.semester = '1' AND co.section = '00')
+       OR (co.course_code = 'CSE204'
+           AND co.year = 2025 AND co.semester = '1' AND co.section = '00')
+)
+SELECT course_code, year, semester, section, assignment_percentage
+FROM target_offerings
+WHERE assignment_percentage = (
+    SELECT MIN(assignment_percentage)
+    FROM target_offerings
+);",3829,2.69
+J041,"2025학년도 2학기 CSE103-00(객체지향프로그래밍)와 2026학년도 1학기 CSE406-06(캡스톤디자인)의 출석 비율을 순서대로 알려주고, 두 번째에서 첫 번째를 뺀 차이를 퍼센트포인트로 계산해줘.",,"multi_document_reasoning,attendance_gap,official_public_facts",True,True,True,correct,,1,True,,,"WITH attendance AS (
+    SELECT
+        MAX(CASE
+            WHEN co.course_code = 'CSE103'
+             AND co.section = '00'
+             AND co.year = 2025
+             AND co.semester = '2'
+            THEN s.attendance_percentage
+        END) AS first_percentage,
+        MAX(CASE
+            WHEN co.course_code = 'CSE406'
+             AND co.section = '06'
+             AND co.year = 2026
+             AND co.semester = '1'
+            THEN s.attendance_percentage
+        END) AS second_percentage
+    FROM course_offerings AS co
+    JOIN syllabi AS s ON s.offering_id = co.offering_id
+    WHERE (co.course_code = 'CSE103' AND co.section = '00'
+           AND co.year = 2025 AND co.semester = '2')
+       OR (co.course_code = 'CSE406' AND co.section = '06'
+           AND co.year = 2026 AND co.semester = '1')
+)
+SELECT
+    first_percentage AS ""객체지향프로그래밍_출석비율"",
+    second_percentage AS ""캡스톤디자인_출석비율"",
+    second_percentage - first_percentage AS ""차이_퍼센트포인트""
+FROM attendance;",3997,5.16
+J042,"2025학년도 1학기 SWCON103-00(디자인적사고)와 2026학년도 2학기 AI4007-02(독립심화학습(인공지능)2)의 출석 비율을 순서대로 알려주고, 두 번째에서 첫 번째를 뺀 차이를 퍼센트포인트로 계산해줘.",,"multi_document_reasoning,attendance_gap,official_public_facts",True,True,True,correct,,1,True,,,"SELECT
+    s1.attendance_percentage AS 첫번째_출석비율,
+    s2.attendance_percentage AS 두번째_출석비율,
+    s2.attendance_percentage - s1.attendance_percentage AS 차이_퍼센트포인트
+FROM course_offerings AS o1
+JOIN syllabi AS s1 ON s1.offering_id = o1.offering_id
+CROSS JOIN course_offerings AS o2
+JOIN syllabi AS s2 ON s2.offering_id = o2.offering_id
+WHERE o1.course_code = 'SWCON103'
+  AND o1.section = '00'
+  AND o1.year = 2025
+  AND o1.semester = '1'
+  AND o2.course_code = 'AI4007'
+  AND o2.section = '02'
+  AND o2.year = 2026
+  AND o2.semester = '2';",3859,2.87
+J043,"2025학년도 2학기 CSE302-01(컴퓨터네트워크)와 2026학년도 1학기 SWCON321-02(데이터분석캡스톤디자인)의 출석 비율을 순서대로 알려주고, 두 번째에서 첫 번째를 뺀 차이를 퍼센트포인트로 계산해줘.",,"multi_document_reasoning,attendance_gap,official_public_facts",True,True,True,correct,,1,True,,,"WITH attendance AS (
+    SELECT
+        MAX(CASE
+            WHEN co.year = 2025 AND co.semester = '2'
+                 AND co.course_code = 'CSE302' AND co.section = '01'
+            THEN s.attendance_percentage
+        END) AS first_percentage,
+        MAX(CASE
+            WHEN co.year = 2026 AND co.semester = '1'
+                 AND co.course_code = 'SWCON321' AND co.section = '02'
+            THEN s.attendance_percentage
+        END) AS second_percentage
+    FROM course_offerings AS co
+    LEFT JOIN syllabi AS s ON s.offering_id = co.offering_id
+    WHERE (co.year = 2025 AND co.semester = '2'
+           AND co.course_code = 'CSE302' AND co.section = '01')
+       OR (co.year = 2026 AND co.semester = '1'
+           AND co.course_code = 'SWCON321' AND co.section = '02')
+)
+SELECT
+    first_percentage AS ""컴퓨터네트워크 출석 비율"",
+    second_percentage AS ""데이터분석캡스톤디자인 출석 비율"",
+    second_percentage - first_percentage AS ""차이(퍼센트포인트)""
+FROM attendance;",3933,4.15
+J044,"2026학년도 2학기 SWCON401-02(소프트웨어융합캡스톤디자인)와 2026학년도 1학기 CSE301-01(운영체제)의 출석 비율을 순서대로 알려주고, 두 번째에서 첫 번째를 뺀 차이를 퍼센트포인트로 계산해줘.",,"multi_document_reasoning,attendance_gap,official_public_facts",True,True,True,correct,,1,True,,,"WITH attendance AS (
+    SELECT
+        (
+            SELECT s.attendance_percentage
+            FROM course_offerings AS co
+            JOIN syllabi AS s ON s.offering_id = co.offering_id
+            WHERE co.year = 2026
+              AND co.semester = '2'
+              AND co.course_code = 'SWCON401'
+              AND co.section = '02'
+        ) AS first_percentage,
+        (
+            SELECT s.attendance_percentage
+            FROM course_offerings AS co
+            JOIN syllabi AS s ON s.offering_id = co.offering_id
+            WHERE co.year = 2026
+              AND co.semester = '1'
+              AND co.course_code = 'CSE301'
+              AND co.section = '01'
+        ) AS second_percentage
+)
+SELECT
+    first_percentage AS ""SWCON401-02 출석 비율(%)"",
+    second_percentage AS ""CSE301-01 출석 비율(%)"",
+    second_percentage - first_percentage AS ""두 번째 - 첫 번째(%p)""
+FROM attendance;",3883,3.76
+J045,"2026학년도 1학기 IE419-00(서비스데이터사이언스) 담당 교수의 다른 수업 중, 같은 학기 소프트웨어융합학과 개설목록에서 산학필수인 강좌의 과목코드와 분반을 알려줘. 기준 과목의 다른 분반도 제외해줘.",,"multi_hop,prof_other_industry,official_public_facts",True,True,True,correct,,1,True,,,"SELECT DISTINCT co.course_code, co.section
+FROM course_offerings AS co
+WHERE co.year = 2026
+  AND co.semester = '1'
+  AND co.industry_required = 1
+  AND co.course_code <> 'IE419'
+  AND EXISTS (
+      SELECT 1
+      FROM course_offering_categories AS coc
+      WHERE coc.offering_id = co.offering_id
+        AND coc.department_id = 8
+  )
+  AND EXISTS (
+      SELECT 1
+      FROM offering_professors AS op
+      JOIN offering_professors AS base_op
+        ON base_op.professor_id = op.professor_id
+      JOIN course_offerings AS base
+        ON base.offering_id = base_op.offering_id
+      WHERE op.offering_id = co.offering_id
+        AND base.year = 2026
+        AND base.semester = '1'
+        AND base.course_code = 'IE419'
+        AND base.section = '00'
+  );",3940,5.64
+J046,"2026학년도 1학기 IE419-00(서비스데이터사이언스) 담당 교수의 다른 수업 중, 같은 학기 소프트웨어융합학과 개설목록에서 3학점인 강좌의 과목코드와 분반을 알려줘. 기준 과목의 다른 분반도 제외해줘.",,"multi_hop,prof_other_3credit,official_public_facts",True,True,True,correct,,1,True,,,"SELECT co.course_code, co.section
+FROM course_offerings AS co
+WHERE co.year = 2026
+  AND co.semester = '1'
+  AND co.credits = 3
+  AND co.course_code <> 'IE419'
+  AND EXISTS (
+      SELECT 1
+      FROM course_offering_categories AS coc
+      JOIN departments AS d ON d.department_id = coc.department_id
+      WHERE coc.offering_id = co.offering_id
+        AND d.name = '소프트웨어융합학과'
+  )
+  AND EXISTS (
+      SELECT 1
+      FROM offering_professors AS op
+      JOIN offering_professors AS base_op
+        ON base_op.professor_id = op.professor_id
+      JOIN course_offerings AS base
+        ON base.offering_id = base_op.offering_id
+      WHERE op.offering_id = co.offering_id
+        AND base.year = 2026
+        AND base.semester = '1'
+        AND base.course_code = 'IE419'
+        AND base.section = '00'
+  )
+ORDER BY co.course_code, co.section;",3963,5.25
+J047,"2026학년도 1학기 IE419-00(서비스데이터사이언스) 담당 교수가 같은 학기 소프트웨어융합학과 개설목록에서 맡은 다른 과목의 분반 수와 개설학점 합계를 알려줘. 기준 과목 코드는 제외하고, 다른 분반은 각각 합산해줘.",,"multi_hop_aggregation,prof_credit_load,official_public_facts",True,True,True,correct,,1,True,,,"SELECT
+    COUNT(*) AS 분반_수,
+    COALESCE(SUM(co.credits), 0) AS 개설학점_합계
+FROM course_offerings AS co
+WHERE co.year = 2026
+  AND co.semester = '1'
+  AND co.course_code <> 'IE419'
+  AND EXISTS (
+      SELECT 1
+      FROM course_offering_categories AS coc
+      JOIN departments AS d
+        ON d.department_id = coc.department_id
+      WHERE coc.offering_id = co.offering_id
+        AND d.name = '소프트웨어융합학과'
+  )
+  AND EXISTS (
+      SELECT 1
+      FROM offering_professors AS op
+      JOIN offering_professors AS target_op
+        ON target_op.professor_id = op.professor_id
+      JOIN course_offerings AS target
+        ON target.offering_id = target_op.offering_id
+      WHERE op.offering_id = co.offering_id
+        AND target.year = 2026
+        AND target.semester = '1'
+        AND target.course_code = 'IE419'
+        AND target.section = '00'
+  );",4067,6.75
+J048,"2025학년도 2학기 SWCON253-01(기계학습) 담당 교수의 다른 수업 중, 같은 학기 컴퓨터공학과 개설목록에서 전공필수인 강좌의 과목코드와 분반을 알려줘. 기준 과목의 다른 분반도 제외해줘.",,"multi_hop,prof_other_required,official_public_facts",True,True,True,correct,,1,True,,,"SELECT DISTINCT co.course_code, co.section
+FROM course_offerings AS co
+JOIN course_offering_categories AS coc
+  ON coc.offering_id = co.offering_id
+WHERE co.year = 2025
+  AND co.semester = '2'
+  AND co.course_code <> 'SWCON253'
+  AND coc.department_id = 11
+  AND coc.category_id = 2
+  AND EXISTS (
+    SELECT 1
+    FROM offering_professors AS op
+    JOIN offering_professors AS target_op
+      ON target_op.professor_id = op.professor_id
+    JOIN course_offerings AS target
+      ON target.offering_id = target_op.offering_id
+    WHERE op.offering_id = co.offering_id
+      AND target.year = 2025
+      AND target.semester = '2'
+      AND target.course_code = 'SWCON253'
+      AND target.section = '01'
+  );",3945,5.83
+J049,"2025학년도 2학기 SWCON253-01(기계학습) 담당 교수의 다른 수업 중, 같은 학기 컴퓨터공학과 개설목록에서 산학필수인 강좌의 과목코드와 분반을 알려줘. 기준 과목의 다른 분반도 제외해줘.",,"multi_hop,prof_other_industry,official_public_facts",True,True,True,correct,,1,True,,,"SELECT DISTINCT co.course_code, co.section
+FROM course_offerings AS co
+WHERE co.year = 2025
+  AND co.semester = '2'
+  AND co.industry_required = 1
+  AND co.course_code <> 'SWCON253'
+  AND EXISTS (
+      SELECT 1
+      FROM course_offering_categories AS coc
+      JOIN departments AS d ON d.department_id = coc.department_id
+      WHERE coc.offering_id = co.offering_id
+        AND d.name = '컴퓨터공학과'
+  )
+  AND EXISTS (
+      SELECT 1
+      FROM offering_professors AS op
+      JOIN offering_professors AS base_op
+        ON base_op.professor_id = op.professor_id
+      JOIN course_offerings AS base
+        ON base.offering_id = base_op.offering_id
+      WHERE op.offering_id = co.offering_id
+        AND base.year = 2025
+        AND base.semester = '2'
+        AND base.course_code = 'SWCON253'
+        AND base.section = '01'
+  )
+ORDER BY co.course_code, co.section;",3972,4.94
+J050,"2025학년도 2학기 SWCON253-01(기계학습) 담당 교수의 다른 수업 중, 같은 학기 컴퓨터공학과 개설목록에서 3학점인 강좌의 과목코드와 분반을 알려줘. 기준 과목의 다른 분반도 제외해줘.",,"multi_hop,prof_other_3credit,official_public_facts",True,True,True,correct,,1,True,,,"SELECT DISTINCT co.course_code, co.section
+FROM course_offerings AS co
+WHERE co.year = 2025
+  AND co.semester = '2'
+  AND co.credits = 3
+  AND co.course_code <> 'SWCON253'
+  AND EXISTS (
+      SELECT 1
+      FROM course_offering_categories AS coc
+      WHERE coc.offering_id = co.offering_id
+        AND coc.department_id = 11
+  )
+  AND EXISTS (
+      SELECT 1
+      FROM offering_professors AS op
+      JOIN offering_professors AS base_op
+        ON base_op.professor_id = op.professor_id
+      JOIN course_offerings AS base
+        ON base.offering_id = base_op.offering_id
+      WHERE op.offering_id = co.offering_id
+        AND base.year = 2025
+        AND base.semester = '2'
+        AND base.course_code = 'SWCON253'
+        AND base.section = '01'
+  );",3917,4.26
+J051,2025학년도 2학기 SWCON253-01(기계학습)의 담당 교수가 2026학년도 2학기 컴퓨터공학과 개설목록에서 맡은 다른 과목의 코드와 분반을 알려줘. 기준 과목 코드는 제외해줘.,,"multi_document_multi_hop,prof_future_other,official_public_facts",True,True,True,correct,,1,True,,,"SELECT DISTINCT co.course_code, co.section
+FROM course_offerings AS co
+JOIN courses AS c ON c.course_code = co.course_code
+JOIN departments AS d ON d.department_id = c.department_id
+WHERE co.year = 2026
+  AND co.semester = '2'
+  AND d.name = '컴퓨터공학과'
+  AND co.course_code <> 'SWCON253'
+  AND EXISTS (
+      SELECT 1
+      FROM offering_professors AS op
+      JOIN offering_professors AS base_op
+        ON base_op.professor_id = op.professor_id
+      JOIN course_offerings AS base
+        ON base.offering_id = base_op.offering_id
+      WHERE op.offering_id = co.offering_id
+        AND base.year = 2025
+        AND base.semester = '2'
+        AND base.course_code = 'SWCON253'
+        AND base.section = '01'
+  )
+ORDER BY co.course_code, co.section;",3953,5.56
+J052,"2025학년도 1학기 CSE406-05(캡스톤디자인) 담당 교수의 다른 수업 중, 같은 학기 컴퓨터공학과 개설목록에서 산학필수인 강좌의 과목코드와 분반을 알려줘. 기준 과목의 다른 분반도 제외해줘.",,"multi_hop,prof_other_industry,official_public_facts",True,True,True,correct,,1,True,,,"SELECT DISTINCT co.course_code, co.section
+FROM course_offerings AS co
+WHERE co.year = 2025
+  AND co.semester = '1'
+  AND co.industry_required = 1
+  AND co.course_code <> 'CSE406'
+  AND EXISTS (
+      SELECT 1
+      FROM course_offering_categories AS coc
+      WHERE coc.offering_id = co.offering_id
+        AND coc.department_id = 11
+  )
+  AND EXISTS (
+      SELECT 1
+      FROM offering_professors AS op
+      JOIN offering_professors AS base_op
+        ON base_op.professor_id = op.professor_id
+      JOIN course_offerings AS base
+        ON base.offering_id = base_op.offering_id
+      WHERE op.offering_id = co.offering_id
+        AND base.year = 2025
+        AND base.semester = '1'
+        AND base.course_code = 'CSE406'
+        AND base.section = '05'
+  )
+ORDER BY co.course_code, co.section;",4091,8.74
+J053,"2025학년도 1학기 CSE406-05(캡스톤디자인) 담당 교수의 다른 수업 중, 같은 학기 컴퓨터공학과 개설목록에서 3학점인 강좌의 과목코드와 분반을 알려줘. 기준 과목의 다른 분반도 제외해줘.",,"multi_hop,prof_other_3credit,official_public_facts",True,True,True,correct,,1,True,,,"SELECT co.course_code, co.section
+FROM course_offerings AS co
+WHERE co.year = 2025
+  AND co.semester = '1'
+  AND co.credits = 3
+  AND co.course_code <> 'CSE406'
+  AND EXISTS (
+      SELECT 1
+      FROM course_offering_categories AS coc
+      WHERE coc.offering_id = co.offering_id
+        AND coc.department_id = 11
+  )
+  AND EXISTS (
+      SELECT 1
+      FROM offering_professors AS op
+      JOIN offering_professors AS base_op
+        ON base_op.professor_id = op.professor_id
+      JOIN course_offerings AS base
+        ON base.offering_id = base_op.offering_id
+      WHERE op.offering_id = co.offering_id
+        AND base.year = 2025
+        AND base.semester = '1'
+        AND base.course_code = 'CSE406'
+        AND base.section = '05'
+  )
+ORDER BY co.course_code, co.section;",3962,5.31
+J054,"2026학년도 1학기 CSE304-01(알고리즘) 담당 교수의 다른 수업 중, 같은 학기 컴퓨터공학과 개설목록에서 전공필수인 강좌의 과목코드와 분반을 알려줘. 기준 과목의 다른 분반도 제외해줘.",,"multi_hop,prof_other_required,official_public_facts",True,True,True,correct,,1,True,,,"SELECT DISTINCT co.course_code, co.section
+FROM course_offerings AS co
+JOIN course_offering_categories AS coc
+  ON coc.offering_id = co.offering_id
+WHERE co.year = 2026
+  AND co.semester = '1'
+  AND co.course_code <> 'CSE304'
+  AND coc.department_id = 11
+  AND coc.category_id = 2
+  AND EXISTS (
+      SELECT 1
+      FROM offering_professors AS op
+      JOIN offering_professors AS base_op
+        ON base_op.professor_id = op.professor_id
+      JOIN course_offerings AS base
+        ON base.offering_id = base_op.offering_id
+      WHERE op.offering_id = co.offering_id
+        AND base.year = 2026
+        AND base.semester = '1'
+        AND base.course_code = 'CSE304'
+        AND base.section = '01'
+  )
+ORDER BY co.course_code, co.section;",3940,5.36
+J055,"2026학년도 1학기 CSE304-01(알고리즘) 담당 교수의 다른 수업 중, 같은 학기 컴퓨터공학과 개설목록에서 산학필수인 강좌의 과목코드와 분반을 알려줘. 기준 과목의 다른 분반도 제외해줘.",,"multi_hop,prof_other_industry,official_public_facts",True,True,True,correct,,1,True,,,"SELECT DISTINCT co.course_code, co.section
+FROM course_offerings AS co
+WHERE co.year = 2026
+  AND co.semester = '1'
+  AND co.industry_required = 1
+  AND co.course_code <> 'CSE304'
+  AND EXISTS (
+      SELECT 1
+      FROM course_offering_categories AS coc
+      JOIN departments AS d ON d.department_id = coc.department_id
+      WHERE coc.offering_id = co.offering_id
+        AND d.name = '컴퓨터공학과'
+  )
+  AND EXISTS (
+      SELECT 1
+      FROM offering_professors AS op
+      JOIN offering_professors AS base_op
+        ON base_op.professor_id = op.professor_id
+      JOIN course_offerings AS base
+        ON base.offering_id = base_op.offering_id
+      WHERE op.offering_id = co.offering_id
+        AND base.year = 2026
+        AND base.semester = '1'
+        AND base.course_code = 'CSE304'
+        AND base.section = '01'
+  )
+ORDER BY co.course_code, co.section;",3994,6.09
+J056,"2026학년도 1학기 CSE304-01(알고리즘) 담당 교수의 다른 수업 중, 같은 학기 컴퓨터공학과 개설목록에서 3학점인 강좌의 과목코드와 분반을 알려줘. 기준 과목의 다른 분반도 제외해줘.",,"multi_hop,prof_other_3credit,official_public_facts",True,True,True,correct,,1,True,,,"SELECT DISTINCT co.course_code, co.section
+FROM course_offerings AS co
+WHERE co.year = 2026
+  AND co.semester = '1'
+  AND co.credits = 3
+  AND co.course_code <> 'CSE304'
+  AND EXISTS (
+      SELECT 1
+      FROM course_offering_categories AS coc
+      WHERE coc.offering_id = co.offering_id
+        AND coc.department_id = 11
+  )
+  AND EXISTS (
+      SELECT 1
+      FROM offering_professors AS op
+      JOIN offering_professors AS base_op
+        ON base_op.professor_id = op.professor_id
+      JOIN course_offerings AS base
+        ON base.offering_id = base_op.offering_id
+      WHERE op.offering_id = co.offering_id
+        AND base.year = 2026
+        AND base.semester = '1'
+        AND base.course_code = 'CSE304'
+        AND base.section = '01'
+  )
+ORDER BY co.course_code, co.section;",3971,7.32
+J057,"2026학년도 1학기 CSE304-01(알고리즘) 담당 교수가 같은 학기 컴퓨터공학과 개설목록에서 맡은 다른 과목의 분반 수와 개설학점 합계를 알려줘. 기준 과목 코드는 제외하고, 다른 분반은 각각 합산해줘.",,"multi_hop_aggregation,prof_credit_load,official_public_facts",True,True,True,correct,,1,True,,,"SELECT
+    COUNT(*) AS 분반_수,
+    COALESCE(SUM(co.credits), 0) AS 개설학점_합계
+FROM course_offerings AS co
+JOIN courses AS c ON c.course_code = co.course_code
+JOIN departments AS d ON d.department_id = c.department_id
+WHERE co.year = 2026
+  AND co.semester = '1'
+  AND d.name = '컴퓨터공학과'
+  AND co.course_code <> 'CSE304'
+  AND EXISTS (
+      SELECT 1
+      FROM offering_professors AS op
+      JOIN offering_professors AS base_op
+        ON base_op.professor_id = op.professor_id
+      JOIN course_offerings AS base
+        ON base.offering_id = base_op.offering_id
+      WHERE op.offering_id = co.offering_id
+        AND base.year = 2026
+        AND base.semester = '1'
+        AND base.course_code = 'CSE304'
+        AND base.section = '01'
+  );",3981,5.93
+J058,"2026학년도 1학기 AI4003-00(졸업논문(인공지능)) 담당 교수의 다른 수업 중, 같은 학기 인공지능학과 개설목록에서 전공필수인 강좌의 과목코드와 분반을 알려줘. 기준 과목의 다른 분반도 제외해줘.",,"multi_hop,prof_other_required,official_public_facts",True,True,True,correct,,1,True,,,"SELECT co.course_code, co.section
+FROM course_offerings AS co
+WHERE co.year = 2026
+  AND co.semester = '1'
+  AND co.course_code <> 'AI4003'
+  AND EXISTS (
+      SELECT 1
+      FROM course_offering_categories AS coc
+      WHERE coc.offering_id = co.offering_id
+        AND coc.department_id = 12
+        AND coc.category_id = 2
+  )
+  AND EXISTS (
+      SELECT 1
+      FROM offering_professors AS op
+      JOIN offering_professors AS base_op
+        ON base_op.professor_id = op.professor_id
+      JOIN course_offerings AS base
+        ON base.offering_id = base_op.offering_id
+      WHERE op.offering_id = co.offering_id
+        AND base.course_code = 'AI4003'
+        AND base.section = '00'
+        AND base.year = 2026
+        AND base.semester = '1'
+  )
+ORDER BY co.course_code, co.section;",3947,4.57
+J059,"2026학년도 1학기 AI4003-00(졸업논문(인공지능)) 담당 교수가 같은 학기 인공지능학과 개설목록에서 맡은 다른 과목의 분반 수와 개설학점 합계를 알려줘. 기준 과목 코드는 제외하고, 다른 분반은 각각 합산해줘.",,"multi_hop_aggregation,prof_credit_load,official_public_facts",False,False,False,value_mismatch,,1,True,,,"SELECT
+    COUNT(*) AS 분반_수,
+    COALESCE(SUM(co.credits), 0) AS 개설학점_합계
+FROM course_offerings AS co
+JOIN courses AS c ON c.course_code = co.course_code
+WHERE co.year = 2026
+  AND co.semester = '1'
+  AND c.department_id = 12
+  AND co.course_code <> 'AI4003'
+  AND EXISTS (
+      SELECT 1
+      FROM offering_professors AS op
+      JOIN offering_professors AS base_op
+        ON base_op.professor_id = op.professor_id
+      JOIN course_offerings AS base
+        ON base.offering_id = base_op.offering_id
+      WHERE op.offering_id = co.offering_id
+        AND base.year = 2026
+        AND base.semester = '1'
+        AND base.course_code = 'AI4003'
+        AND base.section = '00'
+  );",3968,5.33
+J060,"2026학년도 1학기 CSE423-00(정보보호) 담당 교수의 다른 수업 중, 같은 학기 컴퓨터공학과 개설목록에서 전공필수인 강좌의 과목코드와 분반을 알려줘. 기준 과목의 다른 분반도 제외해줘.",,"multi_hop,prof_other_required,official_public_facts",True,True,True,correct,,1,True,,,"SELECT DISTINCT co.course_code, co.section
+FROM course_offerings AS co
+JOIN course_offering_categories AS coc
+  ON coc.offering_id = co.offering_id
+WHERE co.year = 2026
+  AND co.semester = '1'
+  AND co.course_code <> 'CSE423'
+  AND coc.department_id = 11
+  AND coc.category_id = 2
+  AND EXISTS (
+    SELECT 1
+    FROM offering_professors AS op
+    JOIN offering_professors AS base_op
+      ON base_op.professor_id = op.professor_id
+    JOIN course_offerings AS base
+      ON base.offering_id = base_op.offering_id
+    WHERE op.offering_id = co.offering_id
+      AND base.year = 2026
+      AND base.semester = '1'
+      AND base.course_code = 'CSE423'
+      AND base.section = '00'
+  )
+ORDER BY co.course_code, co.section;",3903,5.46
+J061,"2026학년도 1학기 CSE423-00(정보보호) 담당 교수가 같은 학기 컴퓨터공학과 개설목록에서 맡은 다른 과목의 분반 수와 개설학점 합계를 알려줘. 기준 과목 코드는 제외하고, 다른 분반은 각각 합산해줘.",,"multi_hop_aggregation,prof_credit_load,official_public_facts",True,True,True,correct,,1,True,,,"SELECT
+    COUNT(*) AS 분반_수,
+    COALESCE(SUM(co.credits), 0) AS 개설학점_합계
+FROM course_offerings AS co
+JOIN courses AS c ON c.course_code = co.course_code
+JOIN departments AS d ON d.department_id = c.department_id
+WHERE co.year = 2026
+  AND co.semester = '1'
+  AND d.name = '컴퓨터공학과'
+  AND co.course_code <> 'CSE423'
+  AND EXISTS (
+      SELECT 1
+      FROM offering_professors AS op
+      JOIN offering_professors AS base_op
+        ON base_op.professor_id = op.professor_id
+      JOIN course_offerings AS base
+        ON base.offering_id = base_op.offering_id
+      WHERE op.offering_id = co.offering_id
+        AND base.year = 2026
+        AND base.semester = '1'
+        AND base.course_code = 'CSE423'
+        AND base.section = '00'
+  );",4032,6.61
+J062,2025학년도 1학기 SWCON253-00(기계학습)의 담당 교수가 2026학년도 1학기 소프트웨어융합학과 개설목록에서 맡은 다른 과목의 코드와 분반을 알려줘. 기준 과목 코드는 제외해줘.,,"multi_document_multi_hop,prof_future_other,official_public_facts",True,True,True,correct,,1,True,,,"WITH reference_professors AS (
+    SELECT op.professor_id
+    FROM course_offerings AS co
+    JOIN offering_professors AS op ON op.offering_id = co.offering_id
+    WHERE co.year = 2025
+      AND co.semester = '1'
+      AND co.course_code = 'SWCON253'
+      AND co.section = '00'
+)
+SELECT DISTINCT co.course_code, co.section
+FROM course_offerings AS co
+JOIN courses AS c ON c.course_code = co.course_code
+JOIN departments AS d ON d.department_id = c.department_id
+JOIN offering_professors AS op ON op.offering_id = co.offering_id
+WHERE co.year = 2026
+  AND co.semester = '1'
+  AND d.name = '소프트웨어융합학과'
+  AND co.course_code <> 'SWCON253'
+  AND op.professor_id IN (SELECT professor_id FROM reference_professors)
+ORDER BY co.course_code, co.section;",3940,6.36
+J063,2025학년도 1학기 CSE423-00(정보보호)의 담당 교수가 2026학년도 1학기 컴퓨터공학과 개설목록에서 맡은 다른 과목의 코드와 분반을 알려줘. 기준 과목 코드는 제외해줘.,,"multi_document_multi_hop,prof_future_other,official_public_facts",True,True,True,correct,,1,True,,,"SELECT DISTINCT co.course_code, co.section
+FROM course_offerings AS co
+JOIN courses AS c ON c.course_code = co.course_code
+JOIN departments AS d ON d.department_id = c.department_id
+WHERE co.year = 2026
+  AND co.semester = '1'
+  AND d.name = '컴퓨터공학과'
+  AND co.course_code <> 'CSE423'
+  AND EXISTS (
+      SELECT 1
+      FROM offering_professors AS op
+      JOIN offering_professors AS base_op
+        ON base_op.professor_id = op.professor_id
+      JOIN course_offerings AS base
+        ON base.offering_id = base_op.offering_id
+      WHERE op.offering_id = co.offering_id
+        AND base.year = 2025
+        AND base.semester = '1'
+        AND base.course_code = 'CSE423'
+        AND base.section = '00'
+  )
+ORDER BY co.course_code, co.section;",3894,4.69
+J064,2025학년도 2학기 CSE497-02(연구연수활동2(컴퓨터공학))의 담당 교수가 2026학년도 2학기 컴퓨터공학과 개설목록에서 맡은 다른 과목의 코드와 분반을 알려줘. 기준 과목 코드는 제외해줘.,,"multi_document_multi_hop,prof_future_other,official_public_facts",False,False,False,row_count_mismatch,,1,True,,,"SELECT DISTINCT co.course_code, co.section
+FROM course_offerings AS co
+JOIN courses AS c ON c.course_code = co.course_code
+JOIN departments AS d ON d.department_id = c.department_id
+JOIN offering_professors AS op ON op.offering_id = co.offering_id
+WHERE co.year = 2026
+  AND co.semester = '2'
+  AND d.name = '컴퓨터공학과'
+  AND co.course_code <> 'CSE497'
+  AND op.professor_id IN (
+      SELECT base_op.professor_id
+      FROM course_offerings AS base
+      JOIN offering_professors AS base_op
+        ON base_op.offering_id = base.offering_id
+      WHERE base.year = 2025
+        AND base.semester = '2'
+        AND base.course_code = 'CSE497'
+        AND base.section = '02'
+  );",3845,3.16
+J065,2026학년도 1학기 IE419-00(서비스데이터사이언스)와 2025학년도 2학기 IE306-00(데이터마이닝)를 모두 담당한 교수 이름을 알려줘.,,"multi_document_multi_hop,common_instructor,official_public_facts",True,True,True,correct,,1,True,,,"SELECT p.name
+FROM professors AS p
+JOIN offering_professors AS op ON op.professor_id = p.professor_id
+JOIN course_offerings AS co ON co.offering_id = op.offering_id
+WHERE (co.year = 2026 AND co.semester = '1'
+       AND co.course_code = 'IE419' AND co.section = '00')
+   OR (co.year = 2025 AND co.semester = '2'
+       AND co.course_code = 'IE306' AND co.section = '00')
+GROUP BY p.professor_id, p.name
+HAVING COUNT(DISTINCT co.course_code) = 2;",3858,4.82
+J066,2025학년도 2학기 AI4007-00(독립심화학습(인공지능)2)와 2026학년도 1학기 CSE204-01(자료구조)를 모두 담당한 교수 이름을 알려줘.,,"multi_document_multi_hop,common_instructor,official_public_facts",True,True,True,correct,,1,True,,,"SELECT DISTINCT p.name
+FROM professors AS p
+WHERE EXISTS (
+    SELECT 1
+    FROM offering_professors AS op
+    JOIN course_offerings AS co ON co.offering_id = op.offering_id
+    WHERE op.professor_id = p.professor_id
+      AND co.year = 2025
+      AND co.semester = '2'
+      AND co.course_code = 'AI4007'
+      AND co.section = '00'
+)
+AND EXISTS (
+    SELECT 1
+    FROM offering_professors AS op
+    JOIN course_offerings AS co ON co.offering_id = op.offering_id
+    WHERE op.professor_id = p.professor_id
+      AND co.year = 2026
+      AND co.semester = '1'
+      AND co.course_code = 'CSE204'
+      AND co.section = '01'
+);",3822,3.93
+J067,2025학년도 2학기 SWCON253-01(기계학습)와 2026학년도 2학기 CSE497-03(연구연수활동2(컴퓨터공학))를 모두 담당한 교수 이름을 알려줘.,,"multi_document_multi_hop,common_instructor,official_public_facts",True,True,True,correct,,1,True,,,"SELECT DISTINCT p.name
+FROM professors AS p
+WHERE EXISTS (
+    SELECT 1
+    FROM offering_professors AS op
+    JOIN course_offerings AS co ON co.offering_id = op.offering_id
+    WHERE op.professor_id = p.professor_id
+      AND co.course_code = 'SWCON253'
+      AND co.section = '01'
+      AND co.year = 2025
+      AND co.semester = '2'
+)
+AND EXISTS (
+    SELECT 1
+    FROM offering_professors AS op
+    JOIN course_offerings AS co ON co.offering_id = op.offering_id
+    WHERE op.professor_id = p.professor_id
+      AND co.course_code = 'CSE497'
+      AND co.section = '03'
+      AND co.year = 2026
+      AND co.semester = '2'
+);",3824,2.65
+J068,2025학년도 1학기 CSE406-05(캡스톤디자인)와 2026학년도 2학기 SWCON313-00(가상현실)를 모두 담당한 교수 이름을 알려줘.,,"multi_document_multi_hop,common_instructor,official_public_facts",True,True,True,correct,,1,True,,,"SELECT DISTINCT p.name
+FROM professors AS p
+WHERE EXISTS (
+    SELECT 1
+    FROM offering_professors AS op
+    JOIN course_offerings AS co ON co.offering_id = op.offering_id
+    WHERE op.professor_id = p.professor_id
+      AND co.course_code = 'CSE406'
+      AND co.section = '05'
+      AND co.year = 2025
+      AND co.semester = '1'
+)
+AND EXISTS (
+    SELECT 1
+    FROM offering_professors AS op
+    JOIN course_offerings AS co ON co.offering_id = op.offering_id
+    WHERE op.professor_id = p.professor_id
+      AND co.course_code = 'SWCON313'
+      AND co.section = '00'
+      AND co.year = 2026
+      AND co.semester = '2'
+);",3817,2.78
+J069,2026학년도 1학기 IE419-00(서비스데이터사이언스)와 2026학년도 1학기 SWCON104-01(웹/파이선프로그래밍)의 정규 수업시간이 일주일에 총 몇 분 겹쳐? 시험 일정은 제외하고 요일별 겹치는 구간만 합산해줘.,,"temporal_reasoning,schedule_overlap,official_public_facts",True,True,True,correct,,1,True,,,"WITH regular_times AS (
+    SELECT DISTINCT
+        o.course_code,
+        t.day,
+        CAST(substr(t.start_time, 1, 2) AS INTEGER) * 60
+            + CAST(substr(t.start_time, 4, 2) AS INTEGER) AS start_minute,
+        CAST(substr(t.end_time, 1, 2) AS INTEGER) * 60
+            + CAST(substr(t.end_time, 4, 2) AS INTEGER) AS end_minute
+    FROM course_offerings AS o
+    JOIN class_times AS ct ON ct.offering_id = o.offering_id
+    JOIN time_slots AS t ON t.time_slot_id = ct.time_slot_id
+    WHERE o.year = 2026
+      AND o.semester = '1'
+      AND (
+          (o.course_code = 'IE419' AND o.section = '00')
+          OR (o.course_code = 'SWCON104' AND o.section = '01')
+      )
+),
+overlaps AS (
+    SELECT DISTINCT
+        a.day,
+        MAX(a.start_minute, b.start_minute) AS start_minute,
+        MIN(a.end_minute, b.end_minute) AS end_minute
+    FROM regular_times AS a
+    JOIN regular_times AS b ON b.day = a.day
+    WHERE a.course_code = 'IE419'
+      AND b.course_code = 'SWCON104'
+      AND a.start_minute < b.end_minute
+      AND b.start_minute < a.end_minute
+),
+previous_ends AS (
+    SELECT *,
+        MAX(end_minute) OVER (
+            PARTITION BY day
+            ORDER BY start_minute, end_minute
+            ROWS BETWEEN UNBOUNDED PRECEDING AND 1 PRECEDING
+        ) AS previous_max_end
+    FROM overlaps
+),
+grouped_intervals AS (
+    SELECT *,
+        SUM(
+            CASE
+                WHEN previous_max_end IS NULL
+                     OR start_minute > previous_max_end THEN 1
+                ELSE 0
+            END
+        ) OVER (
+            PARTITION BY day
+            ORDER BY start_minute, end_minute
+            ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW
+        ) AS interval_group
+    FROM previous_ends
+),
+merged_intervals AS (
+    SELECT
+        day,
+        MIN(start_minute) AS start_minute,
+        MAX(end_minute) AS end_minute
+    FROM grouped_intervals
+    GROUP BY day, interval_group
+)
+SELECT COALESCE(SUM(end_minute - start_minute), 0) AS weekly_overlap_minutes
+FROM merged_intervals;",4435,11.23
+J070,2025학년도 2학기 AI4007-00(독립심화학습(인공지능)2)와 2025학년도 2학기 SWCON401-08(소프트웨어융합캡스톤디자인)의 정규 수업시간이 일주일에 총 몇 분 겹쳐? 시험 일정은 제외하고 요일별 겹치는 구간만 합산해줘.,,"temporal_reasoning,schedule_overlap,official_public_facts",True,True,True,correct,,1,True,,,"WITH regular_times AS (
+    SELECT DISTINCT
+        co.course_code,
+        ts.day,
+        ts.start_time,
+        ts.end_time
+    FROM course_offerings AS co
+    JOIN class_times AS ct ON ct.offering_id = co.offering_id
+    JOIN time_slots AS ts ON ts.time_slot_id = ct.time_slot_id
+    WHERE co.year = 2025
+      AND co.semester = '2'
+      AND (
+          (co.course_code = 'AI4007' AND co.section = '00')
+          OR (co.course_code = 'SWCON401' AND co.section = '08')
+      )
+),
+overlaps AS (
+    SELECT DISTINCT
+        a.day,
+        MAX(a.start_time, b.start_time) AS start_time,
+        MIN(a.end_time, b.end_time) AS end_time
+    FROM regular_times AS a
+    JOIN regular_times AS b ON b.day = a.day
+    WHERE a.course_code = 'AI4007'
+      AND b.course_code = 'SWCON401'
+      AND a.start_time < b.end_time
+      AND b.start_time < a.end_time
+),
+ordered_overlaps AS (
+    SELECT *,
+        MAX(end_time) OVER (
+            PARTITION BY day
+            ORDER BY start_time, end_time
+            ROWS BETWEEN UNBOUNDED PRECEDING AND 1 PRECEDING
+        ) AS previous_max_end
+    FROM overlaps
+),
+grouped_overlaps AS (
+    SELECT *,
+        SUM(
+            CASE
+                WHEN previous_max_end IS NULL
+                  OR start_time > previous_max_end THEN 1
+                ELSE 0
+            END
+        ) OVER (
+            PARTITION BY day
+            ORDER BY start_time, end_time
+            ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW
+        ) AS interval_group
+    FROM ordered_overlaps
+),
+merged_overlaps AS (
+    SELECT
+        day,
+        MIN(start_time) AS start_time,
+        MAX(end_time) AS end_time
+    FROM grouped_overlaps
+    GROUP BY day, interval_group
+),
+daily_totals AS (
+    SELECT
+        day,
+        SUM(
+            (CAST(strftime('%s', end_time) AS INTEGER)
+             - CAST(strftime('%s', start_time) AS INTEGER)) / 60
+        ) AS overlap_minutes
+    FROM merged_overlaps
+    GROUP BY day
+)
+SELECT COALESCE(SUM(overlap_minutes), 0) AS total_overlap_minutes
+FROM daily_totals;",4370,10.99
+J071,2025학년도 2학기 SWCON253-01(기계학습)와 2025학년도 2학기 CSE103-01(객체지향프로그래밍)의 정규 수업시간이 일주일에 총 몇 분 겹쳐? 시험 일정은 제외하고 요일별 겹치는 구간만 합산해줘.,,"temporal_reasoning,schedule_overlap,official_public_facts",True,True,True,correct,,1,True,,,"WITH first_times AS (
+    SELECT DISTINCT ts.day, ts.start_time, ts.end_time
+    FROM course_offerings AS co
+    JOIN class_times AS ct ON ct.offering_id = co.offering_id
+    JOIN time_slots AS ts ON ts.time_slot_id = ct.time_slot_id
+    WHERE co.year = 2025
+      AND co.semester = '2'
+      AND co.course_code = 'SWCON253'
+      AND co.section = '01'
+),
+second_times AS (
+    SELECT DISTINCT ts.day, ts.start_time, ts.end_time
+    FROM course_offerings AS co
+    JOIN class_times AS ct ON ct.offering_id = co.offering_id
+    JOIN time_slots AS ts ON ts.time_slot_id = ct.time_slot_id
+    WHERE co.year = 2025
+      AND co.semester = '2'
+      AND co.course_code = 'CSE103'
+      AND co.section = '01'
+),
+overlaps AS (
+    SELECT DISTINCT
+        a.day,
+        MAX(a.start_time, b.start_time) AS overlap_start,
+        MIN(a.end_time, b.end_time) AS overlap_end
+    FROM first_times AS a
+    JOIN second_times AS b ON b.day = a.day
+    WHERE a.start_time < b.end_time
+      AND b.start_time < a.end_time
+),
+previous_ends AS (
+    SELECT *,
+        MAX(overlap_end) OVER (
+            PARTITION BY day
+            ORDER BY overlap_start, overlap_end
+            ROWS BETWEEN UNBOUNDED PRECEDING AND 1 PRECEDING
+        ) AS previous_end
+    FROM overlaps
+),
+grouped_overlaps AS (
+    SELECT *,
+        SUM(
+            CASE
+                WHEN previous_end IS NULL OR overlap_start > previous_end
+                THEN 1 ELSE 0
+            END
+        ) OVER (
+            PARTITION BY day
+            ORDER BY overlap_start, overlap_end
+            ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW
+        ) AS interval_group
+    FROM previous_ends
+),
+merged_overlaps AS (
+    SELECT
+        day,
+        MIN(overlap_start) AS start_time,
+        MAX(overlap_end) AS end_time
+    FROM grouped_overlaps
+    GROUP BY day, interval_group
+)
+SELECT COALESCE(SUM(
+    CAST(SUBSTR(end_time, 1, 2) AS INTEGER) * 60
+    + CAST(SUBSTR(end_time, 4, 2) AS INTEGER)
+    - CAST(SUBSTR(start_time, 1, 2) AS INTEGER) * 60
+    - CAST(SUBSTR(start_time, 4, 2) AS INTEGER)
+), 0) AS weekly_overlap_minutes
+FROM merged_overlaps;",4411,10.24
+J072,2026학년도 1학기 CSE304-01(알고리즘)와 2026학년도 1학기 EE210-01(신호와시스템)의 정규 수업시간이 일주일에 총 몇 분 겹쳐? 시험 일정은 제외하고 요일별 겹치는 구간만 합산해줘.,,"temporal_reasoning,schedule_overlap,official_public_facts",True,True,True,correct,,1,True,,,"WITH regular_times AS (
+    SELECT DISTINCT
+        co.course_code,
+        ts.day,
+        CAST(substr(ts.start_time, 1, 2) AS INTEGER) * 60
+            + CAST(substr(ts.start_time, 4, 2) AS INTEGER) AS start_min,
+        CAST(substr(ts.end_time, 1, 2) AS INTEGER) * 60
+            + CAST(substr(ts.end_time, 4, 2) AS INTEGER) AS end_min
+    FROM course_offerings AS co
+    JOIN class_times AS ct ON ct.offering_id = co.offering_id
+    JOIN time_slots AS ts ON ts.time_slot_id = ct.time_slot_id
+    WHERE co.year = 2026
+      AND co.semester = '1'
+      AND co.section = '01'
+      AND co.course_code IN ('CSE304', 'EE210')
+),
+overlaps AS (
+    SELECT DISTINCT
+        a.day,
+        MAX(a.start_min, b.start_min) AS start_min,
+        MIN(a.end_min, b.end_min) AS end_min
+    FROM regular_times AS a
+    JOIN regular_times AS b ON b.day = a.day
+    WHERE a.course_code = 'CSE304'
+      AND b.course_code = 'EE210'
+      AND a.start_min < b.end_min
+      AND b.start_min < a.end_min
+),
+previous_ends AS (
+    SELECT *,
+        MAX(end_min) OVER (
+            PARTITION BY day
+            ORDER BY start_min, end_min
+            ROWS BETWEEN UNBOUNDED PRECEDING AND 1 PRECEDING
+        ) AS previous_end
+    FROM overlaps
+),
+grouped_overlaps AS (
+    SELECT *,
+        SUM(
+            CASE WHEN previous_end IS NULL OR start_min > previous_end
+                 THEN 1 ELSE 0 END
+        ) OVER (
+            PARTITION BY day
+            ORDER BY start_min, end_min
+            ROWS UNBOUNDED PRECEDING
+        ) AS group_id
+    FROM previous_ends
+),
+merged_overlaps AS (
+    SELECT day, group_id,
+        MIN(start_min) AS start_min,
+        MAX(end_min) AS end_min
+    FROM grouped_overlaps
+    GROUP BY day, group_id
+)
+SELECT COALESCE(SUM(end_min - start_min), 0) AS weekly_overlap_minutes
+FROM merged_overlaps;",4306,9.02
+J073,"다음 세 강좌 중 중간·기말 비율 합계가 70% 이상인 강좌의 과목코드·연도·학기·분반·합계를 알려줘: 2025학년도 1학기 CSE406-01(캡스톤디자인), 2026학년도 1학기 AI4003-00(졸업논문(인공지능)), 2025학년도 1학기 CSE405-00(졸업프로젝트).",,"multi_document_reasoning,exam_threshold_set,official_public_facts",True,True,True,correct,,1,True,,,"SELECT
+    co.course_code,
+    co.year,
+    co.semester,
+    co.section,
+    s.midterm_percentage + s.final_exam_percentage AS exam_percentage_total
+FROM course_offerings AS co
+JOIN syllabi AS s ON s.offering_id = co.offering_id
+WHERE (
+    (co.year = 2025 AND co.semester = '1' AND co.course_code = 'CSE406' AND co.section = '01')
+    OR (co.year = 2026 AND co.semester = '1' AND co.course_code = 'AI4003' AND co.section = '00')
+    OR (co.year = 2025 AND co.semester = '1' AND co.course_code = 'CSE405' AND co.section = '00')
+)
+AND s.midterm_percentage + s.final_exam_percentage >= 70;",3871,4.88
+J074,"이 세 강좌 중 과제 비율이 가장 낮은 강좌의 과목코드·연도·학기·분반·과제 비율을 알려줘. 동률은 모두 포함해줘: 2025학년도 1학기 CSE406-01(캡스톤디자인), 2026학년도 1학기 AI4003-00(졸업논문(인공지능)), 2025학년도 1학기 CSE405-00(졸업프로젝트).",,"multi_document_reasoning,assignment_ranking,official_public_facts",True,True,True,correct,,1,True,,,"WITH candidates AS (
+    SELECT co.course_code, co.year, co.semester, co.section,
+           s.assignment_percentage
+    FROM course_offerings AS co
+    JOIN syllabi AS s ON s.offering_id = co.offering_id
+    WHERE (co.course_code = 'CSE406' AND co.year = 2025 AND co.semester = '1' AND co.section = '01')
+       OR (co.course_code = 'AI4003' AND co.year = 2026 AND co.semester = '1' AND co.section = '00')
+       OR (co.course_code = 'CSE405' AND co.year = 2025 AND co.semester = '1' AND co.section = '00')
+)
+SELECT course_code, year, semester, section, assignment_percentage
+FROM candidates
+WHERE assignment_percentage = (SELECT MIN(assignment_percentage) FROM candidates);",3882,2.85
+J075,"다음 세 강좌 중 중간·기말 비율 합계가 70% 이상인 강좌의 과목코드·연도·학기·분반·합계를 알려줘: 2026학년도 1학기 IE419-00(서비스데이터사이언스), 2025학년도 2학기 CSE497-02(연구연수활동2(컴퓨터공학)), 2026학년도 1학기 EE209-01(논리회로).",,"multi_document_reasoning,exam_threshold_set,official_public_facts",True,True,True,correct,,1,True,,,"SELECT co.course_code,
+       co.year,
+       co.semester,
+       co.section,
+       s.midterm_percentage + s.final_exam_percentage AS exam_percentage_total
+FROM course_offerings AS co
+JOIN syllabi AS s ON s.offering_id = co.offering_id
+WHERE (
+    (co.course_code = 'IE419' AND co.year = 2026 AND co.semester = '1' AND co.section = '00')
+    OR (co.course_code = 'CSE497' AND co.year = 2025 AND co.semester = '2' AND co.section = '02')
+    OR (co.course_code = 'EE209' AND co.year = 2026 AND co.semester = '1' AND co.section = '01')
+)
+AND s.midterm_percentage + s.final_exam_percentage >= 70;",3868,2.73
+J076,"이 세 강좌 중 과제 비율이 가장 낮은 강좌의 과목코드·연도·학기·분반·과제 비율을 알려줘. 동률은 모두 포함해줘: 2026학년도 1학기 IE419-00(서비스데이터사이언스), 2025학년도 2학기 CSE497-02(연구연수활동2(컴퓨터공학)), 2026학년도 1학기 EE209-01(논리회로).",,"multi_document_reasoning,assignment_ranking,official_public_facts",True,True,True,correct,,1,True,,,"WITH selected_courses AS (
+    SELECT co.course_code, co.year, co.semester, co.section,
+           s.assignment_percentage
+    FROM course_offerings AS co
+    JOIN syllabi AS s ON s.offering_id = co.offering_id
+    WHERE (co.course_code = 'IE419' AND co.year = 2026 AND co.semester = '1' AND co.section = '00')
+       OR (co.course_code = 'CSE497' AND co.year = 2025 AND co.semester = '2' AND co.section = '02')
+       OR (co.course_code = 'EE209' AND co.year = 2026 AND co.semester = '1' AND co.section = '01')
+)
+SELECT course_code, year, semester, section, assignment_percentage
+FROM selected_courses
+WHERE assignment_percentage = (
+    SELECT MIN(assignment_percentage)
+    FROM selected_courses
+);",3887,2.89
+J077,"다음 세 강좌 중 중간·기말 비율 합계가 70% 이상인 강좌의 과목코드·연도·학기·분반·합계를 알려줘: 2025학년도 2학기 CSE302-01(컴퓨터네트워크), 2026학년도 1학기 SWCON321-02(데이터분석캡스톤디자인), 2026학년도 2학기 CSE406-16(캡스톤디자인).",,"multi_document_reasoning,exam_threshold_set,official_public_facts",True,True,True,correct,,1,True,,,"SELECT
+    co.course_code,
+    co.year,
+    co.semester,
+    co.section,
+    s.midterm_percentage + s.final_exam_percentage AS exam_percentage_total
+FROM course_offerings AS co
+JOIN syllabi AS s ON s.offering_id = co.offering_id
+WHERE (
+    (co.course_code = 'CSE302' AND co.year = 2025 AND co.semester = '2' AND co.section = '01')
+    OR (co.course_code = 'SWCON321' AND co.year = 2026 AND co.semester = '1' AND co.section = '02')
+    OR (co.course_code = 'CSE406' AND co.year = 2026 AND co.semester = '2' AND co.section = '16')
+)
+AND s.midterm_percentage + s.final_exam_percentage >= 70;",3872,2.81
+J078,"이 세 강좌 중 과제 비율이 가장 낮은 강좌의 과목코드·연도·학기·분반·과제 비율을 알려줘. 동률은 모두 포함해줘: 2025학년도 2학기 CSE302-01(컴퓨터네트워크), 2026학년도 1학기 SWCON321-02(데이터분석캡스톤디자인), 2026학년도 2학기 CSE406-16(캡스톤디자인).",,"multi_document_reasoning,assignment_ranking,official_public_facts",True,True,True,correct,,1,True,,,"WITH candidates AS (
+    SELECT co.course_code, co.year, co.semester, co.section,
+           s.assignment_percentage
+    FROM course_offerings AS co
+    JOIN syllabi AS s ON s.offering_id = co.offering_id
+    WHERE (co.course_code = 'CSE302' AND co.year = 2025 AND co.semester = '2' AND co.section = '01')
+       OR (co.course_code = 'SWCON321' AND co.year = 2026 AND co.semester = '1' AND co.section = '02')
+       OR (co.course_code = 'CSE406' AND co.year = 2026 AND co.semester = '2' AND co.section = '16')
+)
+SELECT course_code, year, semester, section, assignment_percentage
+FROM candidates
+WHERE assignment_percentage = (
+    SELECT MIN(assignment_percentage)
+    FROM candidates
+);",3886,2.95
+J079,"다음 세 강좌 중 중간·기말 비율 합계가 70% 이상인 강좌의 과목코드·연도·학기·분반·합계를 알려줘: 2025학년도 1학기 CSE327-00(소프트웨어공학), 2025학년도 1학기 CSE496-06(연구연수활동1(컴퓨터공학)), 2025학년도 1학기 CSE304-00(알고리즘).",,"multi_document_reasoning,exam_threshold_set,official_public_facts",True,True,True,correct,,1,True,,,"SELECT
+    co.course_code,
+    co.year,
+    co.semester,
+    co.section,
+    s.midterm_percentage + s.final_exam_percentage AS exam_percentage_sum
+FROM course_offerings AS co
+JOIN syllabi AS s ON s.offering_id = co.offering_id
+WHERE co.year = 2025
+  AND co.semester = '1'
+  AND (
+      (co.course_code = 'CSE327' AND co.section = '00')
+      OR (co.course_code = 'CSE496' AND co.section = '06')
+      OR (co.course_code = 'CSE304' AND co.section = '00')
+  )
+  AND s.midterm_percentage + s.final_exam_percentage >= 70;",3847,2.77
+J080,"이 세 강좌 중 과제 비율이 가장 낮은 강좌의 과목코드·연도·학기·분반·과제 비율을 알려줘. 동률은 모두 포함해줘: 2025학년도 1학기 CSE327-00(소프트웨어공학), 2025학년도 1학기 CSE496-06(연구연수활동1(컴퓨터공학)), 2025학년도 1학기 CSE304-00(알고리즘).",,"multi_document_reasoning,assignment_ranking,official_public_facts",True,True,True,correct,,1,True,,,"WITH candidates AS (
+    SELECT co.course_code, co.year, co.semester, co.section,
+           s.assignment_percentage
+    FROM course_offerings AS co
+    JOIN syllabi AS s ON s.offering_id = co.offering_id
+    WHERE co.year = 2025
+      AND co.semester = '1'
+      AND (
+          (co.course_code = 'CSE327' AND co.section = '00')
+          OR (co.course_code = 'CSE496' AND co.section = '06')
+          OR (co.course_code = 'CSE304' AND co.section = '00')
+      )
+)
+SELECT course_code, year, semester, section, assignment_percentage
+FROM candidates
+WHERE assignment_percentage = (
+    SELECT MIN(assignment_percentage)
+    FROM candidates
+);",3863,2.83
+J081,2026학년도 1학기 소프트웨어융합학과 원천 개설목록에서 전공필수로 분류된 강좌의 분반 수와 개설학점 합계를 알려줘. 분반별로 각각 계산해줘.,,"classification_aggregation,department_required_load,official_public_facts",True,True,True,correct,,1,True,,,"SELECT
+    COUNT(*) AS 분반_수,
+    COALESCE(SUM(co.credits), 0) AS 개설학점_합계
+FROM course_offerings AS co
+WHERE co.year = 2026
+  AND co.semester = '1'
+  AND EXISTS (
+      SELECT 1
+      FROM course_offering_categories AS coc
+      WHERE coc.offering_id = co.offering_id
+        AND coc.department_id = 8
+        AND coc.category_id = 2
+  );",3878,5.68
+J082,2025학년도 2학기 인공지능학과 원천 개설목록에서 전공필수로 분류된 강좌의 분반 수와 개설학점 합계를 알려줘. 분반별로 각각 계산해줘.,,"classification_aggregation,department_required_load,official_public_facts",False,False,False,row_count_mismatch,,1,True,,,"SELECT
+    co.section AS 분반,
+    COUNT(*) AS 분반_수,
+    SUM(co.credits) AS 개설학점_합계
+FROM course_offerings AS co
+WHERE co.year = 2025
+  AND co.semester = '2'
+  AND EXISTS (
+      SELECT 1
+      FROM course_offering_categories AS coc
+      JOIN course_categories AS cc
+        ON cc.category_id = coc.category_id
+      WHERE coc.offering_id = co.offering_id
+        AND coc.department_id = 12
+        AND cc.category_name = '전공필수'
+  )
+GROUP BY co.section
+ORDER BY co.section;",3973,7.59
+J083,2025학년도 2학기 소프트웨어융합학과 원천 개설목록에서 전공필수로 분류된 강좌의 분반 수와 개설학점 합계를 알려줘. 분반별로 각각 계산해줘.,,"classification_aggregation,department_required_load,official_public_facts",False,False,False,row_count_mismatch,,1,True,,,"SELECT
+    co.section AS 분반,
+    COUNT(*) AS 분반_수,
+    SUM(co.credits) AS 개설학점_합계
+FROM course_offerings AS co
+WHERE co.year = 2025
+  AND co.semester = '2'
+  AND EXISTS (
+      SELECT 1
+      FROM course_offering_categories AS coc
+      WHERE coc.offering_id = co.offering_id
+        AND coc.department_id = 8
+        AND coc.category_id = 2
+  )
+GROUP BY co.section
+ORDER BY co.section;",3833,4.57
+J084,2025학년도 1학기 컴퓨터공학과 원천 개설목록에서 전공필수로 분류된 강좌의 분반 수와 개설학점 합계를 알려줘. 분반별로 각각 계산해줘.,,"classification_aggregation,department_required_load,official_public_facts",True,True,True,correct,,1,True,,,"SELECT
+    COUNT(*) AS 분반_수,
+    COALESCE(SUM(co.credits), 0) AS 개설학점_합계
+FROM course_offerings AS co
+WHERE co.year = 2025
+  AND co.semester = '1'
+  AND EXISTS (
+      SELECT 1
+      FROM course_offering_categories AS coc
+      WHERE coc.offering_id = co.offering_id
+        AND coc.department_id = 11
+        AND coc.category_id = 2
+  );",3919,5.87
+J085,"2025학년도 2학기 CSE406-01(캡스톤디자인)에서 중간고사 80점, 기말고사 90점(각 100점 만점)을 받았다고 가정하면 두 시험이 최종 100점에 기여하는 점수 합은? 다른 항목과 추가 보정은 제외해줘.",,"arithmetic_reasoning,weighted_exam_score,official_rule_with_hypothetical_inputs",True,True,True,correct,,1,True,,,"SELECT 80.0 * s.midterm_percentage / 100.0
+     + 90.0 * s.final_exam_percentage / 100.0 AS exam_contribution
+FROM course_offerings AS co
+JOIN syllabi AS s ON s.offering_id = co.offering_id
+WHERE co.year = 2025
+  AND co.semester = '2'
+  AND co.course_code = 'CSE406'
+  AND co.section = '01';",3762,2.24
+J086,"2026학년도 1학기 CSE438-00(최신기술콜로키움1)에서 중간고사 80점, 기말고사 90점(각 100점 만점)을 받았다고 가정하면 두 시험이 최종 100점에 기여하는 점수 합은? 다른 항목과 추가 보정은 제외해줘.",,"arithmetic_reasoning,weighted_exam_score,official_rule_with_hypothetical_inputs",True,True,True,correct,,1,True,,,"SELECT (80.0 * s.midterm_percentage + 90.0 * s.final_exam_percentage) / 100.0 AS 시험_기여점수_합
+FROM course_offerings AS co
+JOIN syllabi AS s ON s.offering_id = co.offering_id
+WHERE co.year = 2026
+  AND co.semester = '1'
+  AND co.course_code = 'CSE438'
+  AND co.section = '00';",3808,3.48
+J087,"2025학년도 2학기 AI4007-00(독립심화학습(인공지능)2)에서 중간고사 80점, 기말고사 90점(각 100점 만점)을 받았다고 가정하면 두 시험이 최종 100점에 기여하는 점수 합은? 다른 항목과 추가 보정은 제외해줘.",,"arithmetic_reasoning,weighted_exam_score,official_rule_with_hypothetical_inputs",True,True,True,correct,,1,True,,,"SELECT 80.0 * s.midterm_percentage / 100.0
+     + 90.0 * s.final_exam_percentage / 100.0 AS 시험_기여점수_합
+FROM course_offerings AS co
+JOIN syllabi AS s ON s.offering_id = co.offering_id
+WHERE co.year = 2025
+  AND co.semester = '2'
+  AND co.course_code = 'AI4007'
+  AND co.section = '00';",3773,2.7
+J088,"2025학년도 2학기 SWCON201-00(오픈소스SW개발방법및도구)에서 중간고사 80점, 기말고사 90점(각 100점 만점)을 받았다고 가정하면 두 시험이 최종 100점에 기여하는 점수 합은? 다른 항목과 추가 보정은 제외해줘.",,"arithmetic_reasoning,weighted_exam_score,official_rule_with_hypothetical_inputs",True,True,True,correct,,1,True,,,"SELECT 80.0 * s.midterm_percentage / 100.0
+     + 90.0 * s.final_exam_percentage / 100.0 AS exam_contribution
+FROM course_offerings AS co
+JOIN syllabi AS s ON s.offering_id = co.offering_id
+WHERE co.year = 2025
+  AND co.semester = '2'
+  AND co.course_code = 'SWCON201'
+  AND co.section = '00';",3767,2.55
+J089,[가상 학생 202210001] 내 가상 수강이력에서 완료됐고 재수강으로 대체되지 않은 기록의 학점 합계는 얼마야?,202210001,"fixture_personalized,fixture_earned,simulated_student_fixture",True,True,True,correct,,1,True,,,"SELECT COALESCE(SUM(co.credits), 0) AS total_credits
+FROM enrollments AS e
+JOIN course_offerings AS co ON co.offering_id = e.offering_id
+WHERE e.student_id = 202210001
+  AND e.status = '완료'
+  AND e.retaken = 0;",3687,2.91
+J090,[가상 학생 202210002] 내 가상 수강이력 중 재수강으로 대체된 과거 기록은 몇 건이야?,202210002,"fixture_personalized,fixture_retake,simulated_student_fixture",True,True,True,correct,,1,True,,,"SELECT COUNT(*) AS replaced_enrollment_count
+FROM enrollments
+WHERE student_id = 202210002
+  AND retaken = 1;",3643,1.71
+J091,[가상 학생 202310003] 내 가상 수강이력을 완료·미이수 등 기록된 상태별로 나눠 각각 몇 건인지 알려줘.,202310003,"fixture_personalized,fixture_status,simulated_student_fixture",True,True,True,correct,,1,True,,,"SELECT status, COUNT(*) AS record_count
+FROM enrollments
+WHERE student_id = 202310003
+GROUP BY status;",3643,1.77
+J092,[가상 학생 202510004] 내 가상 수강이력에서 완료됐고 재수강으로 대체되지 않은 기록의 학점 합계는 얼마야?,202510004,"fixture_personalized,fixture_earned,simulated_student_fixture",True,True,True,correct,,1,True,,,"SELECT COALESCE(SUM(co.credits), 0) AS total_credits
+FROM enrollments AS e
+JOIN course_offerings AS co ON co.offering_id = e.offering_id
+WHERE e.student_id = 202510004
+  AND e.status = '완료'
+  AND e.retaken = 0;",3687,2.18
+J093,[가상 학생 202410005] 내 가상 수강이력 중 재수강으로 대체된 과거 기록은 몇 건이야?,202410005,"fixture_personalized,fixture_retake,simulated_student_fixture",True,True,True,correct,,1,True,,,"SELECT COUNT(*) AS replaced_record_count
+FROM enrollments
+WHERE student_id = 202410005
+  AND retaken = 1;",3642,9.89
+J094,[가상 학생 202410006] 내 가상 수강이력을 완료·미이수 등 기록된 상태별로 나눠 각각 몇 건인지 알려줘.,202410006,"fixture_personalized,fixture_status,simulated_student_fixture",True,True,True,correct,,1,True,,,"SELECT status, COUNT(*) AS record_count
+FROM enrollments
+WHERE student_id = 202410006
+GROUP BY status;",3643,1.85
+J095,"2023학번 일반 신입학생의 후마니타스 기본구조표에서 총 교양학점, 배분이수 학점, 최소 영역 수, 영역당 학점은 각각 얼마야? 면제·대체·편입 예외는 제외해줘.",,"official_rule,general_cohort_rule,official_public_facts",True,True,True,correct,,1,True,,,"SELECT
+    g.total_general_credits AS 총_교양학점,
+    c.min_credits AS 배분이수_학점,
+    c.min_areas AS 최소_영역_수,
+    c.per_area_min_credits AS 영역당_학점
+FROM general_education_requirements AS g
+JOIN general_education_requirement_categories AS c
+    ON c.general_requirement_id = g.general_requirement_id
+WHERE g.cohort_start <= 2023
+  AND (g.cohort_end IS NULL OR g.cohort_end >= 2023)
+  AND c.requirement_code = 'DISTRIBUTION';",3778,2.77
+J096,"2024학번 일반 신입학생의 후마니타스 기본구조표에서 총 교양학점, 배분이수 학점, 최소 영역 수, 영역당 학점은 각각 얼마야? 면제·대체·편입 예외는 제외해줘.",,"official_rule,general_cohort_rule,official_public_facts",True,True,True,correct,,1,True,,,"SELECT
+    g.total_general_credits AS 총_교양학점,
+    c.min_credits AS 배분이수_학점,
+    c.min_areas AS 최소_영역_수,
+    c.per_area_min_credits AS 영역당_학점
+FROM general_education_requirements AS g
+JOIN general_education_requirement_categories AS c
+    ON c.general_requirement_id = g.general_requirement_id
+WHERE g.cohort_start <= 2024
+  AND (g.cohort_end IS NULL OR g.cohort_end >= 2024)
+  AND c.requirement_code = 'DISTRIBUTION';",3778,2.47
+J097,2023학번과 2024학번 기본구조표를 비교하면 2024학번의 총 교양 최소학점과 배분이수 최소학점은 각각 몇 학점 줄었어? 면제·대체 예외는 제외해줘.,,"cross_rule_reasoning,general_cohort_difference,official_public_facts",True,True,True,correct,,1,True,,,"WITH cohort_requirements AS (
+    SELECT
+        c.admission_year,
+        g.total_general_credits,
+        rc.min_credits AS distribution_min_credits
+    FROM (
+        SELECT 2023 AS admission_year
+        UNION ALL
+        SELECT 2024
+    ) AS c
+    JOIN general_education_requirements AS g
+      ON g.cohort_start <= c.admission_year
+     AND (g.cohort_end IS NULL OR g.cohort_end >= c.admission_year)
+    JOIN general_education_requirement_categories AS rc
+      ON rc.general_requirement_id = g.general_requirement_id
+     AND rc.requirement_code = 'DISTRIBUTION'
+)
+SELECT
+    a.total_general_credits - b.total_general_credits AS ""총 교양 최소학점 감소분"",
+    a.distribution_min_credits - b.distribution_min_credits AS ""배분이수 최소학점 감소분""
+FROM cohort_requirements AS a
+JOIN cohort_requirements AS b
+  ON b.admission_year = 2024
+WHERE a.admission_year = 2023;",3934,6.12
+J098,"2024학번 일반 신입학생이 배분이수 6학점을 취득했고, 영역당 3학점 기준을 채운 영역은 2개라고 가정하자. 기본구조표 기준 부족 학점·부족 영역 수와 두 조건 충족 여부(1/0)는? 편입·면제 예외는 제외해줘.",,"rule_reasoning,distribution_rule_application,official_rule_with_hypothetical_inputs",True,True,True,correct,,1,True,,,"SELECT
+    MAX(0, c.min_credits - 6) AS 부족_학점,
+    MAX(0, c.min_areas - 2) AS 부족_영역_수,
+    CASE
+        WHEN 6 >= c.min_credits AND 2 >= c.min_areas THEN 1
+        ELSE 0
+    END AS 두_조건_충족_여부
+FROM general_education_requirements AS r
+JOIN general_education_requirement_categories AS c
+    ON c.general_requirement_id = r.general_requirement_id
+WHERE r.cohort_start <= 2024
+  AND (r.cohort_end IS NULL OR r.cohort_end >= 2024)
+  AND c.requirement_code = 'DISTRIBUTION';",3992,6.79
+J099,"2024학번 일반 신입학생이 배분이수 9학점을 취득했고, 영역당 3학점 기준을 채운 영역은 2개라고 가정하자. 기본구조표 기준 부족 학점·부족 영역 수와 두 조건 충족 여부(1/0)는? 편입·면제 예외는 제외해줘.",,"rule_reasoning,distribution_rule_application,official_rule_with_hypothetical_inputs",True,True,True,correct,,1,True,,,"SELECT
+    MAX(0, rc.min_credits - 9) AS 부족_학점,
+    MAX(0, COALESCE(rc.min_areas, 0) - 2) AS 부족_영역_수,
+    CASE
+        WHEN 9 >= rc.min_credits
+         AND 2 >= COALESCE(rc.min_areas, 0)
+        THEN 1 ELSE 0
+    END AS 두_조건_충족_여부
+FROM general_education_requirements AS r
+JOIN general_education_requirement_categories AS rc
+    ON rc.general_requirement_id = r.general_requirement_id
+WHERE r.cohort_start <= 2024
+  AND (r.cohort_end IS NULL OR r.cohort_end >= 2024)
+  AND rc.requirement_code = 'DISTRIBUTION';",4011,7.98
+J100,"2024학번 일반 신입학생이 배분이수 12학점을 취득했고, 영역당 3학점 기준을 채운 영역은 4개라고 가정하자. 기본구조표 기준 부족 학점·부족 영역 수와 두 조건 충족 여부(1/0)는? 편입·면제 예외는 제외해줘.",,"rule_reasoning,distribution_rule_application,official_rule_with_hypothetical_inputs",True,True,True,correct,,1,True,,,"SELECT
+    MAX(0, c.min_credits - 12) AS 부족_학점,
+    MAX(0, COALESCE(c.min_areas, 0) - 4) AS 부족_영역_수,
+    CASE
+        WHEN 12 >= c.min_credits
+         AND 4 >= COALESCE(c.min_areas, 0)
+        THEN 1
+        ELSE 0
+    END AS 두_조건_충족_여부
+FROM general_education_requirements AS r
+JOIN general_education_requirement_categories AS c
+    ON c.general_requirement_id = r.general_requirement_id
+WHERE r.cohort_start <= 2024
+  AND (r.cohort_end IS NULL OR r.cohort_end >= 2024)
+  AND c.requirement_code = 'DISTRIBUTION';",3980,7.52

@@ -54,6 +54,7 @@ class Settings:
     api_key: str | None = os.environ.get("CHATKHU_API_KEY")
     base_url: str = os.environ.get("CHATKHU_BASE_URL", CHATKHU_BASE_URL)
     model: str = os.environ.get("CHATKHU_MODEL", "")
+    judge_model: str = os.environ.get("CHATKHU_JUDGE_MODEL", "")  # 비우면 model 로 채점(llm_judge)
     temperature: float | None = (
         float(os.environ["CHATKHU_TEMPERATURE"]) if os.environ.get("CHATKHU_TEMPERATURE") else None
     )

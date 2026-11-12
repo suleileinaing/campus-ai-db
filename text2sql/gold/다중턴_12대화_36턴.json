@@ -1,0 +1,1052 @@
+[
+  {
+    "conversation_id": "D01",
+    "task_type": "professor_reference_and_filter",
+    "scope": "국제캠퍼스; 2025-2; 분류 기준 컴퓨터공학과",
+    "turns": [
+      {
+        "user": "2025학년도 2학기 SWCON253-01(기계학습) 담당 교수는 누구야?",
+        "self_contained_question": "2025학년도 2학기 SWCON253-01(기계학습) 담당 교수 이름",
+        "expected_action": "answer",
+        "gold_answer": [
+          {
+            "professor_name": "김휘용"
+          }
+        ],
+        "reference_sql": "SELECT DISTINCT p.name AS professor_name FROM course_offerings o JOIN offering_professors op ON op.offering_id=o.offering_id JOIN professors p ON p.professor_id=op.professor_id WHERE o.year=2025 AND o.semester='2' AND o.course_code='SWCON253' AND o.section='01' AND o.campus='국제';",
+        "sources": [
+          {
+            "kind": "official_raw",
+            "url": "https://github.com/suleileinaing/campus-ai-db/blob/f4a822285995359adb46a56468406c5a39757a58/raw_data/College_of_software_convergence_course_lists/2025-2_A07337_raw.json",
+            "path": "raw_data/College_of_software_convergence_course_lists/2025-2_A07337_raw.json",
+            "sha256": "a4636186782bd1ec4606408bfa983ab6901233a9011d8852245ae106e1716f12"
+          },
+          {
+            "kind": "official_raw",
+            "url": "https://github.com/suleileinaing/campus-ai-db/blob/f4a822285995359adb46a56468406c5a39757a58/raw_data/College_of_software_convergence_course_lists/2025-2_A10627_raw.json",
+            "path": "raw_data/College_of_software_convergence_course_lists/2025-2_A10627_raw.json",
+            "sha256": "31621ee36f5c501e618817c9d80dc5d917a18ba9f3cd2fc3217df835ecc3e028"
+          },
+          {
+            "kind": "official_raw",
+            "url": "https://github.com/suleileinaing/campus-ai-db/blob/f4a822285995359adb46a56468406c5a39757a58/raw_data/College_of_software_convergence_course_lists/2025-2_A10628_raw.json",
+            "path": "raw_data/College_of_software_convergence_course_lists/2025-2_A10628_raw.json",
+            "sha256": "cabef6e7f9b9cee59ac2fb0f3617ae642fc82e251dcc1b5bf9f8cfebed06f08a"
+          }
+        ],
+        "turn": 1,
+        "database_check": "match",
+        "question_origin": "authored_dialogue_not_real_chat"
+      },
+      {
+        "user": "그 교수님이 같은 학기 컴퓨터공학과 개설목록에서 맡은 다른 과목의 코드와 분반은? 방금 과목 코드는 제외해줘.",
+        "self_contained_question": "2025-2 컴퓨터공학과에서 김휘용 교수가 맡은 강좌 중 SWCON253를 제외한 과목코드·분반",
+        "expected_action": "answer",
+        "gold_answer": [
+          {
+            "course_code": "CSE406",
+            "section": "03"
+          }
+        ],
+        "reference_sql": "WITH anchor_prof AS (SELECT DISTINCT op.professor_id FROM course_offerings o JOIN offering_professors op ON op.offering_id=o.offering_id WHERE o.year=2025 AND o.semester='2' AND o.course_code='SWCON253' AND o.section='01' AND o.campus='국제') SELECT DISTINCT o.course_code,o.section FROM course_offerings o JOIN offering_professors op ON op.offering_id=o.offering_id JOIN anchor_prof ap ON ap.professor_id=op.professor_id JOIN course_offering_categories oc ON oc.offering_id=o.offering_id JOIN departments d ON d.department_id=oc.department_id JOIN course_categories cc ON cc.category_id=oc.category_id WHERE o.year=2025 AND o.semester='2' AND o.campus='국제' AND d.code='A10627' AND o.course_code<>'SWCON253' AND (1=1) ORDER BY o.course_code,o.section;",
+        "sources": [
+          {
+            "kind": "official_raw",
+            "url": "https://github.com/suleileinaing/campus-ai-db/blob/f4a822285995359adb46a56468406c5a39757a58/raw_data/College_of_software_convergence_course_lists/2025-2_A10627_raw.json",
+            "path": "raw_data/College_of_software_convergence_course_lists/2025-2_A10627_raw.json",
+            "sha256": "31621ee36f5c501e618817c9d80dc5d917a18ba9f3cd2fc3217df835ecc3e028"
+          }
+        ],
+        "turn": 2,
+        "database_check": "match",
+        "question_origin": "authored_dialogue_not_real_chat"
+      },
+      {
+        "user": "그중 전공필수인 강좌만 과목코드와 분반으로 알려줘.",
+        "self_contained_question": "2025학년도 2학기 SWCON253-01(기계학습) 담당 교수의 다른 수업 중, 같은 학기 컴퓨터공학과 개설목록에서 전공필수인 강좌의 과목코드와 분반을 알려줘. 기준 과목의 다른 분반도 제외해줘.",
+        "expected_action": "answer",
+        "gold_answer": [
+          {
+            "course_code": "CSE406",
+            "section": "03"
+          }
+        ],
+        "reference_sql": "WITH anchor_prof AS (SELECT DISTINCT op.professor_id FROM course_offerings o JOIN offering_professors op ON op.offering_id=o.offering_id WHERE o.year=2025 AND o.semester='2' AND o.course_code='SWCON253' AND o.section='01' AND o.campus='국제') SELECT DISTINCT o.course_code,o.section FROM course_offerings o JOIN offering_professors op ON op.offering_id=o.offering_id JOIN anchor_prof ap ON ap.professor_id=op.professor_id JOIN course_offering_categories oc ON oc.offering_id=o.offering_id JOIN departments d ON d.department_id=oc.department_id JOIN course_categories cc ON cc.category_id=oc.category_id WHERE o.year=2025 AND o.semester='2' AND o.campus='국제' AND d.code='A10627' AND o.course_code<>'SWCON253' AND (cc.category_code='04') ORDER BY o.course_code,o.section;",
+        "sources": [
+          {
+            "kind": "official_raw",
+            "url": "https://github.com/suleileinaing/campus-ai-db/blob/f4a822285995359adb46a56468406c5a39757a58/raw_data/College_of_software_convergence_course_lists/2025-2_A10627_raw.json",
+            "path": "raw_data/College_of_software_convergence_course_lists/2025-2_A10627_raw.json",
+            "sha256": "31621ee36f5c501e618817c9d80dc5d917a18ba9f3cd2fc3217df835ecc3e028"
+          }
+        ],
+        "turn": 3,
+        "database_check": "match",
+        "question_origin": "authored_dialogue_not_real_chat"
+      }
+    ],
+    "note": "대화 자체는 설계한 평가 시나리오이며 실제 사용자 대화 로그가 아님. 실제 모델의 이전 응답을 다음 턴에 누적하고 정답은 채점에만 사용."
+  },
+  {
+    "conversation_id": "D02",
+    "task_type": "professor_reference_and_filter",
+    "scope": "국제캠퍼스; 2026-1; 분류 기준 컴퓨터공학과",
+    "turns": [
+      {
+        "user": "2026학년도 1학기 CSE304-01(알고리즘) 담당 교수는 누구야?",
+        "self_contained_question": "2026학년도 1학기 CSE304-01(알고리즘) 담당 교수 이름",
+        "expected_action": "answer",
+        "gold_answer": [
+          {
+            "professor_name": "성무진"
+          }
+        ],
+        "reference_sql": "SELECT DISTINCT p.name AS professor_name FROM course_offerings o JOIN offering_professors op ON op.offering_id=o.offering_id JOIN professors p ON p.professor_id=op.professor_id WHERE o.year=2026 AND o.semester='1' AND o.course_code='CSE304' AND o.section='01' AND o.campus='국제';",
+        "sources": [
+          {
+            "kind": "official_raw",
+            "url": "https://github.com/suleileinaing/campus-ai-db/blob/f4a822285995359adb46a56468406c5a39757a58/raw_data/College_of_software_convergence_course_lists/2026-1_A07337_raw.json",
+            "path": "raw_data/College_of_software_convergence_course_lists/2026-1_A07337_raw.json",
+            "sha256": "88d5a320a6e0a73f5e00b90b9b6f078050f65c04ea3047ebbeaf62a82daf5d1d"
+          },
+          {
+            "kind": "official_raw",
+            "url": "https://github.com/suleileinaing/campus-ai-db/blob/f4a822285995359adb46a56468406c5a39757a58/raw_data/College_of_software_convergence_course_lists/2026-1_A10627_raw.json",
+            "path": "raw_data/College_of_software_convergence_course_lists/2026-1_A10627_raw.json",
+            "sha256": "c734102cb6dca40122006077949b730424ed5ee364ba4f27de03657d98d83193"
+          },
+          {
+            "kind": "official_raw",
+            "url": "https://github.com/suleileinaing/campus-ai-db/blob/f4a822285995359adb46a56468406c5a39757a58/raw_data/College_of_software_convergence_course_lists/2026-1_A10628_raw.json",
+            "path": "raw_data/College_of_software_convergence_course_lists/2026-1_A10628_raw.json",
+            "sha256": "a13d0be262f6aa7c7bb51ccee89363be5cf45dcbf2f5f321271e2439dd86530f"
+          }
+        ],
+        "turn": 1,
+        "database_check": "match",
+        "question_origin": "authored_dialogue_not_real_chat"
+      },
+      {
+        "user": "그 교수님이 같은 학기 컴퓨터공학과 개설목록에서 맡은 다른 과목의 코드와 분반은? 방금 과목 코드는 제외해줘.",
+        "self_contained_question": "2026-1 컴퓨터공학과에서 성무진 교수가 맡은 강좌 중 CSE304를 제외한 과목코드·분반",
+        "expected_action": "answer",
+        "gold_answer": [
+          {
+            "course_code": "CSE406",
+            "section": "06"
+          },
+          {
+            "course_code": "CSE495",
+            "section": "02"
+          },
+          {
+            "course_code": "CSE496",
+            "section": "01"
+          }
+        ],
+        "reference_sql": "WITH anchor_prof AS (SELECT DISTINCT op.professor_id FROM course_offerings o JOIN offering_professors op ON op.offering_id=o.offering_id WHERE o.year=2026 AND o.semester='1' AND o.course_code='CSE304' AND o.section='01' AND o.campus='국제') SELECT DISTINCT o.course_code,o.section FROM course_offerings o JOIN offering_professors op ON op.offering_id=o.offering_id JOIN anchor_prof ap ON ap.professor_id=op.professor_id JOIN course_offering_categories oc ON oc.offering_id=o.offering_id JOIN departments d ON d.department_id=oc.department_id JOIN course_categories cc ON cc.category_id=oc.category_id WHERE o.year=2026 AND o.semester='1' AND o.campus='국제' AND d.code='A10627' AND o.course_code<>'CSE304' AND (1=1) ORDER BY o.course_code,o.section;",
+        "sources": [
+          {
+            "kind": "official_raw",
+            "url": "https://github.com/suleileinaing/campus-ai-db/blob/f4a822285995359adb46a56468406c5a39757a58/raw_data/College_of_software_convergence_course_lists/2026-1_A10627_raw.json",
+            "path": "raw_data/College_of_software_convergence_course_lists/2026-1_A10627_raw.json",
+            "sha256": "c734102cb6dca40122006077949b730424ed5ee364ba4f27de03657d98d83193"
+          }
+        ],
+        "turn": 2,
+        "database_check": "match",
+        "question_origin": "authored_dialogue_not_real_chat"
+      },
+      {
+        "user": "그중 전공필수인 강좌만 과목코드와 분반으로 알려줘.",
+        "self_contained_question": "2026학년도 1학기 CSE304-01(알고리즘) 담당 교수의 다른 수업 중, 같은 학기 컴퓨터공학과 개설목록에서 전공필수인 강좌의 과목코드와 분반을 알려줘. 기준 과목의 다른 분반도 제외해줘.",
+        "expected_action": "answer",
+        "gold_answer": [
+          {
+            "course_code": "CSE406",
+            "section": "06"
+          }
+        ],
+        "reference_sql": "WITH anchor_prof AS (SELECT DISTINCT op.professor_id FROM course_offerings o JOIN offering_professors op ON op.offering_id=o.offering_id WHERE o.year=2026 AND o.semester='1' AND o.course_code='CSE304' AND o.section='01' AND o.campus='국제') SELECT DISTINCT o.course_code,o.section FROM course_offerings o JOIN offering_professors op ON op.offering_id=o.offering_id JOIN anchor_prof ap ON ap.professor_id=op.professor_id JOIN course_offering_categories oc ON oc.offering_id=o.offering_id JOIN departments d ON d.department_id=oc.department_id JOIN course_categories cc ON cc.category_id=oc.category_id WHERE o.year=2026 AND o.semester='1' AND o.campus='국제' AND d.code='A10627' AND o.course_code<>'CSE304' AND (cc.category_code='04') ORDER BY o.course_code,o.section;",
+        "sources": [
+          {
+            "kind": "official_raw",
+            "url": "https://github.com/suleileinaing/campus-ai-db/blob/f4a822285995359adb46a56468406c5a39757a58/raw_data/College_of_software_convergence_course_lists/2026-1_A10627_raw.json",
+            "path": "raw_data/College_of_software_convergence_course_lists/2026-1_A10627_raw.json",
+            "sha256": "c734102cb6dca40122006077949b730424ed5ee364ba4f27de03657d98d83193"
+          }
+        ],
+        "turn": 3,
+        "database_check": "match",
+        "question_origin": "authored_dialogue_not_real_chat"
+      }
+    ],
+    "note": "대화 자체는 설계한 평가 시나리오이며 실제 사용자 대화 로그가 아님. 실제 모델의 이전 응답을 다음 턴에 누적하고 정답은 채점에만 사용."
+  },
+  {
+    "conversation_id": "D03",
+    "task_type": "professor_reference_and_filter",
+    "scope": "국제캠퍼스; 2026-1; 분류 기준 인공지능학과",
+    "turns": [
+      {
+        "user": "2026학년도 1학기 AI4003-00(졸업논문(인공지능)) 담당 교수는 누구야?",
+        "self_contained_question": "2026학년도 1학기 AI4003-00(졸업논문(인공지능)) 담당 교수 이름",
+        "expected_action": "answer",
+        "gold_answer": [
+          {
+            "professor_name": "김정욱"
+          }
+        ],
+        "reference_sql": "SELECT DISTINCT p.name AS professor_name FROM course_offerings o JOIN offering_professors op ON op.offering_id=o.offering_id JOIN professors p ON p.professor_id=op.professor_id WHERE o.year=2026 AND o.semester='1' AND o.course_code='AI4003' AND o.section='00' AND o.campus='국제';",
+        "sources": [
+          {
+            "kind": "official_raw",
+            "url": "https://github.com/suleileinaing/campus-ai-db/blob/f4a822285995359adb46a56468406c5a39757a58/raw_data/College_of_software_convergence_course_lists/2026-1_A10628_raw.json",
+            "path": "raw_data/College_of_software_convergence_course_lists/2026-1_A10628_raw.json",
+            "sha256": "a13d0be262f6aa7c7bb51ccee89363be5cf45dcbf2f5f321271e2439dd86530f"
+          }
+        ],
+        "turn": 1,
+        "database_check": "match",
+        "question_origin": "authored_dialogue_not_real_chat"
+      },
+      {
+        "user": "그 교수님이 같은 학기 인공지능학과 개설목록에서 맡은 다른 과목의 코드와 분반은? 방금 과목 코드는 제외해줘.",
+        "self_contained_question": "2026-1 인공지능학과에서 김정욱 교수가 맡은 강좌 중 AI4003를 제외한 과목코드·분반",
+        "expected_action": "answer",
+        "gold_answer": [
+          {
+            "course_code": "AI3002",
+            "section": "00"
+          },
+          {
+            "course_code": "AI4006",
+            "section": "00"
+          },
+          {
+            "course_code": "CSE203",
+            "section": "00"
+          },
+          {
+            "course_code": "CSE405",
+            "section": "00"
+          },
+          {
+            "course_code": "CSE406",
+            "section": "00"
+          }
+        ],
+        "reference_sql": "WITH anchor_prof AS (SELECT DISTINCT op.professor_id FROM course_offerings o JOIN offering_professors op ON op.offering_id=o.offering_id WHERE o.year=2026 AND o.semester='1' AND o.course_code='AI4003' AND o.section='00' AND o.campus='국제') SELECT DISTINCT o.course_code,o.section FROM course_offerings o JOIN offering_professors op ON op.offering_id=o.offering_id JOIN anchor_prof ap ON ap.professor_id=op.professor_id JOIN course_offering_categories oc ON oc.offering_id=o.offering_id JOIN departments d ON d.department_id=oc.department_id JOIN course_categories cc ON cc.category_id=oc.category_id WHERE o.year=2026 AND o.semester='1' AND o.campus='국제' AND d.code='A10628' AND o.course_code<>'AI4003' AND (1=1) ORDER BY o.course_code,o.section;",
+        "sources": [
+          {
+            "kind": "official_raw",
+            "url": "https://github.com/suleileinaing/campus-ai-db/blob/f4a822285995359adb46a56468406c5a39757a58/raw_data/College_of_software_convergence_course_lists/2026-1_A10628_raw.json",
+            "path": "raw_data/College_of_software_convergence_course_lists/2026-1_A10628_raw.json",
+            "sha256": "a13d0be262f6aa7c7bb51ccee89363be5cf45dcbf2f5f321271e2439dd86530f"
+          }
+        ],
+        "turn": 2,
+        "database_check": "match",
+        "question_origin": "authored_dialogue_not_real_chat"
+      },
+      {
+        "user": "그중 전공필수인 강좌만 과목코드와 분반으로 알려줘.",
+        "self_contained_question": "2026학년도 1학기 AI4003-00(졸업논문(인공지능)) 담당 교수의 다른 수업 중, 같은 학기 인공지능학과 개설목록에서 전공필수인 강좌의 과목코드와 분반을 알려줘. 기준 과목의 다른 분반도 제외해줘.",
+        "expected_action": "answer",
+        "gold_answer": [
+          {
+            "course_code": "AI3002",
+            "section": "00"
+          },
+          {
+            "course_code": "CSE405",
+            "section": "00"
+          },
+          {
+            "course_code": "CSE406",
+            "section": "00"
+          }
+        ],
+        "reference_sql": "WITH anchor_prof AS (SELECT DISTINCT op.professor_id FROM course_offerings o JOIN offering_professors op ON op.offering_id=o.offering_id WHERE o.year=2026 AND o.semester='1' AND o.course_code='AI4003' AND o.section='00' AND o.campus='국제') SELECT DISTINCT o.course_code,o.section FROM course_offerings o JOIN offering_professors op ON op.offering_id=o.offering_id JOIN anchor_prof ap ON ap.professor_id=op.professor_id JOIN course_offering_categories oc ON oc.offering_id=o.offering_id JOIN departments d ON d.department_id=oc.department_id JOIN course_categories cc ON cc.category_id=oc.category_id WHERE o.year=2026 AND o.semester='1' AND o.campus='국제' AND d.code='A10628' AND o.course_code<>'AI4003' AND (cc.category_code='04') ORDER BY o.course_code,o.section;",
+        "sources": [
+          {
+            "kind": "official_raw",
+            "url": "https://github.com/suleileinaing/campus-ai-db/blob/f4a822285995359adb46a56468406c5a39757a58/raw_data/College_of_software_convergence_course_lists/2026-1_A10628_raw.json",
+            "path": "raw_data/College_of_software_convergence_course_lists/2026-1_A10628_raw.json",
+            "sha256": "a13d0be262f6aa7c7bb51ccee89363be5cf45dcbf2f5f321271e2439dd86530f"
+          }
+        ],
+        "turn": 3,
+        "database_check": "match",
+        "question_origin": "authored_dialogue_not_real_chat"
+      }
+    ],
+    "note": "대화 자체는 설계한 평가 시나리오이며 실제 사용자 대화 로그가 아님. 실제 모델의 이전 응답을 다음 턴에 누적하고 정답은 채점에만 사용."
+  },
+  {
+    "conversation_id": "D04",
+    "task_type": "professor_reference_and_filter",
+    "scope": "국제캠퍼스; 2026-1; 분류 기준 컴퓨터공학과",
+    "turns": [
+      {
+        "user": "2026학년도 1학기 CSE423-00(정보보호) 담당 교수는 누구야?",
+        "self_contained_question": "2026학년도 1학기 CSE423-00(정보보호) 담당 교수 이름",
+        "expected_action": "answer",
+        "gold_answer": [
+          {
+            "professor_name": "장대희"
+          }
+        ],
+        "reference_sql": "SELECT DISTINCT p.name AS professor_name FROM course_offerings o JOIN offering_professors op ON op.offering_id=o.offering_id JOIN professors p ON p.professor_id=op.professor_id WHERE o.year=2026 AND o.semester='1' AND o.course_code='CSE423' AND o.section='00' AND o.campus='국제';",
+        "sources": [
+          {
+            "kind": "official_raw",
+            "url": "https://github.com/suleileinaing/campus-ai-db/blob/f4a822285995359adb46a56468406c5a39757a58/raw_data/College_of_software_convergence_course_lists/2026-1_A07337_raw.json",
+            "path": "raw_data/College_of_software_convergence_course_lists/2026-1_A07337_raw.json",
+            "sha256": "88d5a320a6e0a73f5e00b90b9b6f078050f65c04ea3047ebbeaf62a82daf5d1d"
+          },
+          {
+            "kind": "official_raw",
+            "url": "https://github.com/suleileinaing/campus-ai-db/blob/f4a822285995359adb46a56468406c5a39757a58/raw_data/College_of_software_convergence_course_lists/2026-1_A10627_raw.json",
+            "path": "raw_data/College_of_software_convergence_course_lists/2026-1_A10627_raw.json",
+            "sha256": "c734102cb6dca40122006077949b730424ed5ee364ba4f27de03657d98d83193"
+          }
+        ],
+        "turn": 1,
+        "database_check": "match",
+        "question_origin": "authored_dialogue_not_real_chat"
+      },
+      {
+        "user": "그 교수님이 같은 학기 컴퓨터공학과 개설목록에서 맡은 다른 과목의 코드와 분반은? 방금 과목 코드는 제외해줘.",
+        "self_contained_question": "2026-1 컴퓨터공학과에서 장대희 교수가 맡은 강좌 중 CSE423를 제외한 과목코드·분반",
+        "expected_action": "answer",
+        "gold_answer": [
+          {
+            "course_code": "CSE406",
+            "section": "10"
+          },
+          {
+            "course_code": "CSE495",
+            "section": "03"
+          }
+        ],
+        "reference_sql": "WITH anchor_prof AS (SELECT DISTINCT op.professor_id FROM course_offerings o JOIN offering_professors op ON op.offering_id=o.offering_id WHERE o.year=2026 AND o.semester='1' AND o.course_code='CSE423' AND o.section='00' AND o.campus='국제') SELECT DISTINCT o.course_code,o.section FROM course_offerings o JOIN offering_professors op ON op.offering_id=o.offering_id JOIN anchor_prof ap ON ap.professor_id=op.professor_id JOIN course_offering_categories oc ON oc.offering_id=o.offering_id JOIN departments d ON d.department_id=oc.department_id JOIN course_categories cc ON cc.category_id=oc.category_id WHERE o.year=2026 AND o.semester='1' AND o.campus='국제' AND d.code='A10627' AND o.course_code<>'CSE423' AND (1=1) ORDER BY o.course_code,o.section;",
+        "sources": [
+          {
+            "kind": "official_raw",
+            "url": "https://github.com/suleileinaing/campus-ai-db/blob/f4a822285995359adb46a56468406c5a39757a58/raw_data/College_of_software_convergence_course_lists/2026-1_A10627_raw.json",
+            "path": "raw_data/College_of_software_convergence_course_lists/2026-1_A10627_raw.json",
+            "sha256": "c734102cb6dca40122006077949b730424ed5ee364ba4f27de03657d98d83193"
+          }
+        ],
+        "turn": 2,
+        "database_check": "match",
+        "question_origin": "authored_dialogue_not_real_chat"
+      },
+      {
+        "user": "그중 전공필수인 강좌만 과목코드와 분반으로 알려줘.",
+        "self_contained_question": "2026학년도 1학기 CSE423-00(정보보호) 담당 교수의 다른 수업 중, 같은 학기 컴퓨터공학과 개설목록에서 전공필수인 강좌의 과목코드와 분반을 알려줘. 기준 과목의 다른 분반도 제외해줘.",
+        "expected_action": "answer",
+        "gold_answer": [
+          {
+            "course_code": "CSE406",
+            "section": "10"
+          }
+        ],
+        "reference_sql": "WITH anchor_prof AS (SELECT DISTINCT op.professor_id FROM course_offerings o JOIN offering_professors op ON op.offering_id=o.offering_id WHERE o.year=2026 AND o.semester='1' AND o.course_code='CSE423' AND o.section='00' AND o.campus='국제') SELECT DISTINCT o.course_code,o.section FROM course_offerings o JOIN offering_professors op ON op.offering_id=o.offering_id JOIN anchor_prof ap ON ap.professor_id=op.professor_id JOIN course_offering_categories oc ON oc.offering_id=o.offering_id JOIN departments d ON d.department_id=oc.department_id JOIN course_categories cc ON cc.category_id=oc.category_id WHERE o.year=2026 AND o.semester='1' AND o.campus='국제' AND d.code='A10627' AND o.course_code<>'CSE423' AND (cc.category_code='04') ORDER BY o.course_code,o.section;",
+        "sources": [
+          {
+            "kind": "official_raw",
+            "url": "https://github.com/suleileinaing/campus-ai-db/blob/f4a822285995359adb46a56468406c5a39757a58/raw_data/College_of_software_convergence_course_lists/2026-1_A10627_raw.json",
+            "path": "raw_data/College_of_software_convergence_course_lists/2026-1_A10627_raw.json",
+            "sha256": "c734102cb6dca40122006077949b730424ed5ee364ba4f27de03657d98d83193"
+          }
+        ],
+        "turn": 3,
+        "database_check": "match",
+        "question_origin": "authored_dialogue_not_real_chat"
+      }
+    ],
+    "note": "대화 자체는 설계한 평가 시나리오이며 실제 사용자 대화 로그가 아님. 실제 모델의 이전 응답을 다음 턴에 누적하고 정답은 채점에만 사용."
+  },
+  {
+    "conversation_id": "D05",
+    "task_type": "course_reference_and_arithmetic",
+    "scope": "국제캠퍼스; 각 강좌의 연도·학기·분반 고정",
+    "turns": [
+      {
+        "user": "2025학년도 1학기 CSE406-01(캡스톤디자인)의 중간·기말고사 비율은 각각 얼마야?",
+        "self_contained_question": "2025학년도 1학기 CSE406-01(캡스톤디자인) 중간·기말 비율",
+        "expected_action": "answer",
+        "gold_answer": [
+          {
+            "midterm_percentage": 0.0,
+            "final_exam_percentage": 50.0
+          }
+        ],
+        "reference_sql": "SELECT (SELECT s.midterm_percentage FROM course_offerings o JOIN syllabi s ON s.offering_id=o.offering_id WHERE o.year=2025 AND o.semester='1' AND o.course_code='CSE406' AND o.section='01' AND o.campus='국제') AS midterm_percentage,(SELECT s.final_exam_percentage FROM course_offerings o JOIN syllabi s ON s.offering_id=o.offering_id WHERE o.year=2025 AND o.semester='1' AND o.course_code='CSE406' AND o.section='01' AND o.campus='국제') AS final_exam_percentage;",
+        "sources": [
+          {
+            "kind": "official_syllabus",
+            "url": "https://sugang.khu.ac.kr/core?attribute=lectPlan&p_year=2025&p_term=10&p_teach=039542&p_code=CSE40601&p_subjt=CSE406&lang=ko&loginYn=N&schedule_cd=hakbu",
+            "path": "official_html/2025-1_CSE40601.html",
+            "sha256": "87f97d79aba8cb78a793c5d79c4a3bceb4c2e418d895510ba6ac23b2777ccbd6",
+            "retrieved_date": "2026-10-22"
+          }
+        ],
+        "turn": 1,
+        "database_check": "match",
+        "question_origin": "authored_dialogue_not_real_chat"
+      },
+      {
+        "user": "그 두 시험 비율을 합치면 몇 퍼센트야?",
+        "self_contained_question": "2025학년도 1학기 CSE406-01(캡스톤디자인) 중간·기말 비율 합계",
+        "expected_action": "answer",
+        "gold_answer": [
+          {
+            "exam_total": 50.0
+          }
+        ],
+        "reference_sql": "SELECT ((SELECT s.midterm_percentage FROM course_offerings o JOIN syllabi s ON s.offering_id=o.offering_id WHERE o.year=2025 AND o.semester='1' AND o.course_code='CSE406' AND o.section='01' AND o.campus='국제')+(SELECT s.final_exam_percentage FROM course_offerings o JOIN syllabi s ON s.offering_id=o.offering_id WHERE o.year=2025 AND o.semester='1' AND o.course_code='CSE406' AND o.section='01' AND o.campus='국제')) AS exam_total;",
+        "sources": [
+          {
+            "kind": "official_syllabus",
+            "url": "https://sugang.khu.ac.kr/core?attribute=lectPlan&p_year=2025&p_term=10&p_teach=039542&p_code=CSE40601&p_subjt=CSE406&lang=ko&loginYn=N&schedule_cd=hakbu",
+            "path": "official_html/2025-1_CSE40601.html",
+            "sha256": "87f97d79aba8cb78a793c5d79c4a3bceb4c2e418d895510ba6ac23b2777ccbd6",
+            "retrieved_date": "2026-10-22"
+          }
+        ],
+        "turn": 2,
+        "database_check": "match",
+        "question_origin": "authored_dialogue_not_real_chat"
+      },
+      {
+        "user": "그 합계에서 2025학년도 2학기 CSE497-02(연구연수활동2(컴퓨터공학))의 두 시험 비율 합계를 빼면 몇 퍼센트포인트야?",
+        "self_contained_question": "2025학년도 1학기 CSE406-01(캡스톤디자인) 시험 비율 합계에서 2025학년도 2학기 CSE497-02(연구연수활동2(컴퓨터공학)) 시험 비율 합계를 뺀 차이",
+        "expected_action": "answer",
+        "gold_answer": [
+          {
+            "first_minus_second_pp": 50
+          }
+        ],
+        "reference_sql": "SELECT ((SELECT s.midterm_percentage FROM course_offerings o JOIN syllabi s ON s.offering_id=o.offering_id WHERE o.year=2025 AND o.semester='1' AND o.course_code='CSE406' AND o.section='01' AND o.campus='국제')+(SELECT s.final_exam_percentage FROM course_offerings o JOIN syllabi s ON s.offering_id=o.offering_id WHERE o.year=2025 AND o.semester='1' AND o.course_code='CSE406' AND o.section='01' AND o.campus='국제'))-((SELECT s.midterm_percentage FROM course_offerings o JOIN syllabi s ON s.offering_id=o.offering_id WHERE o.year=2025 AND o.semester='2' AND o.course_code='CSE497' AND o.section='02' AND o.campus='국제')+(SELECT s.final_exam_percentage FROM course_offerings o JOIN syllabi s ON s.offering_id=o.offering_id WHERE o.year=2025 AND o.semester='2' AND o.course_code='CSE497' AND o.section='02' AND o.campus='국제')) AS first_minus_second_pp;",
+        "sources": [
+          {
+            "kind": "official_syllabus",
+            "url": "https://sugang.khu.ac.kr/core?attribute=lectPlan&p_year=2025&p_term=10&p_teach=039542&p_code=CSE40601&p_subjt=CSE406&lang=ko&loginYn=N&schedule_cd=hakbu",
+            "path": "official_html/2025-1_CSE40601.html",
+            "sha256": "87f97d79aba8cb78a793c5d79c4a3bceb4c2e418d895510ba6ac23b2777ccbd6",
+            "retrieved_date": "2026-10-22"
+          },
+          {
+            "kind": "official_syllabus",
+            "url": "https://sugang.khu.ac.kr/core?attribute=lectPlan&p_year=2025&p_term=20&p_teach=047387&p_code=CSE49702&p_subjt=CSE497&lang=ko&loginYn=N&schedule_cd=hakbu",
+            "path": "official_html/2025-2_CSE49702.html",
+            "sha256": "44f2aec403e622c1db8d3a9b897e15c444fe10d53379e6209f03436f80964ccd",
+            "retrieved_date": "2026-10-22"
+          }
+        ],
+        "turn": 3,
+        "database_check": "match",
+        "question_origin": "authored_dialogue_not_real_chat"
+      }
+    ],
+    "note": "대화 자체는 설계한 평가 시나리오이며 실제 사용자 대화 로그가 아님. 실제 모델의 이전 응답을 다음 턴에 누적하고 정답은 채점에만 사용."
+  },
+  {
+    "conversation_id": "D06",
+    "task_type": "course_reference_and_arithmetic",
+    "scope": "국제캠퍼스; 각 강좌의 연도·학기·분반 고정",
+    "turns": [
+      {
+        "user": "2026학년도 1학기 AI4003-00(졸업논문(인공지능))의 중간·기말고사 비율은 각각 얼마야?",
+        "self_contained_question": "2026학년도 1학기 AI4003-00(졸업논문(인공지능)) 중간·기말 비율",
+        "expected_action": "answer",
+        "gold_answer": [
+          {
+            "midterm_percentage": 0.0,
+            "final_exam_percentage": 0.0
+          }
+        ],
+        "reference_sql": "SELECT (SELECT s.midterm_percentage FROM course_offerings o JOIN syllabi s ON s.offering_id=o.offering_id WHERE o.year=2026 AND o.semester='1' AND o.course_code='AI4003' AND o.section='00' AND o.campus='국제') AS midterm_percentage,(SELECT s.final_exam_percentage FROM course_offerings o JOIN syllabi s ON s.offering_id=o.offering_id WHERE o.year=2026 AND o.semester='1' AND o.course_code='AI4003' AND o.section='00' AND o.campus='국제') AS final_exam_percentage;",
+        "sources": [
+          {
+            "kind": "official_syllabus",
+            "url": "https://sugang.khu.ac.kr/core?attribute=lectPlan&p_year=2026&p_term=10&p_teach=058974&p_code=AI400300&p_subjt=AI4003&lang=ko&loginYn=N&schedule_cd=hakbu",
+            "path": "official_html/2026-1_AI400300.html",
+            "sha256": "0d22e91614c9dc6ad4840017635180217004020dbed5bab895611fffb53b27f3",
+            "retrieved_date": "2026-10-22"
+          }
+        ],
+        "turn": 1,
+        "database_check": "match",
+        "question_origin": "authored_dialogue_not_real_chat"
+      },
+      {
+        "user": "그 두 시험 비율을 합치면 몇 퍼센트야?",
+        "self_contained_question": "2026학년도 1학기 AI4003-00(졸업논문(인공지능)) 중간·기말 비율 합계",
+        "expected_action": "answer",
+        "gold_answer": [
+          {
+            "exam_total": 0.0
+          }
+        ],
+        "reference_sql": "SELECT ((SELECT s.midterm_percentage FROM course_offerings o JOIN syllabi s ON s.offering_id=o.offering_id WHERE o.year=2026 AND o.semester='1' AND o.course_code='AI4003' AND o.section='00' AND o.campus='국제')+(SELECT s.final_exam_percentage FROM course_offerings o JOIN syllabi s ON s.offering_id=o.offering_id WHERE o.year=2026 AND o.semester='1' AND o.course_code='AI4003' AND o.section='00' AND o.campus='국제')) AS exam_total;",
+        "sources": [
+          {
+            "kind": "official_syllabus",
+            "url": "https://sugang.khu.ac.kr/core?attribute=lectPlan&p_year=2026&p_term=10&p_teach=058974&p_code=AI400300&p_subjt=AI4003&lang=ko&loginYn=N&schedule_cd=hakbu",
+            "path": "official_html/2026-1_AI400300.html",
+            "sha256": "0d22e91614c9dc6ad4840017635180217004020dbed5bab895611fffb53b27f3",
+            "retrieved_date": "2026-10-22"
+          }
+        ],
+        "turn": 2,
+        "database_check": "match",
+        "question_origin": "authored_dialogue_not_real_chat"
+      },
+      {
+        "user": "그 합계에서 2026학년도 1학기 EE209-01(논리회로)의 두 시험 비율 합계를 빼면 몇 퍼센트포인트야?",
+        "self_contained_question": "2026학년도 1학기 AI4003-00(졸업논문(인공지능)) 시험 비율 합계에서 2026학년도 1학기 EE209-01(논리회로) 시험 비율 합계를 뺀 차이",
+        "expected_action": "answer",
+        "gold_answer": [
+          {
+            "first_minus_second_pp": -60
+          }
+        ],
+        "reference_sql": "SELECT ((SELECT s.midterm_percentage FROM course_offerings o JOIN syllabi s ON s.offering_id=o.offering_id WHERE o.year=2026 AND o.semester='1' AND o.course_code='AI4003' AND o.section='00' AND o.campus='국제')+(SELECT s.final_exam_percentage FROM course_offerings o JOIN syllabi s ON s.offering_id=o.offering_id WHERE o.year=2026 AND o.semester='1' AND o.course_code='AI4003' AND o.section='00' AND o.campus='국제'))-((SELECT s.midterm_percentage FROM course_offerings o JOIN syllabi s ON s.offering_id=o.offering_id WHERE o.year=2026 AND o.semester='1' AND o.course_code='EE209' AND o.section='01' AND o.campus='국제')+(SELECT s.final_exam_percentage FROM course_offerings o JOIN syllabi s ON s.offering_id=o.offering_id WHERE o.year=2026 AND o.semester='1' AND o.course_code='EE209' AND o.section='01' AND o.campus='국제')) AS first_minus_second_pp;",
+        "sources": [
+          {
+            "kind": "official_syllabus",
+            "url": "https://sugang.khu.ac.kr/core?attribute=lectPlan&p_year=2026&p_term=10&p_teach=058974&p_code=AI400300&p_subjt=AI4003&lang=ko&loginYn=N&schedule_cd=hakbu",
+            "path": "official_html/2026-1_AI400300.html",
+            "sha256": "0d22e91614c9dc6ad4840017635180217004020dbed5bab895611fffb53b27f3",
+            "retrieved_date": "2026-10-22"
+          },
+          {
+            "kind": "official_syllabus",
+            "url": "https://sugang.khu.ac.kr/core?attribute=lectPlan&p_year=2026&p_term=10&p_teach=066513&p_code=EE20901&p_subjt=EE209&lang=ko&loginYn=N&schedule_cd=hakbu",
+            "path": "official_html/2026-1_EE20901.html",
+            "sha256": "84f01a8c4a0aa781e18443ff07b9e5793451ec5bb0f0aac29f5944bbfe803a5c",
+            "retrieved_date": "2026-10-22"
+          }
+        ],
+        "turn": 3,
+        "database_check": "match",
+        "question_origin": "authored_dialogue_not_real_chat"
+      }
+    ],
+    "note": "대화 자체는 설계한 평가 시나리오이며 실제 사용자 대화 로그가 아님. 실제 모델의 이전 응답을 다음 턴에 누적하고 정답은 채점에만 사용."
+  },
+  {
+    "conversation_id": "D07",
+    "task_type": "course_reference_and_arithmetic",
+    "scope": "국제캠퍼스; 각 강좌의 연도·학기·분반 고정",
+    "turns": [
+      {
+        "user": "2025학년도 1학기 CSE405-00(졸업프로젝트)의 중간·기말고사 비율은 각각 얼마야?",
+        "self_contained_question": "2025학년도 1학기 CSE405-00(졸업프로젝트) 중간·기말 비율",
+        "expected_action": "answer",
+        "gold_answer": [
+          {
+            "midterm_percentage": 0.0,
+            "final_exam_percentage": 0.0
+          }
+        ],
+        "reference_sql": "SELECT (SELECT s.midterm_percentage FROM course_offerings o JOIN syllabi s ON s.offering_id=o.offering_id WHERE o.year=2025 AND o.semester='1' AND o.course_code='CSE405' AND o.section='00' AND o.campus='국제') AS midterm_percentage,(SELECT s.final_exam_percentage FROM course_offerings o JOIN syllabi s ON s.offering_id=o.offering_id WHERE o.year=2025 AND o.semester='1' AND o.course_code='CSE405' AND o.section='00' AND o.campus='국제') AS final_exam_percentage;",
+        "sources": [
+          {
+            "kind": "official_syllabus",
+            "url": "https://sugang.khu.ac.kr/core?attribute=lectPlan&p_year=2025&p_term=10&p_teach=055392&p_code=CSE40500&p_subjt=CSE405&lang=ko&loginYn=N&schedule_cd=hakbu",
+            "path": "official_html/2025-1_CSE40500.html",
+            "sha256": "be3027c671d054cd8b2e0de29a12d271256036edd9f367e53947b1e760b37110",
+            "retrieved_date": "2026-10-22"
+          }
+        ],
+        "turn": 1,
+        "database_check": "match",
+        "question_origin": "authored_dialogue_not_real_chat"
+      },
+      {
+        "user": "그 두 시험 비율을 합치면 몇 퍼센트야?",
+        "self_contained_question": "2025학년도 1학기 CSE405-00(졸업프로젝트) 중간·기말 비율 합계",
+        "expected_action": "answer",
+        "gold_answer": [
+          {
+            "exam_total": 0.0
+          }
+        ],
+        "reference_sql": "SELECT ((SELECT s.midterm_percentage FROM course_offerings o JOIN syllabi s ON s.offering_id=o.offering_id WHERE o.year=2025 AND o.semester='1' AND o.course_code='CSE405' AND o.section='00' AND o.campus='국제')+(SELECT s.final_exam_percentage FROM course_offerings o JOIN syllabi s ON s.offering_id=o.offering_id WHERE o.year=2025 AND o.semester='1' AND o.course_code='CSE405' AND o.section='00' AND o.campus='국제')) AS exam_total;",
+        "sources": [
+          {
+            "kind": "official_syllabus",
+            "url": "https://sugang.khu.ac.kr/core?attribute=lectPlan&p_year=2025&p_term=10&p_teach=055392&p_code=CSE40500&p_subjt=CSE405&lang=ko&loginYn=N&schedule_cd=hakbu",
+            "path": "official_html/2025-1_CSE40500.html",
+            "sha256": "be3027c671d054cd8b2e0de29a12d271256036edd9f367e53947b1e760b37110",
+            "retrieved_date": "2026-10-22"
+          }
+        ],
+        "turn": 2,
+        "database_check": "match",
+        "question_origin": "authored_dialogue_not_real_chat"
+      },
+      {
+        "user": "그 합계에서 2025학년도 2학기 CSE302-01(컴퓨터네트워크)의 두 시험 비율 합계를 빼면 몇 퍼센트포인트야?",
+        "self_contained_question": "2025학년도 1학기 CSE405-00(졸업프로젝트) 시험 비율 합계에서 2025학년도 2학기 CSE302-01(컴퓨터네트워크) 시험 비율 합계를 뺀 차이",
+        "expected_action": "answer",
+        "gold_answer": [
+          {
+            "first_minus_second_pp": -60
+          }
+        ],
+        "reference_sql": "SELECT ((SELECT s.midterm_percentage FROM course_offerings o JOIN syllabi s ON s.offering_id=o.offering_id WHERE o.year=2025 AND o.semester='1' AND o.course_code='CSE405' AND o.section='00' AND o.campus='국제')+(SELECT s.final_exam_percentage FROM course_offerings o JOIN syllabi s ON s.offering_id=o.offering_id WHERE o.year=2025 AND o.semester='1' AND o.course_code='CSE405' AND o.section='00' AND o.campus='국제'))-((SELECT s.midterm_percentage FROM course_offerings o JOIN syllabi s ON s.offering_id=o.offering_id WHERE o.year=2025 AND o.semester='2' AND o.course_code='CSE302' AND o.section='01' AND o.campus='국제')+(SELECT s.final_exam_percentage FROM course_offerings o JOIN syllabi s ON s.offering_id=o.offering_id WHERE o.year=2025 AND o.semester='2' AND o.course_code='CSE302' AND o.section='01' AND o.campus='국제')) AS first_minus_second_pp;",
+        "sources": [
+          {
+            "kind": "official_syllabus",
+            "url": "https://sugang.khu.ac.kr/core?attribute=lectPlan&p_year=2025&p_term=10&p_teach=055392&p_code=CSE40500&p_subjt=CSE405&lang=ko&loginYn=N&schedule_cd=hakbu",
+            "path": "official_html/2025-1_CSE40500.html",
+            "sha256": "be3027c671d054cd8b2e0de29a12d271256036edd9f367e53947b1e760b37110",
+            "retrieved_date": "2026-10-22"
+          },
+          {
+            "kind": "official_syllabus",
+            "url": "https://sugang.khu.ac.kr/core?attribute=lectPlan&p_year=2025&p_term=20&p_teach=015327&p_code=CSE30201&p_subjt=CSE302&lang=ko&loginYn=N&schedule_cd=hakbu",
+            "path": "official_html/2025-2_CSE30201.html",
+            "sha256": "4ddc58b14d0f9e171081b9db494d5f69a681fddee96df8192e82a2c02e437a04",
+            "retrieved_date": "2026-10-22"
+          }
+        ],
+        "turn": 3,
+        "database_check": "match",
+        "question_origin": "authored_dialogue_not_real_chat"
+      }
+    ],
+    "note": "대화 자체는 설계한 평가 시나리오이며 실제 사용자 대화 로그가 아님. 실제 모델의 이전 응답을 다음 턴에 누적하고 정답은 채점에만 사용."
+  },
+  {
+    "conversation_id": "D08",
+    "task_type": "course_reference_and_arithmetic",
+    "scope": "국제캠퍼스; 각 강좌의 연도·학기·분반 고정",
+    "turns": [
+      {
+        "user": "2026학년도 1학기 IE419-00(서비스데이터사이언스)의 중간·기말고사 비율은 각각 얼마야?",
+        "self_contained_question": "2026학년도 1학기 IE419-00(서비스데이터사이언스) 중간·기말 비율",
+        "expected_action": "answer",
+        "gold_answer": [
+          {
+            "midterm_percentage": 35.0,
+            "final_exam_percentage": 35.0
+          }
+        ],
+        "reference_sql": "SELECT (SELECT s.midterm_percentage FROM course_offerings o JOIN syllabi s ON s.offering_id=o.offering_id WHERE o.year=2026 AND o.semester='1' AND o.course_code='IE419' AND o.section='00' AND o.campus='국제') AS midterm_percentage,(SELECT s.final_exam_percentage FROM course_offerings o JOIN syllabi s ON s.offering_id=o.offering_id WHERE o.year=2026 AND o.semester='1' AND o.course_code='IE419' AND o.section='00' AND o.campus='국제') AS final_exam_percentage;",
+        "sources": [
+          {
+            "kind": "official_syllabus",
+            "url": "https://sugang.khu.ac.kr/core?attribute=lectPlan&p_year=2026&p_term=10&p_teach=024581&p_code=IE41900&p_subjt=IE419&lang=ko&loginYn=N&schedule_cd=hakbu",
+            "path": "official_html/2026-1_IE41900.html",
+            "sha256": "9f1782fed9a476eeb97434e5252453f9f7c288e5b97b2a94ace95b9bca3d14be",
+            "retrieved_date": "2026-10-22"
+          }
+        ],
+        "turn": 1,
+        "database_check": "match",
+        "question_origin": "authored_dialogue_not_real_chat"
+      },
+      {
+        "user": "그 두 시험 비율을 합치면 몇 퍼센트야?",
+        "self_contained_question": "2026학년도 1학기 IE419-00(서비스데이터사이언스) 중간·기말 비율 합계",
+        "expected_action": "answer",
+        "gold_answer": [
+          {
+            "exam_total": 70.0
+          }
+        ],
+        "reference_sql": "SELECT ((SELECT s.midterm_percentage FROM course_offerings o JOIN syllabi s ON s.offering_id=o.offering_id WHERE o.year=2026 AND o.semester='1' AND o.course_code='IE419' AND o.section='00' AND o.campus='국제')+(SELECT s.final_exam_percentage FROM course_offerings o JOIN syllabi s ON s.offering_id=o.offering_id WHERE o.year=2026 AND o.semester='1' AND o.course_code='IE419' AND o.section='00' AND o.campus='국제')) AS exam_total;",
+        "sources": [
+          {
+            "kind": "official_syllabus",
+            "url": "https://sugang.khu.ac.kr/core?attribute=lectPlan&p_year=2026&p_term=10&p_teach=024581&p_code=IE41900&p_subjt=IE419&lang=ko&loginYn=N&schedule_cd=hakbu",
+            "path": "official_html/2026-1_IE41900.html",
+            "sha256": "9f1782fed9a476eeb97434e5252453f9f7c288e5b97b2a94ace95b9bca3d14be",
+            "retrieved_date": "2026-10-22"
+          }
+        ],
+        "turn": 2,
+        "database_check": "match",
+        "question_origin": "authored_dialogue_not_real_chat"
+      },
+      {
+        "user": "그 합계에서 2026학년도 1학기 SWCON321-02(데이터분석캡스톤디자인)의 두 시험 비율 합계를 빼면 몇 퍼센트포인트야?",
+        "self_contained_question": "2026학년도 1학기 IE419-00(서비스데이터사이언스) 시험 비율 합계에서 2026학년도 1학기 SWCON321-02(데이터분석캡스톤디자인) 시험 비율 합계를 뺀 차이",
+        "expected_action": "answer",
+        "gold_answer": [
+          {
+            "first_minus_second_pp": 70
+          }
+        ],
+        "reference_sql": "SELECT ((SELECT s.midterm_percentage FROM course_offerings o JOIN syllabi s ON s.offering_id=o.offering_id WHERE o.year=2026 AND o.semester='1' AND o.course_code='IE419' AND o.section='00' AND o.campus='국제')+(SELECT s.final_exam_percentage FROM course_offerings o JOIN syllabi s ON s.offering_id=o.offering_id WHERE o.year=2026 AND o.semester='1' AND o.course_code='IE419' AND o.section='00' AND o.campus='국제'))-((SELECT s.midterm_percentage FROM course_offerings o JOIN syllabi s ON s.offering_id=o.offering_id WHERE o.year=2026 AND o.semester='1' AND o.course_code='SWCON321' AND o.section='02' AND o.campus='국제')+(SELECT s.final_exam_percentage FROM course_offerings o JOIN syllabi s ON s.offering_id=o.offering_id WHERE o.year=2026 AND o.semester='1' AND o.course_code='SWCON321' AND o.section='02' AND o.campus='국제')) AS first_minus_second_pp;",
+        "sources": [
+          {
+            "kind": "official_syllabus",
+            "url": "https://sugang.khu.ac.kr/core?attribute=lectPlan&p_year=2026&p_term=10&p_teach=024581&p_code=IE41900&p_subjt=IE419&lang=ko&loginYn=N&schedule_cd=hakbu",
+            "path": "official_html/2026-1_IE41900.html",
+            "sha256": "9f1782fed9a476eeb97434e5252453f9f7c288e5b97b2a94ace95b9bca3d14be",
+            "retrieved_date": "2026-10-22"
+          },
+          {
+            "kind": "official_syllabus",
+            "url": "https://sugang.khu.ac.kr/core?attribute=lectPlan&p_year=2026&p_term=10&p_teach=061420&p_code=SWCON32102&p_subjt=SWCON321&lang=ko&loginYn=N&schedule_cd=hakbu",
+            "path": "official_html/2026-1_SWCON32102.html",
+            "sha256": "38dd8699a67569b0ea7c7c86d0eab5a5ae93abbe7d59e2f76360ab7668334232",
+            "retrieved_date": "2026-10-22"
+          }
+        ],
+        "turn": 3,
+        "database_check": "match",
+        "question_origin": "authored_dialogue_not_real_chat"
+      }
+    ],
+    "note": "대화 자체는 설계한 평가 시나리오이며 실제 사용자 대화 로그가 아님. 실제 모델의 이전 응답을 다음 턴에 누적하고 정답은 채점에만 사용."
+  },
+  {
+    "conversation_id": "D09",
+    "task_type": "cohort_reference_and_rule_comparison",
+    "scope": "일반 신입학; 기본구조표; 개인별 기이수 경과조치·면제·대체 제외",
+    "turns": [
+      {
+        "user": "2023학번의 후마니타스 기본구조표상 총 교양 최소학점은? 면제·대체 예외는 제외해줘.",
+        "self_contained_question": "2023학번 총 교양 최소학점",
+        "expected_action": "answer",
+        "gold_answer": [
+          {
+            "total_general_credits": 32
+          }
+        ],
+        "reference_sql": "SELECT total_general_credits FROM general_education_requirements WHERE 2023 BETWEEN cohort_start AND cohort_end;",
+        "sources": [
+          {
+            "kind": "official_raw",
+            "url": "https://github.com/suleileinaing/campus-ai-db/blob/f4a822285995359adb46a56468406c5a39757a58/raw_data/graduation_requirements/general_edu_grad_req.pdf",
+            "path": "raw_data/graduation_requirements/general_edu_grad_req.pdf",
+            "sha256": "6bcfdc784ad04ede321f30f44caf5ecb4e818c2940025ffff1720bfbdb71bd18"
+          }
+        ],
+        "turn": 1,
+        "database_check": "match",
+        "question_origin": "authored_dialogue_not_real_chat"
+      },
+      {
+        "user": "그럼 2024학번은?",
+        "self_contained_question": "2024학번의 기본구조표상 총 교양 최소학점, 면제·대체 예외 제외",
+        "expected_action": "answer",
+        "gold_answer": [
+          {
+            "total_general_credits": 29
+          }
+        ],
+        "reference_sql": "SELECT total_general_credits FROM general_education_requirements WHERE 2024 BETWEEN cohort_start AND cohort_end;",
+        "sources": [
+          {
+            "kind": "official_raw",
+            "url": "https://github.com/suleileinaing/campus-ai-db/blob/f4a822285995359adb46a56468406c5a39757a58/raw_data/graduation_requirements/general_edu_grad_req.pdf",
+            "path": "raw_data/graduation_requirements/general_edu_grad_req.pdf",
+            "sha256": "6bcfdc784ad04ede321f30f44caf5ecb4e818c2940025ffff1720bfbdb71bd18"
+          },
+          {
+            "kind": "official",
+            "url": "https://hc.khu.ac.kr/hc_kor/user/contents/view.do?menuNo=4300014"
+          }
+        ],
+        "turn": 2,
+        "database_check": "match",
+        "question_origin": "authored_dialogue_not_real_chat"
+      },
+      {
+        "user": "앞의 두 학번을 비교하면 몇 학점 줄어든 거야?",
+        "self_contained_question": "2023학번 총 교양 최소학점에서 2024학번 총 교양 최소학점을 뺀 학점 차이",
+        "expected_action": "answer",
+        "gold_answer": [
+          {
+            "credit_reduction": 3
+          }
+        ],
+        "reference_sql": "SELECT (SELECT total_general_credits FROM general_education_requirements WHERE 2023 BETWEEN cohort_start AND cohort_end)-(SELECT total_general_credits FROM general_education_requirements WHERE 2024 BETWEEN cohort_start AND cohort_end) AS credit_reduction;",
+        "sources": [
+          {
+            "kind": "official_raw",
+            "url": "https://github.com/suleileinaing/campus-ai-db/blob/f4a822285995359adb46a56468406c5a39757a58/raw_data/graduation_requirements/general_edu_grad_req.pdf",
+            "path": "raw_data/graduation_requirements/general_edu_grad_req.pdf",
+            "sha256": "6bcfdc784ad04ede321f30f44caf5ecb4e818c2940025ffff1720bfbdb71bd18"
+          },
+          {
+            "kind": "official",
+            "url": "https://hc.khu.ac.kr/hc_kor/user/contents/view.do?menuNo=4300014"
+          }
+        ],
+        "turn": 3,
+        "database_check": "match",
+        "question_origin": "authored_dialogue_not_real_chat"
+      }
+    ],
+    "note": "대화 자체는 설계한 평가 시나리오이며 실제 사용자 대화 로그가 아님. 실제 모델의 이전 응답을 다음 턴에 누적하고 정답은 채점에만 사용."
+  },
+  {
+    "conversation_id": "D10",
+    "task_type": "cohort_reference_and_rule_comparison",
+    "scope": "일반 신입학; 기본구조표; 개인별 기이수 경과조치·면제·대체 제외",
+    "turns": [
+      {
+        "user": "2023학번의 후마니타스 기본구조표상 배분이수 최소학점은? 면제·대체 예외는 제외해줘.",
+        "self_contained_question": "2023학번 배분이수 최소학점",
+        "expected_action": "answer",
+        "gold_answer": [
+          {
+            "distribution_credits": 12
+          }
+        ],
+        "reference_sql": "SELECT rc.min_credits AS distribution_credits FROM general_education_requirements gr JOIN general_education_requirement_categories rc ON rc.general_requirement_id=gr.general_requirement_id WHERE 2023 BETWEEN gr.cohort_start AND gr.cohort_end AND rc.requirement_code='DISTRIBUTION';",
+        "sources": [
+          {
+            "kind": "official_raw",
+            "url": "https://github.com/suleileinaing/campus-ai-db/blob/f4a822285995359adb46a56468406c5a39757a58/raw_data/graduation_requirements/general_edu_grad_req.pdf",
+            "path": "raw_data/graduation_requirements/general_edu_grad_req.pdf",
+            "sha256": "6bcfdc784ad04ede321f30f44caf5ecb4e818c2940025ffff1720bfbdb71bd18"
+          }
+        ],
+        "turn": 1,
+        "database_check": "match",
+        "question_origin": "authored_dialogue_not_real_chat"
+      },
+      {
+        "user": "그럼 2024학번은?",
+        "self_contained_question": "2024학번의 기본구조표상 배분이수 최소학점, 면제·대체 예외 제외",
+        "expected_action": "answer",
+        "gold_answer": [
+          {
+            "distribution_credits": 9
+          }
+        ],
+        "reference_sql": "SELECT rc.min_credits AS distribution_credits FROM general_education_requirements gr JOIN general_education_requirement_categories rc ON rc.general_requirement_id=gr.general_requirement_id WHERE 2024 BETWEEN gr.cohort_start AND gr.cohort_end AND rc.requirement_code='DISTRIBUTION';",
+        "sources": [
+          {
+            "kind": "official_raw",
+            "url": "https://github.com/suleileinaing/campus-ai-db/blob/f4a822285995359adb46a56468406c5a39757a58/raw_data/graduation_requirements/general_edu_grad_req.pdf",
+            "path": "raw_data/graduation_requirements/general_edu_grad_req.pdf",
+            "sha256": "6bcfdc784ad04ede321f30f44caf5ecb4e818c2940025ffff1720bfbdb71bd18"
+          },
+          {
+            "kind": "official",
+            "url": "https://hc.khu.ac.kr/hc_kor/user/contents/view.do?menuNo=4300014"
+          }
+        ],
+        "turn": 2,
+        "database_check": "match",
+        "question_origin": "authored_dialogue_not_real_chat"
+      },
+      {
+        "user": "앞의 두 학번을 비교하면 몇 학점 줄어든 거야?",
+        "self_contained_question": "2023학번 배분이수 최소학점에서 2024학번 배분이수 최소학점을 뺀 학점 차이",
+        "expected_action": "answer",
+        "gold_answer": [
+          {
+            "credit_reduction": 3
+          }
+        ],
+        "reference_sql": "SELECT (SELECT rc.min_credits AS distribution_credits FROM general_education_requirements gr JOIN general_education_requirement_categories rc ON rc.general_requirement_id=gr.general_requirement_id WHERE 2023 BETWEEN gr.cohort_start AND gr.cohort_end AND rc.requirement_code='DISTRIBUTION')-(SELECT rc.min_credits AS distribution_credits FROM general_education_requirements gr JOIN general_education_requirement_categories rc ON rc.general_requirement_id=gr.general_requirement_id WHERE 2024 BETWEEN gr.cohort_start AND gr.cohort_end AND rc.requirement_code='DISTRIBUTION') AS credit_reduction;",
+        "sources": [
+          {
+            "kind": "official_raw",
+            "url": "https://github.com/suleileinaing/campus-ai-db/blob/f4a822285995359adb46a56468406c5a39757a58/raw_data/graduation_requirements/general_edu_grad_req.pdf",
+            "path": "raw_data/graduation_requirements/general_edu_grad_req.pdf",
+            "sha256": "6bcfdc784ad04ede321f30f44caf5ecb4e818c2940025ffff1720bfbdb71bd18"
+          },
+          {
+            "kind": "official",
+            "url": "https://hc.khu.ac.kr/hc_kor/user/contents/view.do?menuNo=4300014"
+          }
+        ],
+        "turn": 3,
+        "database_check": "match",
+        "question_origin": "authored_dialogue_not_real_chat"
+      }
+    ],
+    "note": "대화 자체는 설계한 평가 시나리오이며 실제 사용자 대화 로그가 아님. 실제 모델의 이전 응답을 다음 턴에 누적하고 정답은 채점에만 사용."
+  },
+  {
+    "conversation_id": "D11",
+    "task_type": "clarification_then_reference",
+    "scope": "새 대화; 2026-2; 분반 확인 후 지시어 연결",
+    "turns": [
+      {
+        "user": "2026학년도 2학기 독립심화학습(인공지능)2(AI4007)에서 내가 듣는 분반의 교수를 한 명으로 알려줘. 내 분반은 아직 말하지 않았어.",
+        "self_contained_question": "2026-2 AI4007 수강 분반 미지정",
+        "expected_action": "clarify",
+        "gold_answer": "분반을 질문해야 함. 서로 다른 분반 담당자를 임의 선택하지 않음.",
+        "reference_sql": null,
+        "sources": [
+          {
+            "kind": "official_raw",
+            "url": "https://github.com/suleileinaing/campus-ai-db/blob/f4a822285995359adb46a56468406c5a39757a58/raw_data/College_of_software_convergence_course_lists/2026-2_A10628_raw.json",
+            "path": "raw_data/College_of_software_convergence_course_lists/2026-2_A10628_raw.json",
+            "sha256": "3d52dc4e7c5434cbc354d2d391c47fe308eef896409dffac470e200a484c5d02"
+          }
+        ],
+        "turn": 1,
+        "question_origin": "authored_dialogue_not_real_chat"
+      },
+      {
+        "user": "08분반이야.",
+        "self_contained_question": "2026학년도 2학기 AI4007-08(독립심화학습(인공지능)2) 담당 교수 이름",
+        "expected_action": "answer",
+        "gold_answer": [
+          {
+            "professor_name": "남기빈"
+          }
+        ],
+        "reference_sql": "SELECT DISTINCT p.name AS professor_name FROM course_offerings o JOIN offering_professors op ON op.offering_id=o.offering_id JOIN professors p ON p.professor_id=op.professor_id WHERE o.year=2026 AND o.semester='2' AND o.course_code='AI4007' AND o.section='08' AND o.campus='국제';",
+        "sources": [
+          {
+            "kind": "official_raw",
+            "url": "https://github.com/suleileinaing/campus-ai-db/blob/f4a822285995359adb46a56468406c5a39757a58/raw_data/College_of_software_convergence_course_lists/2026-2_A10628_raw.json",
+            "path": "raw_data/College_of_software_convergence_course_lists/2026-2_A10628_raw.json",
+            "sha256": "3d52dc4e7c5434cbc354d2d391c47fe308eef896409dffac470e200a484c5d02"
+          }
+        ],
+        "turn": 2,
+        "database_check": "match",
+        "question_origin": "authored_dialogue_not_real_chat"
+      },
+      {
+        "user": "그 교수님의 같은 학기 인공지능학과 다른 과목은? AI4007 과목 코드는 제외하고 코드·분반으로 알려줘.",
+        "self_contained_question": "2026-2 인공지능학과에서 남기빈 교수가 담당하는 AI4007 이외 과목코드·분반",
+        "expected_action": "answer",
+        "gold_answer": [
+          {
+            "course_code": "CSE327",
+            "section": "01"
+          },
+          {
+            "course_code": "CSE406",
+            "section": "03"
+          }
+        ],
+        "reference_sql": "WITH anchor_prof AS (SELECT DISTINCT op.professor_id FROM course_offerings o JOIN offering_professors op ON op.offering_id=o.offering_id WHERE o.year=2026 AND o.semester='2' AND o.course_code='AI4007' AND o.section='08' AND o.campus='국제') SELECT DISTINCT o.course_code,o.section FROM course_offerings o JOIN offering_professors op ON op.offering_id=o.offering_id JOIN anchor_prof ap ON ap.professor_id=op.professor_id JOIN course_offering_categories oc ON oc.offering_id=o.offering_id JOIN departments d ON d.department_id=oc.department_id JOIN course_categories cc ON cc.category_id=oc.category_id WHERE o.year=2026 AND o.semester='2' AND o.campus='국제' AND d.code='A10628' AND o.course_code<>'AI4007' AND (1=1) ORDER BY o.course_code,o.section;",
+        "sources": [
+          {
+            "kind": "official_raw",
+            "url": "https://github.com/suleileinaing/campus-ai-db/blob/f4a822285995359adb46a56468406c5a39757a58/raw_data/College_of_software_convergence_course_lists/2026-2_A10628_raw.json",
+            "path": "raw_data/College_of_software_convergence_course_lists/2026-2_A10628_raw.json",
+            "sha256": "3d52dc4e7c5434cbc354d2d391c47fe308eef896409dffac470e200a484c5d02"
+          }
+        ],
+        "turn": 3,
+        "database_check": "match",
+        "question_origin": "authored_dialogue_not_real_chat"
+      }
+    ],
+    "note": "대화 자체는 설계한 평가 시나리오이며 실제 사용자 대화 로그가 아님. 실제 모델의 이전 응답을 다음 턴에 누적하고 정답은 채점에만 사용."
+  },
+  {
+    "conversation_id": "D12",
+    "task_type": "clarification_then_reference",
+    "scope": "새 대화; 2026-2; 분반 확인 후 지시어 연결",
+    "turns": [
+      {
+        "user": "2026학년도 2학기 객체지향프로그래밍(CSE103)에서 내가 듣는 분반의 교수를 한 명으로 알려줘. 내 분반은 아직 말하지 않았어.",
+        "self_contained_question": "2026-2 CSE103 수강 분반 미지정",
+        "expected_action": "clarify",
+        "gold_answer": "분반을 질문해야 함. 서로 다른 분반 담당자를 임의 선택하지 않음.",
+        "reference_sql": null,
+        "sources": [
+          {
+            "kind": "official_raw",
+            "url": "https://github.com/suleileinaing/campus-ai-db/blob/f4a822285995359adb46a56468406c5a39757a58/raw_data/College_of_software_convergence_course_lists/2026-2_A07337_raw.json",
+            "path": "raw_data/College_of_software_convergence_course_lists/2026-2_A07337_raw.json",
+            "sha256": "9d60bab99d476ed8b99ed77caa2abb03547a946ec18f0c4deae7e3361fe75f8a"
+          },
+          {
+            "kind": "official_raw",
+            "url": "https://github.com/suleileinaing/campus-ai-db/blob/f4a822285995359adb46a56468406c5a39757a58/raw_data/College_of_software_convergence_course_lists/2026-2_A10627_raw.json",
+            "path": "raw_data/College_of_software_convergence_course_lists/2026-2_A10627_raw.json",
+            "sha256": "dfb6e7a034d2135bfbf090ad8207eb32c108dd5e7a08debc30e68bea970cb99d"
+          },
+          {
+            "kind": "official_raw",
+            "url": "https://github.com/suleileinaing/campus-ai-db/blob/f4a822285995359adb46a56468406c5a39757a58/raw_data/College_of_software_convergence_course_lists/2026-2_A10628_raw.json",
+            "path": "raw_data/College_of_software_convergence_course_lists/2026-2_A10628_raw.json",
+            "sha256": "3d52dc4e7c5434cbc354d2d391c47fe308eef896409dffac470e200a484c5d02"
+          }
+        ],
+        "turn": 1,
+        "question_origin": "authored_dialogue_not_real_chat"
+      },
+      {
+        "user": "00분반이야.",
+        "self_contained_question": "2026학년도 2학기 CSE103-00(객체지향프로그래밍) 담당 교수 이름",
+        "expected_action": "answer",
+        "gold_answer": [
+          {
+            "professor_name": "이대호"
+          }
+        ],
+        "reference_sql": "SELECT DISTINCT p.name AS professor_name FROM course_offerings o JOIN offering_professors op ON op.offering_id=o.offering_id JOIN professors p ON p.professor_id=op.professor_id WHERE o.year=2026 AND o.semester='2' AND o.course_code='CSE103' AND o.section='00' AND o.campus='국제';",
+        "sources": [
+          {
+            "kind": "official_raw",
+            "url": "https://github.com/suleileinaing/campus-ai-db/blob/f4a822285995359adb46a56468406c5a39757a58/raw_data/College_of_software_convergence_course_lists/2026-2_A07337_raw.json",
+            "path": "raw_data/College_of_software_convergence_course_lists/2026-2_A07337_raw.json",
+            "sha256": "9d60bab99d476ed8b99ed77caa2abb03547a946ec18f0c4deae7e3361fe75f8a"
+          },
+          {
+            "kind": "official_raw",
+            "url": "https://github.com/suleileinaing/campus-ai-db/blob/f4a822285995359adb46a56468406c5a39757a58/raw_data/College_of_software_convergence_course_lists/2026-2_A10627_raw.json",
+            "path": "raw_data/College_of_software_convergence_course_lists/2026-2_A10627_raw.json",
+            "sha256": "dfb6e7a034d2135bfbf090ad8207eb32c108dd5e7a08debc30e68bea970cb99d"
+          },
+          {
+            "kind": "official_raw",
+            "url": "https://github.com/suleileinaing/campus-ai-db/blob/f4a822285995359adb46a56468406c5a39757a58/raw_data/College_of_software_convergence_course_lists/2026-2_A10628_raw.json",
+            "path": "raw_data/College_of_software_convergence_course_lists/2026-2_A10628_raw.json",
+            "sha256": "3d52dc4e7c5434cbc354d2d391c47fe308eef896409dffac470e200a484c5d02"
+          }
+        ],
+        "turn": 2,
+        "database_check": "match",
+        "question_origin": "authored_dialogue_not_real_chat"
+      },
+      {
+        "user": "그 교수님의 같은 학기 소프트웨어융합학과 다른 과목은? CSE103 과목 코드는 제외하고 코드·분반으로 알려줘.",
+        "self_contained_question": "2026-2 소프트웨어융합학과에서 이대호 교수가 담당하는 CSE103 이외 과목코드·분반",
+        "expected_action": "answer",
+        "gold_answer": [
+          {
+            "course_code": "SWCON101",
+            "section": "00"
+          },
+          {
+            "course_code": "SWCON367",
+            "section": "00"
+          },
+          {
+            "course_code": "SWCON401",
+            "section": "01"
+          }
+        ],
+        "reference_sql": "WITH anchor_prof AS (SELECT DISTINCT op.professor_id FROM course_offerings o JOIN offering_professors op ON op.offering_id=o.offering_id WHERE o.year=2026 AND o.semester='2' AND o.course_code='CSE103' AND o.section='00' AND o.campus='국제') SELECT DISTINCT o.course_code,o.section FROM course_offerings o JOIN offering_professors op ON op.offering_id=o.offering_id JOIN anchor_prof ap ON ap.professor_id=op.professor_id JOIN course_offering_categories oc ON oc.offering_id=o.offering_id JOIN departments d ON d.department_id=oc.department_id JOIN course_categories cc ON cc.category_id=oc.category_id WHERE o.year=2026 AND o.semester='2' AND o.campus='국제' AND d.code='A07337' AND o.course_code<>'CSE103' AND (1=1) ORDER BY o.course_code,o.section;",
+        "sources": [
+          {
+            "kind": "official_raw",
+            "url": "https://github.com/suleileinaing/campus-ai-db/blob/f4a822285995359adb46a56468406c5a39757a58/raw_data/College_of_software_convergence_course_lists/2026-2_A07337_raw.json",
+            "path": "raw_data/College_of_software_convergence_course_lists/2026-2_A07337_raw.json",
+            "sha256": "9d60bab99d476ed8b99ed77caa2abb03547a946ec18f0c4deae7e3361fe75f8a"
+          }
+        ],
+        "turn": 3,
+        "database_check": "match",
+        "question_origin": "authored_dialogue_not_real_chat"
+      }
+    ],
+    "note": "대화 자체는 설계한 평가 시나리오이며 실제 사용자 대화 로그가 아님. 실제 모델의 이전 응답을 다음 턴에 누적하고 정답은 채점에만 사용."
+  }
+]

@@ -1,0 +1,370 @@
+{
+  "overall": {
+    "n": 100,
+    "exec_ok": 100,
+    "first_try_exec_ok": 100,
+    "strict": 100,
+    "relaxed": 100,
+    "subset": 100
+  },
+  "by_tag": {
+    "arithmetic_reasoning": {
+      "n": 4,
+      "exec_ok": 4,
+      "first_try_exec_ok": 4,
+      "strict": 4,
+      "relaxed": 4,
+      "subset": 4
+    },
+    "assignment_gap": {
+      "n": 4,
+      "exec_ok": 4,
+      "first_try_exec_ok": 4,
+      "strict": 4,
+      "relaxed": 4,
+      "subset": 4
+    },
+    "assignment_min": {
+      "n": 4,
+      "exec_ok": 4,
+      "first_try_exec_ok": 4,
+      "strict": 4,
+      "relaxed": 4,
+      "subset": 4
+    },
+    "assignment_ranking": {
+      "n": 4,
+      "exec_ok": 4,
+      "first_try_exec_ok": 4,
+      "strict": 4,
+      "relaxed": 4,
+      "subset": 4
+    },
+    "attendance_gap": {
+      "n": 4,
+      "exec_ok": 4,
+      "first_try_exec_ok": 4,
+      "strict": 4,
+      "relaxed": 4,
+      "subset": 4
+    },
+    "classification_aggregation": {
+      "n": 4,
+      "exec_ok": 4,
+      "first_try_exec_ok": 4,
+      "strict": 4,
+      "relaxed": 4,
+      "subset": 4
+    },
+    "combined_exam_gap": {
+      "n": 4,
+      "exec_ok": 4,
+      "first_try_exec_ok": 4,
+      "strict": 4,
+      "relaxed": 4,
+      "subset": 4
+    },
+    "common_instructor": {
+      "n": 4,
+      "exec_ok": 4,
+      "first_try_exec_ok": 4,
+      "strict": 4,
+      "relaxed": 4,
+      "subset": 4
+    },
+    "cross_rule_reasoning": {
+      "n": 1,
+      "exec_ok": 1,
+      "first_try_exec_ok": 1,
+      "strict": 1,
+      "relaxed": 1,
+      "subset": 1
+    },
+    "department_required_load": {
+      "n": 4,
+      "exec_ok": 4,
+      "first_try_exec_ok": 4,
+      "strict": 4,
+      "relaxed": 4,
+      "subset": 4
+    },
+    "distribution_rule_application": {
+      "n": 3,
+      "exec_ok": 3,
+      "first_try_exec_ok": 3,
+      "strict": 3,
+      "relaxed": 3,
+      "subset": 3
+    },
+    "english_industry": {
+      "n": 4,
+      "exec_ok": 4,
+      "first_try_exec_ok": 4,
+      "strict": 4,
+      "relaxed": 4,
+      "subset": 4
+    },
+    "exam_change": {
+      "n": 4,
+      "exec_ok": 4,
+      "first_try_exec_ok": 4,
+      "strict": 4,
+      "relaxed": 4,
+      "subset": 4
+    },
+    "exam_threshold_set": {
+      "n": 4,
+      "exec_ok": 4,
+      "first_try_exec_ok": 4,
+      "strict": 4,
+      "relaxed": 4,
+      "subset": 4
+    },
+    "fixture_earned": {
+      "n": 2,
+      "exec_ok": 2,
+      "first_try_exec_ok": 2,
+      "strict": 2,
+      "relaxed": 2,
+      "subset": 2
+    },
+    "fixture_personalized": {
+      "n": 6,
+      "exec_ok": 6,
+      "first_try_exec_ok": 6,
+      "strict": 6,
+      "relaxed": 6,
+      "subset": 6
+    },
+    "fixture_retake": {
+      "n": 2,
+      "exec_ok": 2,
+      "first_try_exec_ok": 2,
+      "strict": 2,
+      "relaxed": 2,
+      "subset": 2
+    },
+    "fixture_status": {
+      "n": 2,
+      "exec_ok": 2,
+      "first_try_exec_ok": 2,
+      "strict": 2,
+      "relaxed": 2,
+      "subset": 2
+    },
+    "general_cohort_difference": {
+      "n": 1,
+      "exec_ok": 1,
+      "first_try_exec_ok": 1,
+      "strict": 1,
+      "relaxed": 1,
+      "subset": 1
+    },
+    "general_cohort_rule": {
+      "n": 2,
+      "exec_ok": 2,
+      "first_try_exec_ok": 2,
+      "strict": 2,
+      "relaxed": 2,
+      "subset": 2
+    },
+    "midterm_max": {
+      "n": 4,
+      "exec_ok": 4,
+      "first_try_exec_ok": 4,
+      "strict": 4,
+      "relaxed": 4,
+      "subset": 4
+    },
+    "multi_document_multi_hop": {
+      "n": 8,
+      "exec_ok": 8,
+      "first_try_exec_ok": 8,
+      "strict": 8,
+      "relaxed": 8,
+      "subset": 8
+    },
+    "multi_document_multi_hop_reasoning": {
+      "n": 8,
+      "exec_ok": 8,
+      "first_try_exec_ok": 8,
+      "strict": 8,
+      "relaxed": 8,
+      "subset": 8
+    },
+    "multi_document_reasoning": {
+      "n": 32,
+      "exec_ok": 32,
+      "first_try_exec_ok": 32,
+      "strict": 32,
+      "relaxed": 32,
+      "subset": 32
+    },
+    "multi_hop": {
+      "n": 16,
+      "exec_ok": 16,
+      "first_try_exec_ok": 16,
+      "strict": 16,
+      "relaxed": 16,
+      "subset": 16
+    },
+    "multi_hop_aggregation": {
+      "n": 4,
+      "exec_ok": 4,
+      "first_try_exec_ok": 4,
+      "strict": 4,
+      "relaxed": 4,
+      "subset": 4
+    },
+    "official_public_facts": {
+      "n": 87,
+      "exec_ok": 87,
+      "first_try_exec_ok": 87,
+      "strict": 87,
+      "relaxed": 87,
+      "subset": 87
+    },
+    "official_rule": {
+      "n": 2,
+      "exec_ok": 2,
+      "first_try_exec_ok": 2,
+      "strict": 2,
+      "relaxed": 2,
+      "subset": 2
+    },
+    "official_rule_with_hypothetical_inputs": {
+      "n": 7,
+      "exec_ok": 7,
+      "first_try_exec_ok": 7,
+      "strict": 7,
+      "relaxed": 7,
+      "subset": 7
+    },
+    "prof_credit_load": {
+      "n": 4,
+      "exec_ok": 4,
+      "first_try_exec_ok": 4,
+      "strict": 4,
+      "relaxed": 4,
+      "subset": 4
+    },
+    "prof_future_other": {
+      "n": 4,
+      "exec_ok": 4,
+      "first_try_exec_ok": 4,
+      "strict": 4,
+      "relaxed": 4,
+      "subset": 4
+    },
+    "prof_other_3credit": {
+      "n": 4,
+      "exec_ok": 4,
+      "first_try_exec_ok": 4,
+      "strict": 4,
+      "relaxed": 4,
+      "subset": 4
+    },
+    "prof_other_industry": {
+      "n": 4,
+      "exec_ok": 4,
+      "first_try_exec_ok": 4,
+      "strict": 4,
+      "relaxed": 4,
+      "subset": 4
+    },
+    "prof_other_required": {
+      "n": 4,
+      "exec_ok": 4,
+      "first_try_exec_ok": 4,
+      "strict": 4,
+      "relaxed": 4,
+      "subset": 4
+    },
+    "professor_assessment_filter": {
+      "n": 4,
+      "exec_ok": 4,
+      "first_try_exec_ok": 4,
+      "strict": 4,
+      "relaxed": 4,
+      "subset": 4
+    },
+    "professor_assessment_ranking": {
+      "n": 4,
+      "exec_ok": 4,
+      "first_try_exec_ok": 4,
+      "strict": 4,
+      "relaxed": 4,
+      "subset": 4
+    },
+    "professor_required_credit_chain": {
+      "n": 4,
+      "exec_ok": 4,
+      "first_try_exec_ok": 4,
+      "strict": 4,
+      "relaxed": 4,
+      "subset": 4
+    },
+    "rule_reasoning": {
+      "n": 3,
+      "exec_ok": 3,
+      "first_try_exec_ok": 3,
+      "strict": 3,
+      "relaxed": 3,
+      "subset": 3
+    },
+    "schedule_overlap": {
+      "n": 4,
+      "exec_ok": 4,
+      "first_try_exec_ok": 4,
+      "strict": 4,
+      "relaxed": 4,
+      "subset": 4
+    },
+    "simulated_student_fixture": {
+      "n": 6,
+      "exec_ok": 6,
+      "first_try_exec_ok": 6,
+      "strict": 6,
+      "relaxed": 6,
+      "subset": 6
+    },
+    "single_document": {
+      "n": 8,
+      "exec_ok": 8,
+      "first_try_exec_ok": 8,
+      "strict": 8,
+      "relaxed": 8,
+      "subset": 8
+    },
+    "teacher_credits": {
+      "n": 4,
+      "exec_ok": 4,
+      "first_try_exec_ok": 4,
+      "strict": 4,
+      "relaxed": 4,
+      "subset": 4
+    },
+    "temporal_reasoning": {
+      "n": 4,
+      "exec_ok": 4,
+      "first_try_exec_ok": 4,
+      "strict": 4,
+      "relaxed": 4,
+      "subset": 4
+    },
+    "weighted_exam_score": {
+      "n": 4,
+      "exec_ok": 4,
+      "first_try_exec_ok": 4,
+      "strict": 4,
+      "relaxed": 4,
+      "subset": 4
+    }
+  },
+  "diagnosis": {
+    "correct": 100
+  },
+  "gold_invalid": [],
+  "avg_tokens": 0,
+  "avg_latency_sec": 0
+}
