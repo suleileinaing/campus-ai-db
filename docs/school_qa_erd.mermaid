@@ -33,6 +33,8 @@ erDiagram
     graduation_requirements ||--o{ requirement_categories : "구분별 최소학점"
     graduation_requirements ||--o{ requirement_courses : "지정과목"
     courses ||--o{ requirement_courses : "지정과목"
+    graduation_requirements ||--o{ requirement_track_courses : "트랙별 과목"
+    courses ||--o{ requirement_track_courses : "트랙별 과목"
     graduation_requirements ||--o{ requirement_others : "기타 졸업요건"
     general_education_requirements ||--o{ general_education_requirement_categories : "교양 구분별 최소학점"
     general_education_requirement_categories ||--o{ general_education_category_members : "포함 source 분류"
@@ -234,10 +236,19 @@ erDiagram
         string course_code FK
         int category_id FK "이 요건에서의 이수구분"
     }
+    requirement_track_courses {
+        int requirement_track_course_id PK
+        int requirement_id FK
+        string course_code FK
+        string course_type "TRACK_REQUIRED/TRACK_ELECTIVE"
+        string source_course_name "원문 과목명"
+        string source_document "근거 PDF"
+        int source_page "PDF 페이지"
+    }
     requirement_others {
         int requirement_other_id PK
         int requirement_id FK
-        string type "산학필수/전공영어강좌/SW교육/졸업논문/다전공등"
+        string type "산학필수/트랙이수"
         string condition "원문 조건"
     }
     requirement_fulfillment_options {

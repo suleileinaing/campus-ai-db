@@ -300,3 +300,15 @@ JOIN syllabus_textbooks AS t ON t.syllabus_id = s.syllabus_id
 WHERE e.student_id = 202210029
   AND o.year = 2025 AND o.semester = '2'
 ORDER BY o.course_code, t.sequence;
+
+-- 21. 2021학번 소프트웨어융합학과 데이터사이언스트랙의 트랙필수 과목코드와 당시 교육과정표의 과목명을 알려줘.
+SELECT rtc.course_code, rtc.source_course_name
+FROM graduation_requirements AS gr
+JOIN requirement_track_courses AS rtc
+  ON rtc.requirement_id = gr.requirement_id
+WHERE gr.department_id = 8
+  AND gr.cohort_start <= 2021
+  AND (gr.cohort_end IS NULL OR gr.cohort_end >= 2021)
+  AND gr.track = '데이터사이언스트랙'
+  AND rtc.course_type = 'TRACK_REQUIRED'
+ORDER BY rtc.course_code;

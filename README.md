@@ -23,7 +23,7 @@ python3 scripts/test_database_queries.py
 - Foreign-key check: PASS
 - 수강내역과 실제 개설강좌의 과목코드 일치 검사: PASS
 - 대표 SQL 질의: 11/11 PASS
-- 졸업요건: CS/AI/SWCON 각 2022~2026학번, 총 15세트
+- 졸업요건: 공통 19세트와 트랙별 34세트, 총 53세트
 
 ## 폴더 구성
 
@@ -118,13 +118,16 @@ CAMPUS AI Database/
 | `graduation_requirements` | 학과·트랙·입학연도별 총 졸업학점 |
 | `requirement_categories` | 전공기초·전공필수·전공선택 등 이수구분별 최소학점 |
 | `requirement_courses` | 해당 교육과정에서 지정된 필수 과목 |
-| `requirement_others` | 산학필수, 영어강좌, SW교육, 졸업논문, 다전공 등의 조건 |
+| `requirement_track_courses` | 공식 교육과정표에서 확인된 트랙별 필수·선택 과목과 근거 문서·페이지 |
+| `requirement_others` | 출처별로 확인된 산학필수·트랙 이수 등의 기타 조건 |
 | `requirement_fulfillment_options` | 과목 대체·마이크로디그리 등 충족 방법; 현재 시뮬레이션 |
 | `general_education_requirements` | 입학연도 범위별 총 교양 이수학점과 공식 출처 |
 | `general_education_requirement_categories` | 필수·배분·자유이수 최소학점과 영역 조건 |
 | `general_education_category_members` | 공식 교양요건과 수강신청 사이트 이수구분의 다대다 매핑 |
 
-2022~2026년 컴퓨터공학과(CS), 인공지능학과(AI), 소프트웨어융합학과(SWCON)의 공식 PDF를 근거로 총 15개 졸업요건 세트를 저장했다. 총학점·이수구분별 최소학점·기타 조건은 공식 데이터이다. `requirement_courses`는 PDF에서 과목 단위 정규화가 완료된 학과·연도만 포함하므로, 행이 없다는 것을 "필수과목 없음"으로 해석하면 안 된다. 범위는 `validation_report/graduation_requirement_coverage.csv`에서 확인한다. [남음 과목들은 추후 추가될 예정이다]
+공식 PDF를 근거로 컴퓨터공학과와 소프트웨어융합학과는 2020~2026학번, 인공지능학과는 학과가 신설된 2022~2026학번의 졸업요건을 저장했다. 기존 호환성을 위한 `공통` 19세트와 공식 트랙별 34세트를 합쳐 총 53세트이다. 인공지능학과는 2022~2024학번의 연구·산학트랙을 구분하고, 소프트웨어융합학과는 2020~2026학번의 4개 트랙을 구분한다. 2023학번부터는 `미래자동차·로봇트랙`이 `로봇·비전트랙`으로 변경된 내용을 반영했다. 총학점·이수구분별 최소학점·트랙 조건은 공식 데이터이다.
+
+기존 가상 학생 44명의 `students.track='공통'` 값은 변경하지 않았다. 따라서 기존 개인화 질의는 공통 요건을 계속 사용하며, 향후 학생별 실제 트랙을 입력하면 같은 스키마에서 트랙별 요건을 조회할 수 있다. `requirement_courses`는 공통 지정과목만, `requirement_track_courses`는 트랙별 과목만 저장한다. 현재 트랙 과목은 공식 교육과정표에서 코드와 필수 표시를 함께 확인한 2020~2021학번 소프트웨어융합학과 항목부터 정규화했다. 행이 없다는 것을 "필수과목 없음"으로 해석하면 안 된다. 세부 범위와 근거 PDF는 `validation_report/graduation_requirement_coverage.csv`에서 확인한다.
 
 교양 졸업요건은 `raw_data/graduation_requirements/general_edu_grad_req.pdf`의 2024 후마니타스 교양교육과정 시행세칙을 근거로 학과별 전공 졸업요건과 분리했다. 현재 DB 범위에서 2020~2023학번은 필수교과 17학점, 배분이수 12학점(7개 중 4개 영역), 자유이수 3학점으로 총 32학점 이상이며, 2024~2026학번은 필수교과 17학점, 배분이수 9학점(5개 중 3개 영역), 자유이수 3학점으로 총 29학점 이상이다. 각 배분이수 영역에서는 3학점을 이수한다.
 
@@ -132,7 +135,7 @@ CAMPUS AI Database/
 
 현재는 출처와 적용 연도를 명확히 검증하기 위해 졸업요건을 학과·학번별 한 행씩 유지한다. 향후 모든 연도의 지정과목 정규화가 완료되면 총학점, 이수구분별 최소학점, 지정과목 및 기타 조건이 모두 같은 연속 학번 구간을 확인하여 `cohort_start`와 `cohort_end` 범위 한 행으로 통합할 수 있다. 총학점만 같은 경우에는 동일한 졸업요건으로 간주하지 않는다.
 
-- PDF에 명시된 `산학필수`, `전공영어강좌`, `SW교육`, `졸업논문`, `TOPIK`, 추가 전공 이수 조건은 실제 `requirement_others` 데이터로 취급한다.
+- `requirement_others`에는 현재 출처별 적용 범위를 확인한 산학필수와 트랙 이수조건만 저장한다. 전공영어강좌·SW교육·졸업논문·인증·추가 전공 조건은 학과·학번별 근거 정규화 후 추가한다.
 - 프로젝트가 가정한 대체과목, 외부성적 또는 임의의 충족 방법만 `requirement_fulfillment_options` 시뮬레이션 데이터로 취급한다.
 - 시뮬레이션 충족 방법을 사용할 때는 대응하는 실제 `graduation_requirements.requirement_id` 또는 `requirement_others.requirement_other_id`와 일치시켜야 한다.
 - 폴더 위치는 데이터의 출처를 구분하기 위한 것이며, SQLite로 적재한 후에는 PK/FK 관계로 무결성을 검증한다.
@@ -165,6 +168,7 @@ CAMPUS AI Database/
 | `general_education_requirement_categories` | `general_requirement_category_id`, `general_requirement_id`, `requirement_code`, `requirement_name`, `min_credits`, `min_areas`, `per_area_min_credits` |
 | `general_education_category_members` | `general_requirement_category_id`, `category_id` |
 | `requirement_courses` | `requirement_course_id`, `requirement_id`, `course_code`, `category_id` |
+| `requirement_track_courses` | `requirement_track_course_id`, `requirement_id`, `course_code`, `course_type`, `source_course_name`, `source_document`, `source_page` |
 | `requirement_others` | `requirement_other_id`, `requirement_id`, `type`, `condition` |
 | `requirement_fulfillment_options` | `fulfillment_option_id`, `target_type`, `target_course_code`, `target_other_id`, `method`, `detail_json` |
 
@@ -179,7 +183,7 @@ PK/FK, 자료형 및 제약조건은 `database/schema.sql`, 테이블 관계는 
 - 10,718개 실제 개설강좌의 강의계획서 링크
 - 10,718개 강의계획서의 상세 추출 정보
 - 강의계획서의 교재, 평가방법, 주차별 계획, 선수과목
-- 2022~2026년 CS/AI/SWCON 공식 졸업요건
+- 2020~2026년 CS/SWCON 및 2022~2026년 AI 공식 졸업요건과 트랙 조건
 - 2020~2026학번 후마니타스 공식 교양 졸업요건
 
 ### 시뮬레이션 데이터
@@ -249,10 +253,12 @@ PK/FK, 자료형 및 제약조건은 `database/schema.sql`, 테이블 관계는 
 | 선수과목 조건 | 450 |
 | 선수과목 근거 연결 | 4,934 |
 | 주차별 계획 | 169,824 |
-| 졸업요건 세트 | 15 |
+| 졸업요건 세트 | 53 |
 | 교양 졸업요건 세트 | 2 |
 | 교양 구분별 요건 | 6 |
 | 시뮬레이션 학생 | 44 |
 | 시뮬레이션 수강이력 | 1,188 |
 
 행 수는 CSV를 다시 생성하거나 실제 교양 데이터를 추가하면 변경될 수 있다.
+
+현재 데이터베이스 버전은 `database/VERSION`에 기록하고, 변경 이력은 `docs/database_versions.md`에서 관리한다.

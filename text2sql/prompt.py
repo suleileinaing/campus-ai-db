@@ -131,8 +131,15 @@ def build_domain_rules(db_path: Path = DATABASE_PATH, current_term: str = CURREN
         "syllabus_textbooks / syllabus_weekly_plans(syllabus_id) 로 조인한다.",
         "- 학생에게 적용되는 졸업요건은 students 와 graduation_requirements 를 department_id, track 이 같고 "
         "cohort_start <= admission_year AND (cohort_end IS NULL OR cohort_end >= admission_year) 로 매칭한다.",
-        "- 이수구분별 최소학점은 requirement_categories, 지정 필수과목은 requirement_courses, "
-        "기타 조건(산학필수·영어강좌 등)은 requirement_others 에 있다.",
+        "- 이수구분별 최소학점은 requirement_categories, 공통 지정 필수과목은 requirement_courses, "
+        "트랙별 필수·선택과목은 requirement_track_courses, 기타 조건은 requirement_others 에 있다.",
+        "- 산학필수 최소학점은 전공선택 전체 최소학점에 포함되는 하위 조건이며 별도로 더하지 않는다. "
+        "'전공선택' 또는 '전공선택 졸업요건'을 묻는 경우 requirement_categories 의 전체 최소학점을 "
+        "그대로 답한다. '산학필수'를 묻는 경우 requirement_others 의 type = '산학필수' 조건을 답한다. "
+        "'일반 전공선택' 또는 '산학필수를 제외한 전공선택'처럼 제외 범위를 명시적으로 묻는 경우에만 "
+        "전공선택 전체 최소학점에서 산학필수 최소학점을 뺀다.",
+        "- 학생에게 필요한 전체 필수과목을 묻는 경우 requirement_courses 의 공통 지정과목과 "
+        "학생에게 적용되는 requirement_track_courses 의 TRACK_REQUIRED 과목을 합치고 중복을 제거한다.",
         "- 선수과목은 course_prerequisites 이며 학번 조건은 (cohort_start IS NULL OR cohort_start <= 입학연도) "
         "AND (cohort_end IS NULL OR cohort_end >= 입학연도) 로 건다.",
         "- 과목 이름으로 찾을 때는 course_offerings.course_name 또는 courses.current_name 에 LIKE '%이름%' 을 쓴다.",

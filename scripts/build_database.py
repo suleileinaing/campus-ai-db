@@ -52,6 +52,10 @@ IMPORTS = [
         DATABASE_TABLES / "general_education_category_members.csv",
     ),
     ("requirement_courses", DATABASE_TABLES / "requirement_courses.csv"),
+    (
+        "requirement_track_courses",
+        DATABASE_TABLES / "requirement_track_courses.csv",
+    ),
     ("requirement_others", DATABASE_TABLES / "requirement_others.csv"),
     (
         "requirement_fulfillment_options",
@@ -68,7 +72,8 @@ INTEGER_COLUMNS = {
     "minimum_required_count", "source_syllabus_id", "textbook_id", "sequence",
     "weekly_plan_id", "week", "requirement_id", "total_credits",
     "requirement_category_id", "min_credits", "min_areas",
-    "per_area_min_credits", "requirement_course_id", "requirement_other_id",
+    "per_area_min_credits", "requirement_course_id",
+    "requirement_track_course_id", "source_page", "requirement_other_id",
     "fulfillment_option_id", "target_other_id", "general_requirement_id",
     "general_requirement_category_id", "total_general_credits",
 }
