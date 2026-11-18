@@ -1,0 +1,1229 @@
+[
+  {
+    "id": "N001",
+    "question": "2026년 2학기 컴퓨터공학과 개설목록에서 컴퓨터네트워크(CSE302) 금요일 수업은 몇 시에 시작하고 어디로 가면 돼?",
+    "student_id": null,
+    "gold_sql": null,
+    "gold_answer": [
+      {
+        "section": "00",
+        "start_time": "09:00",
+        "room_code": "B07"
+      }
+    ],
+    "ordered": false,
+    "tags": [
+      "student_life",
+      "시간표"
+    ],
+    "note": "원천 기록에서 정답 산출. 기준 SQL은 oracle 점검용.",
+    "reference_sql": "SELECT o.section,t.start_time,ct.room_code FROM course_offerings o JOIN class_times ct ON ct.offering_id=o.offering_id JOIN time_slots t ON t.time_slot_id=ct.time_slot_id\n        WHERE o.year=2026 AND o.semester='2' AND o.campus='국제'\n          AND EXISTS (SELECT 1 FROM course_offering_categories oc JOIN departments d ON d.department_id=oc.department_id\n                      WHERE oc.offering_id=o.offering_id AND d.code='A10627') AND o.course_code='CSE302' AND t.day='friday';"
+  },
+  {
+    "id": "N002",
+    "question": "2026년 2학기 컴퓨터공학과 자료구조(CSE204) 듣고 싶은데, 금요일에는 학교에 못 가고 오전 수업도 어려워. 정규 수업이 전부 낮 12시 이후인 분반 번호가 뭐야? 정오 시작은 괜찮아.",
+    "student_id": null,
+    "gold_sql": null,
+    "gold_answer": [
+      {
+        "section": "01"
+      }
+    ],
+    "ordered": false,
+    "tags": [
+      "student_life",
+      "시간표"
+    ],
+    "note": "원천 기록에서 정답 산출. 기준 SQL은 oracle 점검용.",
+    "reference_sql": "SELECT o.section FROM course_offerings o WHERE o.year=2026 AND o.semester='2' AND o.campus='국제'\n          AND EXISTS (SELECT 1 FROM course_offering_categories oc JOIN departments d ON d.department_id=oc.department_id\n                      WHERE oc.offering_id=o.offering_id AND d.code='A10627') AND o.course_code='CSE204'\n        AND EXISTS (SELECT 1 FROM class_times c WHERE c.offering_id=o.offering_id)\n        AND NOT EXISTS (SELECT 1 FROM class_times c JOIN time_slots t USING(time_slot_id)\n                        WHERE c.offering_id=o.offering_id AND (t.day='friday' OR t.start_time<'12:00'));"
+  },
+  {
+    "id": "N003",
+    "question": "화요일에 알바가 있어서 일찍 끝나는 분반으로 바꾸고 싶어. 2026년 2학기 컴퓨터공학과 객체지향프로그래밍(CSE103) 중 화요일에 가장 먼저 끝나는 분반과 끝나는 시간이 뭐야? 동률이면 다 알려줘.",
+    "student_id": null,
+    "gold_sql": null,
+    "gold_answer": [
+      {
+        "section": "01",
+        "end_time": "16:50"
+      }
+    ],
+    "ordered": false,
+    "tags": [
+      "student_life",
+      "시간표"
+    ],
+    "note": "원천 기록에서 정답 산출. 기준 SQL은 oracle 점검용.",
+    "reference_sql": "WITH tues AS (SELECT o.section,MAX(t.end_time) AS end_time FROM course_offerings o JOIN class_times ct ON ct.offering_id=o.offering_id JOIN time_slots t ON t.time_slot_id=ct.time_slot_id\n           WHERE o.year=2026 AND o.semester='2' AND o.campus='국제'\n          AND EXISTS (SELECT 1 FROM course_offering_categories oc JOIN departments d ON d.department_id=oc.department_id\n                      WHERE oc.offering_id=o.offering_id AND d.code='A10627') AND o.course_code='CSE103' AND t.day='tuesday' GROUP BY o.section)\n        SELECT section,end_time FROM tues WHERE end_time=(SELECT MIN(end_time) FROM tues);"
+  },
+  {
+    "id": "N004",
+    "question": "2026년 2학기 컴퓨터공학과에서 데이터베이스 01분반(CSE305-01) 듣고 바로 컴퓨터네트워크 02분반(CSE302-02)으로 가야 해. 화요일에 앞 수업 끝나고 다음 수업 시작까지 몇 분 있어?",
+    "student_id": null,
+    "gold_sql": null,
+    "gold_answer": [
+      {
+        "gap_minutes": 15
+      }
+    ],
+    "ordered": false,
+    "tags": [
+      "student_life",
+      "시간표"
+    ],
+    "note": "원천 기록에서 정답 산출. 기준 SQL은 oracle 점검용.",
+    "reference_sql": "WITH a AS (SELECT t.end_time FROM course_offerings o JOIN class_times ct ON ct.offering_id=o.offering_id JOIN time_slots t ON t.time_slot_id=ct.time_slot_id WHERE o.year=2026 AND o.semester='2' AND o.campus='국제'\n          AND EXISTS (SELECT 1 FROM course_offering_categories oc JOIN departments d ON d.department_id=oc.department_id\n                      WHERE oc.offering_id=o.offering_id AND d.code='A10627') AND o.course_code='CSE305' AND o.section='01' AND t.day='tuesday'),\n        b AS (SELECT t.start_time FROM course_offerings o JOIN class_times ct ON ct.offering_id=o.offering_id JOIN time_slots t ON t.time_slot_id=ct.time_slot_id WHERE o.year=2026 AND o.semester='2' AND o.campus='국제'\n          AND EXISTS (SELECT 1 FROM course_offering_categories oc JOIN departments d ON d.department_id=oc.department_id\n                      WHERE oc.offering_id=o.offering_id AND d.code='A10627') AND o.course_code='CSE302' AND o.section='02' AND t.day='tuesday')\n        SELECT CAST(ROUND((julianday('2000-01-01 ' || b.start_time)-julianday('2000-01-01 ' || a.end_time))*1440) AS INTEGER) AS gap_minutes FROM a CROSS JOIN b;"
+  },
+  {
+    "id": "N005",
+    "question": "2026년 2학기 컴퓨터공학과 자료구조 02분반(CSE204-02)은 이미 시간표에 넣었어. 컴퓨터네트워크(CSE302) 중 정규 수업이 한 번도 겹치지 않는 분반을 전부 알려줘.",
+    "student_id": null,
+    "gold_sql": null,
+    "gold_answer": [
+      {
+        "section": "02"
+      },
+      {
+        "section": "00"
+      }
+    ],
+    "ordered": false,
+    "tags": [
+      "student_life",
+      "시간표"
+    ],
+    "note": "원천 기록에서 정답 산출. 기준 SQL은 oracle 점검용.",
+    "reference_sql": "WITH choices AS (SELECT DISTINCT o.offering_id,o.section FROM course_offerings o\n               WHERE o.year=2026 AND o.semester='2' AND o.campus='국제'\n          AND EXISTS (SELECT 1 FROM course_offering_categories oc JOIN departments d ON d.department_id=oc.department_id\n                      WHERE oc.offering_id=o.offering_id AND d.code='A10627') AND o.course_code='CSE302'),\n        fixed AS (SELECT t.day,t.start_time,t.end_time FROM course_offerings o JOIN class_times ct ON ct.offering_id=o.offering_id JOIN time_slots t ON t.time_slot_id=ct.time_slot_id WHERE o.year=2026 AND o.semester='2' AND o.campus='국제'\n          AND EXISTS (SELECT 1 FROM course_offering_categories oc JOIN departments d ON d.department_id=oc.department_id\n                      WHERE oc.offering_id=o.offering_id AND d.code='A10627') AND o.course_code='CSE204' AND o.section='02')\n        SELECT a.section FROM choices a\n        WHERE EXISTS (SELECT 1 FROM class_times c WHERE c.offering_id=a.offering_id)\n          AND NOT EXISTS (SELECT 1 FROM class_times c JOIN time_slots t USING(time_slot_id) JOIN fixed f\n                  ON f.day=t.day AND t.start_time<f.end_time AND f.start_time<t.end_time WHERE c.offering_id=a.offering_id);"
+  },
+  {
+    "id": "N006",
+    "question": "2026년 2학기 컴퓨터공학과 알고리즘 00분반(CSE304-00) 전에 월요일에 30분은 쉬고 싶어. 소프트웨어공학(CSE327) 중 월요일 수업을 그만큼 일찍 끝낼 수 있는 분반과 쉬는 시간을 알려줘.",
+    "student_id": null,
+    "gold_sql": null,
+    "gold_answer": [
+      {
+        "section": "01",
+        "gap_minutes": 105
+      }
+    ],
+    "ordered": false,
+    "tags": [
+      "student_life",
+      "시간표"
+    ],
+    "note": "원천 기록에서 정답 산출. 기준 SQL은 oracle 점검용.",
+    "reference_sql": "WITH last_end AS (SELECT o.section,MAX(t.end_time) AS end_time FROM course_offerings o JOIN class_times ct ON ct.offering_id=o.offering_id JOIN time_slots t ON t.time_slot_id=ct.time_slot_id\n      WHERE o.year=2026 AND o.semester='2' AND o.campus='국제'\n          AND EXISTS (SELECT 1 FROM course_offering_categories oc JOIN departments d ON d.department_id=oc.department_id\n                      WHERE oc.offering_id=o.offering_id AND d.code='A10627') AND o.course_code='CSE327' AND t.day='monday' GROUP BY o.section),\n      anchor AS (SELECT MIN(t.start_time) AS start_time FROM course_offerings o JOIN class_times ct ON ct.offering_id=o.offering_id JOIN time_slots t ON t.time_slot_id=ct.time_slot_id WHERE o.year=2026 AND o.semester='2' AND o.campus='국제'\n          AND EXISTS (SELECT 1 FROM course_offering_categories oc JOIN departments d ON d.department_id=oc.department_id\n                      WHERE oc.offering_id=o.offering_id AND d.code='A10627') AND o.course_code='CSE304' AND o.section='00' AND t.day='monday'),\n      options AS (SELECT section,CAST(ROUND((julianday('2000-01-01 ' || anchor.start_time)-julianday('2000-01-01 ' || last_end.end_time))*1440) AS INTEGER) AS gap_minutes FROM last_end CROSS JOIN anchor)\n      SELECT section,gap_minutes FROM options WHERE gap_minutes>=30;"
+  },
+  {
+    "id": "N007",
+    "question": "2026년 2학기 컴퓨터공학과 월요일 논리회로 03분반(EE209-03) 다음에 운영체제 01분반(CSE301-01)을 들으려고 해. 두 수업 강의실 코드가 각각 뭐고, 사이에 몇 분 있어?",
+    "student_id": null,
+    "gold_sql": null,
+    "gold_answer": [
+      {
+        "first_room": "B01",
+        "second_room": "B01",
+        "gap_minutes": 15
+      }
+    ],
+    "ordered": false,
+    "tags": [
+      "student_life",
+      "시간표"
+    ],
+    "note": "원천 기록에서 정답 산출. 기준 SQL은 oracle 점검용.",
+    "reference_sql": "WITH a AS (SELECT t.end_time,ct.room_code FROM course_offerings o JOIN class_times ct ON ct.offering_id=o.offering_id JOIN time_slots t ON t.time_slot_id=ct.time_slot_id WHERE o.year=2026 AND o.semester='2' AND o.campus='국제'\n          AND EXISTS (SELECT 1 FROM course_offering_categories oc JOIN departments d ON d.department_id=oc.department_id\n                      WHERE oc.offering_id=o.offering_id AND d.code='A10627') AND o.course_code='EE209' AND o.section='03' AND t.day='monday'),\n        b AS (SELECT t.start_time,ct.room_code FROM course_offerings o JOIN class_times ct ON ct.offering_id=o.offering_id JOIN time_slots t ON t.time_slot_id=ct.time_slot_id WHERE o.year=2026 AND o.semester='2' AND o.campus='국제'\n          AND EXISTS (SELECT 1 FROM course_offering_categories oc JOIN departments d ON d.department_id=oc.department_id\n                      WHERE oc.offering_id=o.offering_id AND d.code='A10627') AND o.course_code='CSE301' AND o.section='01' AND t.day='monday')\n        SELECT a.room_code AS first_room,b.room_code AS second_room,CAST(ROUND((julianday('2000-01-01 ' || b.start_time)-julianday('2000-01-01 ' || a.end_time))*1440) AS INTEGER) AS gap_minutes FROM a CROSS JOIN b;"
+  },
+  {
+    "id": "N008",
+    "question": "2026년 2학기 컴퓨터공학과 목요일에 컴퓨터구조 00분반(CSE203-00)이랑 데이터베이스 01분반(CSE305-01)을 들어. 시작이 빠른 순서대로 강좌코드·분반, 시작 시간, 강의실을 정리해 줘.",
+    "student_id": null,
+    "gold_sql": null,
+    "gold_answer": [
+      {
+        "course_section": "CSE305-01",
+        "start_time": "10:30",
+        "room_code": "B01"
+      },
+      {
+        "course_section": "CSE203-00",
+        "start_time": "15:00",
+        "room_code": "전B09"
+      }
+    ],
+    "ordered": true,
+    "tags": [
+      "student_life",
+      "시간표"
+    ],
+    "note": "원천 기록에서 정답 산출. 기준 SQL은 oracle 점검용.",
+    "reference_sql": "SELECT o.course_code||'-'||o.section AS course_section,t.start_time,ct.room_code\n        FROM course_offerings o JOIN class_times ct ON ct.offering_id=o.offering_id JOIN time_slots t ON t.time_slot_id=ct.time_slot_id WHERE o.year=2026 AND o.semester='2' AND o.campus='국제'\n          AND EXISTS (SELECT 1 FROM course_offering_categories oc JOIN departments d ON d.department_id=oc.department_id\n                      WHERE oc.offering_id=o.offering_id AND d.code='A10627') AND\n        (o.course_code,o.section) IN (('CSE203','00'),('CSE305','01')) AND t.day='thursday' ORDER BY t.start_time;"
+  },
+  {
+    "id": "N009",
+    "question": "2026년 2학기 컴퓨터공학과 데이터베이스(CSE305) 두 분반 중 평소 온라인으로 듣는 게 어느 쪽인지 헷갈려. 분반별로 온라인인지 대면인지 알려줘.",
+    "student_id": null,
+    "gold_sql": null,
+    "gold_answer": [
+      {
+        "section": "00",
+        "delivery_mode": "ONLINE"
+      },
+      {
+        "section": "01",
+        "delivery_mode": "OFFLINE"
+      }
+    ],
+    "ordered": false,
+    "tags": [
+      "student_life",
+      "수강신청"
+    ],
+    "note": "원천 기록에서 정답 산출. 기준 SQL은 oracle 점검용.",
+    "reference_sql": "SELECT o.section,o.delivery_mode FROM course_offerings o WHERE o.year=2026 AND o.semester='2' AND o.campus='국제'\n          AND EXISTS (SELECT 1 FROM course_offering_categories oc JOIN departments d ON d.department_id=oc.department_id\n                      WHERE oc.offering_id=o.offering_id AND d.code='A10627') AND o.course_code='CSE305';"
+  },
+  {
+    "id": "N010",
+    "question": "2026년 2학기 소프트웨어융합학과 개설목록에서 웹/파이선프로그래밍(SWCON104)이랑 운영체제(CSE301) 중 정규 수업이 온라인으로 표시된 분반만 보고 싶어. 강좌코드·분반과 개설목록의 수강정원을 알려줘.",
+    "student_id": null,
+    "gold_sql": null,
+    "gold_answer": [
+      {
+        "course_section": "SWCON104-02",
+        "capacity": 100
+      },
+      {
+        "course_section": "CSE301-00",
+        "capacity": 100
+      }
+    ],
+    "ordered": false,
+    "tags": [
+      "student_life",
+      "수강신청"
+    ],
+    "note": "원천 기록에서 정답 산출. 기준 SQL은 oracle 점검용.",
+    "reference_sql": "SELECT o.course_code||'-'||o.section AS course_section,o.capacity FROM course_offerings o\n        WHERE o.year=2026 AND o.semester='2' AND o.campus='국제'\n          AND EXISTS (SELECT 1 FROM course_offering_categories oc JOIN departments d ON d.department_id=oc.department_id\n                      WHERE oc.offering_id=o.offering_id AND d.code='A07337') AND o.course_code IN ('SWCON104','CSE301') AND o.delivery_mode='ONLINE';"
+  },
+  {
+    "id": "N011",
+    "question": "2026년 2학기 컴퓨터공학과 개설목록에서 컴퓨터구조(CSE203) 00분반이랑 01분반의 대상 학년과 개설목록 수강정원이 각각 어떻게 돼?",
+    "student_id": null,
+    "gold_sql": null,
+    "gold_answer": [
+      {
+        "section": "00",
+        "target_year": 2,
+        "capacity": 105
+      },
+      {
+        "section": "01",
+        "target_year": 2,
+        "capacity": 120
+      }
+    ],
+    "ordered": false,
+    "tags": [
+      "student_life",
+      "수강신청"
+    ],
+    "note": "원천 기록에서 정답 산출. 기준 SQL은 oracle 점검용.",
+    "reference_sql": "SELECT o.section,o.target_year,o.capacity FROM course_offerings o\n        WHERE o.year=2026 AND o.semester='2' AND o.campus='국제'\n          AND EXISTS (SELECT 1 FROM course_offering_categories oc JOIN departments d ON d.department_id=oc.department_id\n                      WHERE oc.offering_id=o.offering_id AND d.code='A10627') AND o.course_code='CSE203' AND o.section IN ('00','01');"
+  },
+  {
+    "id": "N012",
+    "question": "2026년 2학기 컴퓨터공학과 자료구조 02분반(CSE204-02)의 개설목록 수강정원은 00분반보다 몇 명 더 많아?",
+    "student_id": null,
+    "gold_sql": null,
+    "gold_answer": [
+      {
+        "capacity_gap": 56
+      }
+    ],
+    "ordered": false,
+    "tags": [
+      "student_life",
+      "수강신청"
+    ],
+    "note": "원천 기록에서 정답 산출. 기준 SQL은 oracle 점검용.",
+    "reference_sql": "SELECT MAX(CASE WHEN o.section='02' THEN o.capacity END)-\n         MAX(CASE WHEN o.section='00' THEN o.capacity END) AS capacity_gap FROM course_offerings o\n         WHERE o.year=2026 AND o.semester='2' AND o.campus='국제'\n          AND EXISTS (SELECT 1 FROM course_offering_categories oc JOIN departments d ON d.department_id=oc.department_id\n                      WHERE oc.offering_id=o.offering_id AND d.code='A10627') AND o.course_code='CSE204' AND o.section IN ('00','02');"
+  },
+  {
+    "id": "N013",
+    "question": "친구는 인공지능학과고 저는 소프트웨어융합학과예요. 2026년 2학기 데이터베이스 01분반(CSE305-01)이 양쪽 학과 개설목록에서 각각 전공필수인지 전공선택인지 알려 주세요.",
+    "student_id": null,
+    "gold_sql": null,
+    "gold_answer": [
+      {
+        "department": "소프트웨어융합학과",
+        "category": "전공필수"
+      },
+      {
+        "department": "인공지능학과",
+        "category": "전공선택"
+      }
+    ],
+    "ordered": false,
+    "tags": [
+      "student_life",
+      "수강신청"
+    ],
+    "note": "원천 기록에서 정답 산출. 기준 SQL은 oracle 점검용.",
+    "reference_sql": "SELECT d.name AS department,cc.category_name AS category FROM course_offerings o\n       JOIN course_offering_categories oc USING(offering_id) JOIN departments d USING(department_id)\n       JOIN course_categories cc USING(category_id) WHERE o.year=2026 AND o.semester='2' AND o.campus='국제'\n       AND o.course_code='CSE305' AND o.section='01' AND d.code IN ('A07337','A10628');"
+  },
+  {
+    "id": "N014",
+    "question": "2026년 2학기 컴퓨터공학과 객체지향프로그래밍(CSE103)을 듣는데 영어 부분강좌는 피하고 싶어. 영어강좌 표시가 없는 분반의 화요일 시작 시간도 같이 알려줘.",
+    "student_id": null,
+    "gold_sql": null,
+    "gold_answer": [
+      {
+        "section": "00",
+        "start_time": "17:00"
+      }
+    ],
+    "ordered": false,
+    "tags": [
+      "student_life",
+      "수강신청"
+    ],
+    "note": "원천 기록에서 정답 산출. 기준 SQL은 oracle 점검용.",
+    "reference_sql": "SELECT o.section,t.start_time FROM course_offerings o JOIN class_times ct ON ct.offering_id=o.offering_id JOIN time_slots t ON t.time_slot_id=ct.time_slot_id\n        WHERE o.year=2026 AND o.semester='2' AND o.campus='국제'\n          AND EXISTS (SELECT 1 FROM course_offering_categories oc JOIN departments d ON d.department_id=oc.department_id\n                      WHERE oc.offering_id=o.offering_id AND d.code='A10627') AND o.course_code='CSE103' AND o.english_type='NONE' AND t.day='tuesday';"
+  },
+  {
+    "id": "N015",
+    "question": "2026년 2학기 컴퓨터공학과 데이터베이스 00분반(CSE305-00)과 캡스톤디자인 01분반(CSE406-01) 둘 다 정규 수업시간 칸에 시간이 없는데, 각각 온라인 표기인지 시간 미기재인지 구분해 줘.",
+    "student_id": null,
+    "gold_sql": null,
+    "gold_answer": [
+      {
+        "course_section": "CSE305-00",
+        "schedule_status": "ASYNCHRONOUS"
+      },
+      {
+        "course_section": "CSE406-01",
+        "schedule_status": "TBD"
+      }
+    ],
+    "ordered": false,
+    "tags": [
+      "student_life",
+      "수강신청"
+    ],
+    "note": "원천 기록에서 정답 산출. 기준 SQL은 oracle 점검용.",
+    "reference_sql": "SELECT o.course_code||'-'||o.section AS course_section,o.schedule_status FROM course_offerings o\n        WHERE o.year=2026 AND o.semester='2' AND o.campus='국제'\n          AND EXISTS (SELECT 1 FROM course_offering_categories oc JOIN departments d ON d.department_id=oc.department_id\n                      WHERE oc.offering_id=o.offering_id AND d.code='A10627') AND (o.course_code,o.section) IN (('CSE305','00'),('CSE406','01'));"
+  },
+  {
+    "id": "N016",
+    "question": "2026년에 컴퓨터공학과 운영체제(CSE301) 온라인 분반이 1학기와 2학기 중 언제 열렸어? 온라인으로 표시된 학기랑 분반 번호를 알려줘.",
+    "student_id": null,
+    "gold_sql": null,
+    "gold_answer": [
+      {
+        "semester": "2",
+        "section": "00"
+      }
+    ],
+    "ordered": false,
+    "tags": [
+      "student_life",
+      "수강신청"
+    ],
+    "note": "원천 기록에서 정답 산출. 기준 SQL은 oracle 점검용.",
+    "reference_sql": "SELECT o.semester,o.section FROM course_offerings o\n      WHERE (o.year=2026 AND o.semester='1' AND o.campus='국제'\n          AND EXISTS (SELECT 1 FROM course_offering_categories oc JOIN departments d ON d.department_id=oc.department_id\n                      WHERE oc.offering_id=o.offering_id AND d.code='A10627') OR o.year=2026 AND o.semester='2' AND o.campus='국제'\n          AND EXISTS (SELECT 1 FROM course_offering_categories oc JOIN departments d ON d.department_id=oc.department_id\n                      WHERE oc.offering_id=o.offering_id AND d.code='A10627')) AND o.course_code='CSE301' AND o.delivery_mode='ONLINE';"
+  },
+  {
+    "id": "N017",
+    "question": "금요일에 학교에 못 가서 2026년 2학기 컴퓨터공학과 컴퓨터네트워크(CSE302) 다른 분반을 보려고 해. 금요일 수업이 없는 분반 중 개설목록 수강정원이 가장 큰 분반은? 같으면 모두 알려줘.",
+    "student_id": null,
+    "gold_sql": null,
+    "gold_answer": [
+      {
+        "section": "02",
+        "capacity": 50
+      },
+      {
+        "section": "01",
+        "capacity": 50
+      }
+    ],
+    "ordered": false,
+    "tags": [
+      "student_life",
+      "수강신청"
+    ],
+    "note": "원천 기록에서 정답 산출. 기준 SQL은 oracle 점검용.",
+    "reference_sql": "WITH candidates AS (SELECT o.section,o.capacity FROM course_offerings o WHERE o.year=2026 AND o.semester='2' AND o.campus='국제'\n          AND EXISTS (SELECT 1 FROM course_offering_categories oc JOIN departments d ON d.department_id=oc.department_id\n                      WHERE oc.offering_id=o.offering_id AND d.code='A10627') AND o.course_code='CSE302'\n       AND o.capacity IS NOT NULL AND EXISTS (SELECT 1 FROM class_times c WHERE c.offering_id=o.offering_id)\n       AND NOT EXISTS(SELECT 1 FROM class_times c JOIN time_slots t USING(time_slot_id) WHERE c.offering_id=o.offering_id AND t.day='friday'))\n       SELECT section,capacity FROM candidates WHERE capacity=(SELECT MAX(capacity) FROM candidates);"
+  },
+  {
+    "id": "N018",
+    "question": "중고책 찾으려고 하는데, 2026년 1학기 자료구조 01분반(CSE204-01) 강의계획서 교재 1번의 제목과 ISBN을 알려줘.",
+    "student_id": null,
+    "gold_sql": null,
+    "gold_answer": [
+      {
+        "title": "C++ Plus Data Structures,Third Edition",
+        "isbn": "0763704814"
+      }
+    ],
+    "ordered": false,
+    "tags": [
+      "student_life",
+      "강의계획서"
+    ],
+    "note": "원천 기록에서 정답 산출. 기준 SQL은 oracle 점검용.",
+    "reference_sql": "SELECT b.title,b.isbn FROM course_offerings o JOIN syllabi s USING(offering_id)\n          JOIN syllabus_textbooks b USING(syllabus_id) WHERE o.year=2026 AND o.semester='1' AND o.campus='국제' AND o.course_code='CSE204' AND o.section='01' AND (b.sequence=1);"
+  },
+  {
+    "id": "N019",
+    "question": "2026년 1학기 운영체제 01분반(CSE301-01)을 예습하려고 해. 강의계획서 교재 1번의 판이 포함된 책 제목과 출판연도가 뭐야?",
+    "student_id": null,
+    "gold_sql": null,
+    "gold_answer": [
+      {
+        "title": "Operating System Concepts, 10th Ed.",
+        "publication_year": "2019"
+      }
+    ],
+    "ordered": false,
+    "tags": [
+      "student_life",
+      "강의계획서"
+    ],
+    "note": "원천 기록에서 정답 산출. 기준 SQL은 oracle 점검용.",
+    "reference_sql": "SELECT b.title,b.publication_year FROM course_offerings o JOIN syllabi s USING(offering_id)\n          JOIN syllabus_textbooks b USING(syllabus_id) WHERE o.year=2026 AND o.semester='1' AND o.campus='국제' AND o.course_code='CSE301' AND o.section='01' AND (b.sequence=1);"
+  },
+  {
+    "id": "N020",
+    "question": "2025년 1학기 알고리즘 00분반(CSE304-00)에서 동적계획법을 처음 다루는 건 몇 주차야?",
+    "student_id": null,
+    "gold_sql": null,
+    "gold_answer": [
+      {
+        "first_week": 5
+      }
+    ],
+    "ordered": false,
+    "tags": [
+      "student_life",
+      "강의계획서"
+    ],
+    "note": "원천 기록에서 정답 산출. 기준 SQL은 oracle 점검용.",
+    "reference_sql": "SELECT MIN(w.week) AS first_week FROM course_offerings o JOIN syllabi s USING(offering_id)\n          JOIN syllabus_weekly_plans w USING(syllabus_id) WHERE o.year=2025 AND o.semester='1' AND o.campus='국제' AND o.course_code='CSE304' AND o.section='00' AND (w.topic_content LIKE '%동적계획법%');"
+  },
+  {
+    "id": "N021",
+    "question": "2026년 1학기 운영체제 01분반(CSE301-01)에서 Deadlocks를 강의계획서상 몇 주차에 다뤄? 해당 주차 날짜 범위도 알려줘.",
+    "student_id": null,
+    "gold_sql": null,
+    "gold_answer": [
+      {
+        "week": 8,
+        "date_range": "4/21 ~ 4/27"
+      }
+    ],
+    "ordered": false,
+    "tags": [
+      "student_life",
+      "강의계획서"
+    ],
+    "note": "원천 기록에서 정답 산출. 기준 SQL은 oracle 점검용.",
+    "reference_sql": "SELECT w.week,w.date_range FROM course_offerings o JOIN syllabi s USING(offering_id)\n          JOIN syllabus_weekly_plans w USING(syllabus_id) WHERE o.year=2026 AND o.semester='1' AND o.campus='국제' AND o.course_code='CSE301' AND o.section='01' AND (w.topic_content LIKE '%Deadlocks%');"
+  },
+  {
+    "id": "N022",
+    "question": "2025년 2학기 컴퓨터네트워크 01분반(CSE302-01) 중간시험 보려면 뭘 준비하고 어디에 접속해야 해? 강의계획서 8주차 비고 기준으로 알려줘.",
+    "student_id": null,
+    "gold_sql": null,
+    "gold_answer": [
+      {
+        "note": "수업 시간에 개인 지참 랩톱/태블릿/패드 등을 이용하여 이캠퍼스 시스템에 접속하여 응시"
+      }
+    ],
+    "ordered": false,
+    "tags": [
+      "student_life",
+      "강의계획서"
+    ],
+    "note": "원천 기록에서 정답 산출. 기준 SQL은 oracle 점검용.",
+    "reference_sql": "SELECT w.note FROM course_offerings o JOIN syllabi s USING(offering_id)\n          JOIN syllabus_weekly_plans w USING(syllabus_id) WHERE o.year=2025 AND o.semester='2' AND o.campus='국제' AND o.course_code='CSE302' AND o.section='01' AND (w.week=8);"
+  },
+  {
+    "id": "N023",
+    "question": "2026년 1학기 캡스톤디자인 01분반(CSE406-01)에서 최종보고서 작성·발표가 강의계획서에 처음 나오는 주차가 언제야?",
+    "student_id": null,
+    "gold_sql": null,
+    "gold_answer": [
+      {
+        "first_week": 10
+      }
+    ],
+    "ordered": false,
+    "tags": [
+      "student_life",
+      "강의계획서"
+    ],
+    "note": "원천 기록에서 정답 산출. 기준 SQL은 oracle 점검용.",
+    "reference_sql": "SELECT MIN(w.week) AS first_week FROM course_offerings o JOIN syllabi s USING(offering_id)\n          JOIN syllabus_weekly_plans w USING(syllabus_id) WHERE o.year=2026 AND o.semester='1' AND o.campus='국제' AND o.course_code='CSE406' AND o.section='01' AND (w.topic_content LIKE '%최종보고서 작성/발표%');"
+  },
+  {
+    "id": "N024",
+    "question": "2025년 2학기 블록체인 00분반(CSE442-00)에서 산업 전문가 특강을 들으려면 강의계획서상 몇 주차를 보면 돼? 특강이 나오는 주차를 전부 알려줘.",
+    "student_id": null,
+    "gold_sql": null,
+    "gold_answer": [
+      {
+        "week": 7
+      },
+      {
+        "week": 10
+      },
+      {
+        "week": 12
+      }
+    ],
+    "ordered": false,
+    "tags": [
+      "student_life",
+      "강의계획서"
+    ],
+    "note": "원천 기록에서 정답 산출. 기준 SQL은 oracle 점검용.",
+    "reference_sql": "SELECT w.week FROM course_offerings o JOIN syllabi s USING(offering_id)\n          JOIN syllabus_weekly_plans w USING(syllabus_id) WHERE o.year=2025 AND o.semester='2' AND o.campus='국제' AND o.course_code='CSE442' AND o.section='00' AND (w.topic_content LIKE '%산업 전문가 특강%');"
+  },
+  {
+    "id": "N025",
+    "question": "2025년 2학기 세계신화읽기 00분반(ELC281-00)은 추석 있는 6주차에 수업 일정이 어떻게 표시돼? 계획서에 적힌 두 날짜와 휴일 종류를 알려줘.",
+    "student_id": null,
+    "gold_sql": null,
+    "gold_answer": [
+      {
+        "topic_content": "10.6: 추석 휴일\n10.8: 대체 휴일"
+      }
+    ],
+    "ordered": false,
+    "tags": [
+      "student_life",
+      "강의계획서"
+    ],
+    "note": "원천 기록에서 정답 산출. 기준 SQL은 oracle 점검용.",
+    "reference_sql": "SELECT w.topic_content FROM course_offerings o JOIN syllabi s USING(offering_id)\n          JOIN syllabus_weekly_plans w USING(syllabus_id) WHERE o.year=2025 AND o.semester='2' AND o.campus='국제' AND o.course_code='ELC281' AND o.section='00' AND (w.week=6);"
+  },
+  {
+    "id": "N026",
+    "question": "2026년 1학기 캡스톤디자인 01분반(CSE406-01) 준비물 사기 전에 확인하고 싶어. 강의계획서 교재란에 제목이 적힌 교재가 몇 권 있어?",
+    "student_id": null,
+    "gold_sql": null,
+    "gold_answer": [
+      {
+        "listed_textbooks": 0
+      }
+    ],
+    "ordered": false,
+    "tags": [
+      "student_life",
+      "강의계획서"
+    ],
+    "note": "원천 기록에서 정답 산출. 기준 SQL은 oracle 점검용.",
+    "reference_sql": "SELECT COUNT(*) AS listed_textbooks FROM course_offerings o JOIN syllabi s USING(offering_id)\n          JOIN syllabus_textbooks b USING(syllabus_id) WHERE o.year=2026 AND o.semester='1' AND o.campus='국제' AND o.course_code='CSE406' AND o.section='01' AND (NULLIF(TRIM(b.title),'') IS NOT NULL);"
+  },
+  {
+    "id": "N027",
+    "question": "2025년 2학기 컴퓨터네트워크 01분반(CSE302-01) 교수님께 질문하러 가려는데, 강의계획서에 적힌 연구실과 면담 방법이 뭐야?",
+    "student_id": null,
+    "gold_sql": null,
+    "gold_answer": [
+      {
+        "professor_office": "#317",
+        "consultation_time": "사전 예약 후 면담 가능"
+      }
+    ],
+    "ordered": false,
+    "tags": [
+      "student_life",
+      "강의계획서"
+    ],
+    "note": "원천 기록에서 정답 산출. 기준 SQL은 oracle 점검용.",
+    "reference_sql": "SELECT s.professor_office,s.consultation_time FROM course_offerings o JOIN syllabi s USING(offering_id) WHERE o.year=2025 AND o.semester='2' AND o.campus='국제' AND o.course_code='CSE302' AND o.section='01';"
+  },
+  {
+    "id": "N028",
+    "question": "2025년 2학기 컴퓨터공학과 개설목록의 컴퓨터네트워크 01분반(CSE302-01)은 수강정원이 몇 명이었고, 강의계획서 교재 1번 제목은 뭐였어?",
+    "student_id": null,
+    "gold_sql": null,
+    "gold_answer": [
+      {
+        "capacity": 40,
+        "title": "시스코 아카데미 패킷트레이서"
+      }
+    ],
+    "ordered": false,
+    "tags": [
+      "student_life",
+      "자료 연결"
+    ],
+    "note": "원천 기록에서 정답 산출. 기준 SQL은 oracle 점검용.",
+    "reference_sql": "SELECT o.capacity,b.title FROM course_offerings o JOIN syllabi s USING(offering_id)\n          JOIN syllabus_textbooks b USING(syllabus_id) WHERE o.year=2025 AND o.semester='2' AND o.campus='국제' AND o.course_code='CSE302' AND o.section='01' AND (b.sequence=1 AND o.year=2025 AND o.semester='2' AND o.campus='국제'\n          AND EXISTS (SELECT 1 FROM course_offering_categories oc JOIN departments d ON d.department_id=oc.department_id\n                      WHERE oc.offering_id=o.offering_id AND d.code='A10627'));"
+  },
+  {
+    "id": "N029",
+    "question": "2026년 1학기 컴퓨터공학과 자료구조 01분반(CSE204-01), 화요일 정규 수업은 몇 시에 어디서 듣고 4주차에는 어떤 단원을 공부해?",
+    "student_id": null,
+    "gold_sql": null,
+    "gold_answer": [
+      {
+        "start_time": "13:00",
+        "room_code": "전136",
+        "topic_content": "Chap. 4 (Stack and Queue) 1st part"
+      }
+    ],
+    "ordered": false,
+    "tags": [
+      "student_life",
+      "자료 연결"
+    ],
+    "note": "원천 기록에서 정답 산출. 기준 SQL은 oracle 점검용.",
+    "reference_sql": "SELECT t.start_time,ct.room_code,w.topic_content FROM course_offerings o JOIN class_times ct ON ct.offering_id=o.offering_id JOIN time_slots t ON t.time_slot_id=ct.time_slot_id\n        JOIN syllabi s ON s.offering_id=o.offering_id JOIN syllabus_weekly_plans w USING(syllabus_id)\n        WHERE o.year=2026 AND o.semester='1' AND o.campus='국제'\n          AND EXISTS (SELECT 1 FROM course_offering_categories oc JOIN departments d ON d.department_id=oc.department_id\n                      WHERE oc.offering_id=o.offering_id AND d.code='A10627') AND o.course_code='CSE204' AND o.section='01' AND t.day='tuesday' AND w.week=4;"
+  },
+  {
+    "id": "N030",
+    "question": "2025년 2학기 컴퓨터네트워크 01분반(CSE302-01)은 강의계획서에서 중간시험을 몇 주차에 보며, 교재 1번 ISBN은 뭐야? 교재 구매 전에 같이 확인하고 싶어.",
+    "student_id": null,
+    "gold_sql": null,
+    "gold_answer": [
+      {
+        "exam_week": 8,
+        "isbn": "9788982226090"
+      }
+    ],
+    "ordered": false,
+    "tags": [
+      "student_life",
+      "자료 연결"
+    ],
+    "note": "원천 기록에서 정답 산출. 기준 SQL은 oracle 점검용.",
+    "reference_sql": "SELECT w.week AS exam_week,b.isbn FROM course_offerings o JOIN syllabi s USING(offering_id)\n        JOIN syllabus_weekly_plans w USING(syllabus_id) JOIN syllabus_textbooks b USING(syllabus_id)\n        WHERE o.year=2025 AND o.semester='2' AND o.campus='국제' AND o.course_code='CSE302' AND o.section='01' AND w.topic_content LIKE '%중간 시험%' AND b.sequence=1;"
+  },
+  {
+    "id": "N031",
+    "question": "2026년 2학기 컴퓨터공학과에서 소프트웨어공학(CSE327)이랑 논리회로(EE209)를 같이 담고 싶어. 금요일 수업이 없고, 둘 다 오후 5시까지 끝나면서 정규 수업끼리 안 겹치는 분반 조합을 전부 알려줘.",
+    "student_id": null,
+    "gold_sql": null,
+    "gold_answer": [
+      {
+        "software_section": "00",
+        "logic_section": "03"
+      },
+      {
+        "software_section": "00",
+        "logic_section": "01"
+      },
+      {
+        "software_section": "01",
+        "logic_section": "03"
+      },
+      {
+        "software_section": "01",
+        "logic_section": "01"
+      }
+    ],
+    "ordered": false,
+    "tags": [
+      "student_life",
+      "시간표·강의실"
+    ],
+    "note": "원천 기록에서 정답 산출. 기준 SQL은 oracle 점검용.",
+    "reference_sql": "WITH times AS (SELECT o.offering_id,o.course_code,o.section,o.target_year,t.day,t.start_time,t.end_time,ct.room_code\n              FROM course_offerings o JOIN class_times ct USING(offering_id) JOIN time_slots t USING(time_slot_id) WHERE o.year=2026 AND o.semester='2' AND o.campus='국제'\n          AND EXISTS (SELECT 1 FROM course_offering_categories oc JOIN departments d ON d.department_id=oc.department_id\n                      WHERE oc.offering_id=o.offering_id AND d.code='A10627') AND o.course_code IN ('CSE327','EE209')),\n      eligible AS (\n        SELECT offering_id,course_code,section FROM times GROUP BY offering_id,course_code,section\n        HAVING SUM(CASE WHEN day='friday' OR end_time>'17:00' THEN 1 ELSE 0 END)=0\n      ) SELECT a.section AS software_section,b.section AS logic_section FROM eligible a CROSS JOIN eligible b\n        WHERE a.course_code='CSE327' AND b.course_code='EE209'\n        AND NOT EXISTS (SELECT 1 FROM times t JOIN times u ON t.day=u.day AND t.start_time<u.end_time AND u.start_time<t.end_time\n         WHERE t.offering_id=a.offering_id AND u.offering_id=b.offering_id);"
+  },
+  {
+    "id": "N032",
+    "question": "2026년 2학기 컴퓨터공학과 데이터베이스 01분반(CSE305-01) 때문에 학교에 가는 요일만 유지하고 싶어. 등교하는 요일을 늘리지 않고 시간도 안 겹치게 추가할 수 있는 컴퓨터네트워크(CSE302) 분반은 뭐야?",
+    "student_id": null,
+    "gold_sql": null,
+    "gold_answer": [
+      {
+        "section": "02"
+      }
+    ],
+    "ordered": false,
+    "tags": [
+      "student_life",
+      "시간표·강의실"
+    ],
+    "note": "원천 기록에서 정답 산출. 기준 SQL은 oracle 점검용.",
+    "reference_sql": "WITH times AS (SELECT o.offering_id,o.course_code,o.section,o.target_year,t.day,t.start_time,t.end_time,ct.room_code\n              FROM course_offerings o JOIN class_times ct USING(offering_id) JOIN time_slots t USING(time_slot_id) WHERE o.year=2026 AND o.semester='2' AND o.campus='국제'\n          AND EXISTS (SELECT 1 FROM course_offering_categories oc JOIN departments d ON d.department_id=oc.department_id\n                      WHERE oc.offering_id=o.offering_id AND d.code='A10627') AND o.course_code IN ('CSE305','CSE302')),\n      fixed AS (SELECT * FROM times WHERE course_code='CSE305' AND section='01')\n      SELECT DISTINCT a.section FROM times a WHERE a.course_code='CSE302'\n      AND NOT EXISTS(SELECT 1 FROM times b WHERE b.offering_id=a.offering_id AND\n        (NOT EXISTS(SELECT 1 FROM fixed f WHERE f.day=b.day) OR EXISTS(\n          SELECT 1 FROM fixed f WHERE f.day=b.day AND b.start_time<f.end_time AND f.start_time<b.end_time)));"
+  },
+  {
+    "id": "N033",
+    "question": "2026년 2학기 컴퓨터공학과 이산구조 01분반(CSE201-01)과 메타버스데이터처리 00분반(CSE430-00)을 둘 다 들으면, 수요일 첫 수업 시작부터 마지막 수업 끝까지 몇 분이야? 시작과 종료 시각도 알려줘.",
+    "student_id": null,
+    "gold_sql": null,
+    "gold_answer": [
+      {
+        "first_start": "10:30",
+        "last_end": "16:15",
+        "span_minutes": 345
+      }
+    ],
+    "ordered": false,
+    "tags": [
+      "student_life",
+      "시간표·강의실"
+    ],
+    "note": "원천 기록에서 정답 산출. 기준 SQL은 oracle 점검용.",
+    "reference_sql": "WITH times AS (SELECT o.offering_id,o.course_code,o.section,o.target_year,t.day,t.start_time,t.end_time,ct.room_code\n              FROM course_offerings o JOIN class_times ct USING(offering_id) JOIN time_slots t USING(time_slot_id) WHERE o.year=2026 AND o.semester='2' AND o.campus='국제'\n          AND EXISTS (SELECT 1 FROM course_offering_categories oc JOIN departments d ON d.department_id=oc.department_id\n                      WHERE oc.offering_id=o.offering_id AND d.code='A10627') AND o.course_code IN ('CSE201','CSE430'))\n      SELECT MIN(start_time) AS first_start,MAX(end_time) AS last_end,\n      CAST(ROUND((julianday('2000-01-01 ' || MAX(end_time))-julianday('2000-01-01 ' || MIN(start_time)))*1440) AS INTEGER) AS span_minutes\n      FROM times WHERE day='wednesday' AND (course_code,section) IN (('CSE201','01'),('CSE430','00'));"
+  },
+  {
+    "id": "N034",
+    "question": "2026년 2학기 컴퓨터공학과 자료구조(CSE204) 금요일에 몰아서 듣는 00분반하고 월·수 01분반의 주당 정규 수업시간을 비교하고 싶어. 개설목록 기준으로 분반별 총 몇 분이야?",
+    "student_id": null,
+    "gold_sql": null,
+    "gold_answer": [
+      {
+        "section": "00",
+        "weekly_minutes": 230
+      },
+      {
+        "section": "01",
+        "weekly_minutes": 220
+      }
+    ],
+    "ordered": false,
+    "tags": [
+      "student_life",
+      "시간표·강의실"
+    ],
+    "note": "원천 기록에서 정답 산출. 기준 SQL은 oracle 점검용.",
+    "reference_sql": "WITH times AS (SELECT o.offering_id,o.course_code,o.section,o.target_year,t.day,t.start_time,t.end_time,ct.room_code\n              FROM course_offerings o JOIN class_times ct USING(offering_id) JOIN time_slots t USING(time_slot_id) WHERE o.year=2026 AND o.semester='2' AND o.campus='국제'\n          AND EXISTS (SELECT 1 FROM course_offering_categories oc JOIN departments d ON d.department_id=oc.department_id\n                      WHERE oc.offering_id=o.offering_id AND d.code='A10627') AND o.course_code IN ('CSE204')) SELECT section,SUM(CAST(ROUND((julianday('2000-01-01 ' || end_time)-julianday('2000-01-01 ' || start_time))*1440) AS INTEGER)) AS weekly_minutes\n      FROM times WHERE section IN ('00','01') GROUP BY section;"
+  },
+  {
+    "id": "N035",
+    "question": "2026년 2학기 금요일 B07에서 컴퓨터공학과 개설목록에 잡힌 수업이 뭐야? 개설목록 범위에서 강좌코드·분반과 사용 시간을 시작 순으로 알려줘.",
+    "student_id": null,
+    "gold_sql": null,
+    "gold_answer": [
+      {
+        "course_section": "CSE302-00",
+        "start_time": "09:00",
+        "end_time": "11:45"
+      },
+      {
+        "course_section": "CSE204-00",
+        "start_time": "12:00",
+        "end_time": "15:50"
+      }
+    ],
+    "ordered": true,
+    "tags": [
+      "student_life",
+      "시간표·강의실"
+    ],
+    "note": "원천 기록에서 정답 산출. 기준 SQL은 oracle 점검용.",
+    "reference_sql": "SELECT DISTINCT o.course_code||'-'||o.section AS course_section,t.start_time,t.end_time\n              FROM course_offerings o JOIN class_times ct USING(offering_id) JOIN time_slots t USING(time_slot_id) WHERE o.year=2026 AND o.semester='2' AND o.campus='국제'\n          AND EXISTS (SELECT 1 FROM course_offering_categories oc JOIN departments d ON d.department_id=oc.department_id\n                      WHERE oc.offering_id=o.offering_id AND d.code='A10627') AND t.day='friday' AND ct.room_code='B07' ORDER BY t.start_time;"
+  },
+  {
+    "id": "N036",
+    "question": "2026년 2학기 소프트웨어융합학과 소프트웨어융합캡스톤디자인(SWCON401) 중 금요일 오후 3시에 시작하고 개설목록에 강의실까지 적힌 분반은 뭐야? 분반과 강의실 코드를 알려줘.",
+    "student_id": null,
+    "gold_sql": null,
+    "gold_answer": [
+      {
+        "section": "05",
+        "room_code": "전220"
+      }
+    ],
+    "ordered": false,
+    "tags": [
+      "student_life",
+      "시간표·강의실"
+    ],
+    "note": "원천 기록에서 정답 산출. 기준 SQL은 oracle 점검용.",
+    "reference_sql": "SELECT o.section,ct.room_code FROM course_offerings o JOIN class_times ct ON ct.offering_id=o.offering_id JOIN time_slots t ON t.time_slot_id=ct.time_slot_id WHERE o.year=2026 AND o.semester='2' AND o.campus='국제'\n          AND EXISTS (SELECT 1 FROM course_offering_categories oc JOIN departments d ON d.department_id=oc.department_id\n                      WHERE oc.offering_id=o.offering_id AND d.code='A07337')\n      AND o.course_code='SWCON401' AND t.day='friday' AND t.start_time='15:00' AND NULLIF(TRIM(ct.room_code),'') IS NOT NULL;"
+  },
+  {
+    "id": "N037",
+    "question": "작년 자료 말고 2026년 1·2학기를 비교하고 싶어. 컴퓨터공학과 데이터베이스 01분반(CSE305-01) 목요일 수업 강의실이 학기별로 어디였어?",
+    "student_id": null,
+    "gold_sql": null,
+    "gold_answer": [
+      {
+        "semester": "1",
+        "room_code": "전136"
+      },
+      {
+        "semester": "2",
+        "room_code": "B01"
+      }
+    ],
+    "ordered": false,
+    "tags": [
+      "student_life",
+      "시간표·강의실"
+    ],
+    "note": "원천 기록에서 정답 산출. 기준 SQL은 oracle 점검용.",
+    "reference_sql": "SELECT o.semester,ct.room_code FROM course_offerings o JOIN class_times ct ON ct.offering_id=o.offering_id JOIN time_slots t ON t.time_slot_id=ct.time_slot_id\n      WHERE (o.year=2026 AND o.semester='1' AND o.campus='국제'\n          AND EXISTS (SELECT 1 FROM course_offering_categories oc JOIN departments d ON d.department_id=oc.department_id\n                      WHERE oc.offering_id=o.offering_id AND d.code='A10627') OR o.year=2026 AND o.semester='2' AND o.campus='국제'\n          AND EXISTS (SELECT 1 FROM course_offering_categories oc JOIN departments d ON d.department_id=oc.department_id\n                      WHERE oc.offering_id=o.offering_id AND d.code='A10627')) AND o.course_code='CSE305' AND o.section='01' AND t.day='thursday';"
+  },
+  {
+    "id": "N038",
+    "question": "2026년 2학기 소프트웨어융합학과 데이터분석캡스톤디자인(SWCON321) 신청하려고 하는데 목요일에 밤 9시 넘어서 끝나는 분반을 피하고 싶어. 해당 분반 번호랑 종료 시각을 알려줘.",
+    "student_id": null,
+    "gold_sql": null,
+    "gold_answer": [
+      {
+        "section": "01",
+        "end_time": "22:45"
+      }
+    ],
+    "ordered": false,
+    "tags": [
+      "student_life",
+      "시간표·강의실"
+    ],
+    "note": "원천 기록에서 정답 산출. 기준 SQL은 oracle 점검용.",
+    "reference_sql": "SELECT o.section,t.end_time FROM course_offerings o JOIN class_times ct ON ct.offering_id=o.offering_id JOIN time_slots t ON t.time_slot_id=ct.time_slot_id\n      WHERE o.year=2026 AND o.semester='2' AND o.campus='국제'\n          AND EXISTS (SELECT 1 FROM course_offering_categories oc JOIN departments d ON d.department_id=oc.department_id\n                      WHERE oc.offering_id=o.offering_id AND d.code='A07337') AND o.course_code='SWCON321' AND t.day='thursday' AND t.end_time>'21:00';"
+  },
+  {
+    "id": "N039",
+    "question": "졸업논문도 학점이 들어가는지 헷갈려. 2026년 2학기 소프트웨어융합학과의 SWCON402-00과 인공지능학과의 AI4003-00은 개설목록상 각각 몇 학점이야?",
+    "student_id": null,
+    "gold_sql": null,
+    "gold_answer": [
+      {
+        "course_section": "SWCON402-00",
+        "credits": 0
+      },
+      {
+        "course_section": "AI4003-00",
+        "credits": 0
+      }
+    ],
+    "ordered": false,
+    "tags": [
+      "student_life",
+      "수강 요건"
+    ],
+    "note": "원천 기록에서 정답 산출. 기준 SQL은 oracle 점검용.",
+    "reference_sql": "SELECT o.course_code||'-'||o.section AS course_section,o.credits FROM course_offerings o\n      WHERE (o.year=2026 AND o.semester='2' AND o.campus='국제'\n          AND EXISTS (SELECT 1 FROM course_offering_categories oc JOIN departments d ON d.department_id=oc.department_id\n                      WHERE oc.offering_id=o.offering_id AND d.code='A07337') AND o.course_code='SWCON402' AND o.section='00') OR (o.year=2026 AND o.semester='2' AND o.campus='국제'\n          AND EXISTS (SELECT 1 FROM course_offering_categories oc JOIN departments d ON d.department_id=oc.department_id\n                      WHERE oc.offering_id=o.offering_id AND d.code='A10628') AND o.course_code='AI4003' AND o.section='00');"
+  },
+  {
+    "id": "N040",
+    "question": "2026년 2학기 소프트웨어융합캡스톤디자인 03분반(SWCON401-03) 들으려는데, 강의계획서 필수 선수과목 그룹 01에서 코드가 서로 다른 선택지는 몇 개고 그중 최소 몇 과목을 이수해야 해?",
+    "student_id": null,
+    "gold_sql": null,
+    "gold_answer": [
+      {
+        "distinct_prerequisite_codes": 3,
+        "minimum_required_count": 1
+      }
+    ],
+    "ordered": false,
+    "tags": [
+      "student_life",
+      "수강 요건"
+    ],
+    "note": "원천 기록에서 정답 산출. 기준 SQL은 oracle 점검용.",
+    "reference_sql": "SELECT COUNT(DISTINCT p.prerequisite_course_code) AS distinct_prerequisite_codes, MAX(p.minimum_required_count) AS minimum_required_count FROM course_offerings o JOIN syllabi s USING(offering_id)\n           JOIN prerequisite_sources ps ON ps.source_syllabus_id=s.syllabus_id\n           JOIN course_prerequisites p USING(prerequisite_id) WHERE o.year=2026 AND o.semester='2' AND o.campus='국제' AND o.course_code='SWCON401' AND o.section='03'\n           AND p.prerequisite_type='REQUIRED' AND p.prerequisite_group='01';"
+  },
+  {
+    "id": "N041",
+    "question": "고급객체지향프로그래밍(CSE202)만 이수했다고 가정할게. 2026년 1학기 자료구조 02분반(CSE204-02) 강의계획서에서 2024학번 비ABEEK 기준 필수 선수과목 그룹 01의 과목 수 조건을 채워? 충족이면 1, 아니면 0으로 알려줘.",
+    "student_id": null,
+    "gold_sql": null,
+    "gold_answer": [
+      {
+        "meets_group_count": 1
+      }
+    ],
+    "ordered": false,
+    "tags": [
+      "student_life",
+      "수강 요건"
+    ],
+    "note": "원천 기록에서 정답 산출. 기준 SQL은 oracle 점검용.",
+    "reference_sql": "SELECT CASE WHEN COUNT(DISTINCT CASE WHEN p.prerequisite_course_code='CSE202' THEN p.prerequisite_course_code END)>=MAX(p.minimum_required_count) THEN 1 ELSE 0 END AS meets_group_count FROM course_offerings o JOIN syllabi s USING(offering_id)\n           JOIN prerequisite_sources ps ON ps.source_syllabus_id=s.syllabus_id\n           JOIN course_prerequisites p USING(prerequisite_id) WHERE o.year=2026 AND o.semester='1' AND o.campus='국제' AND o.course_code='CSE204' AND o.section='02'\n           AND p.prerequisite_type='REQUIRED' AND p.prerequisite_group='01' AND 2024>=p.cohort_start AND (p.cohort_end IS NULL OR 2024<=p.cohort_end) AND p.abeek_applicable=0;"
+  },
+  {
+    "id": "N042",
+    "question": "2026년 2학기 캡스톤디자인 14분반(CSE406-14) 강의계획서의 비ABEEK 필수 선수과목 그룹 01에는 어떤 과목 코드가 있고, 몇 학번부터 몇 학번까지 적용돼?",
+    "student_id": null,
+    "gold_sql": null,
+    "gold_answer": [
+      {
+        "prerequisite_course_code": "SWCON103",
+        "cohort_start": 2018,
+        "cohort_end": 2024
+      }
+    ],
+    "ordered": false,
+    "tags": [
+      "student_life",
+      "수강 요건"
+    ],
+    "note": "원천 기록에서 정답 산출. 기준 SQL은 oracle 점검용.",
+    "reference_sql": "SELECT DISTINCT p.prerequisite_course_code,p.cohort_start,p.cohort_end FROM course_offerings o JOIN syllabi s USING(offering_id)\n           JOIN prerequisite_sources ps ON ps.source_syllabus_id=s.syllabus_id\n           JOIN course_prerequisites p USING(prerequisite_id) WHERE o.year=2026 AND o.semester='2' AND o.campus='국제' AND o.course_code='CSE406' AND o.section='14'\n           AND p.prerequisite_type='REQUIRED' AND p.prerequisite_group='01' AND p.abeek_applicable=0;"
+  },
+  {
+    "id": "N043",
+    "question": "2026년 2학기 연구연수활동2 04분반(CSE497-04)과 독립심화학습2 02분반(CSE499-02) 계획서를 보니 교재가 겹치는 것 같아. ISBN이 같은 공통 교재의 제목과 ISBN을 알려줘.",
+    "student_id": null,
+    "gold_sql": null,
+    "gold_answer": [
+      {
+        "title": "IT CookBook, 정보 보안 개론(4판)",
+        "isbn": "9791156648130"
+      },
+      {
+        "title": "Security Engineering: A Guide to Building Dependable Distributed Systems",
+        "isbn": "978-1-119-64281-7"
+      }
+    ],
+    "ordered": false,
+    "tags": [
+      "student_life",
+      "교재·참고자료"
+    ],
+    "note": "원천 기록에서 정답 산출. 기준 SQL은 oracle 점검용.",
+    "reference_sql": "SELECT b.title,b.isbn FROM course_offerings o JOIN syllabi s USING(offering_id)\n      JOIN syllabus_textbooks b USING(syllabus_id) WHERE ((o.year=2026 AND o.semester='2' AND o.campus='국제' AND o.course_code='CSE497' AND o.section='04') OR (o.year=2026 AND o.semester='2' AND o.campus='국제' AND o.course_code='CSE499' AND o.section='02')) AND NULLIF(TRIM(b.isbn),'') IS NOT NULL\n      GROUP BY b.title,b.isbn HAVING COUNT(DISTINCT o.offering_id)=2;"
+  },
+  {
+    "id": "N044",
+    "question": "2026년 2학기 연구연수활동2 04분반(CSE497-04)에서 교재 1번을 찾고 있어. 강의계획서 교재란 비고에 적힌 링크 주소만 알려줘.",
+    "student_id": null,
+    "gold_sql": null,
+    "gold_answer": [
+      {
+        "note": "https://www.cl.cam.ac.uk/archive/rja14/book.html"
+      }
+    ],
+    "ordered": false,
+    "tags": [
+      "student_life",
+      "교재·참고자료"
+    ],
+    "note": "원천 기록에서 정답 산출. 기준 SQL은 oracle 점검용.",
+    "reference_sql": "SELECT b.note FROM course_offerings o JOIN syllabi s USING(offering_id)\n          JOIN syllabus_textbooks b USING(syllabus_id) WHERE o.year=2026 AND o.semester='2' AND o.campus='국제' AND o.course_code='CSE497' AND o.section='04' AND (b.sequence=1);"
+  },
+  {
+    "id": "N045",
+    "question": "2026년 2학기 데이터사이언스및시각화 00분반(SWCON425-00) 교재 목록에서 최근에 출판된 책부터 읽고 싶어. 출판연도가 기재된 책 중 가장 최근 책의 제목과 연도는 뭐야? 같은 연도면 모두 알려줘.",
+    "student_id": null,
+    "gold_sql": null,
+    "gold_answer": [
+      {
+        "title": "Modern Data Science with R",
+        "publication_year": "2020"
+      }
+    ],
+    "ordered": false,
+    "tags": [
+      "student_life",
+      "교재·참고자료"
+    ],
+    "note": "원천 기록에서 정답 산출. 기준 SQL은 oracle 점검용.",
+    "reference_sql": "WITH books AS (SELECT b.title,b.publication_year FROM course_offerings o JOIN syllabi s USING(offering_id)\n          JOIN syllabus_textbooks b USING(syllabus_id) WHERE o.year=2026 AND o.semester='2' AND o.campus='국제' AND o.course_code='SWCON425' AND o.section='00' AND (length(b.publication_year)=4 AND b.publication_year NOT GLOB '*[^0-9]*')) SELECT title,publication_year FROM books WHERE publication_year=(SELECT MAX(publication_year) FROM books);"
+  },
+  {
+    "id": "N046",
+    "question": "2026년 2학기 캡스톤디자인(CSE406) 05분반이랑 14분반 중 교수님과 Slack에서 면담 일정을 정한다고 명시한 분반은 어디야?",
+    "student_id": null,
+    "gold_sql": null,
+    "gold_answer": [
+      {
+        "section": "14"
+      }
+    ],
+    "ordered": false,
+    "tags": [
+      "student_life",
+      "면담·수업방식"
+    ],
+    "note": "원천 기록에서 정답 산출. 기준 SQL은 oracle 점검용.",
+    "reference_sql": "SELECT o.section FROM course_offerings o JOIN syllabi s USING(offering_id)\n      WHERE ((o.year=2026 AND o.semester='2' AND o.campus='국제' AND o.course_code='CSE406' AND o.section='05') OR (o.year=2026 AND o.semester='2' AND o.campus='국제' AND o.course_code='CSE406' AND o.section='14')) AND LOWER(s.consultation_time) LIKE '%slack%';"
+  },
+  {
+    "id": "N047",
+    "question": "2026년 2학기 데이터사이언스및시각화(SWCON425-00)와 데이터분석캡스톤디자인(SWCON321-00)에 같은 면담 시간 안내가 적혀 있으면, 공통으로 적힌 안내를 알려줘.",
+    "student_id": null,
+    "gold_sql": null,
+    "gold_answer": [
+      {
+        "consultation_time": "Wednesday 3-5 pm & By appointment"
+      }
+    ],
+    "ordered": false,
+    "tags": [
+      "student_life",
+      "면담·수업방식"
+    ],
+    "note": "원천 기록에서 정답 산출. 기준 SQL은 oracle 점검용.",
+    "reference_sql": "SELECT s.consultation_time FROM course_offerings o JOIN syllabi s USING(offering_id)\n      WHERE ((o.year=2026 AND o.semester='2' AND o.campus='국제' AND o.course_code='SWCON425' AND o.section='00') OR (o.year=2026 AND o.semester='2' AND o.campus='국제' AND o.course_code='SWCON321' AND o.section='00')) AND s.consultation_time IS NOT NULL\n      GROUP BY s.consultation_time HAVING COUNT(DISTINCT o.offering_id)=2;"
+  },
+  {
+    "id": "N048",
+    "question": "2026년 2학기 소프트웨어융합학과 데이터사이언스및시각화(SWCON425-00), 목요일 수업 장소랑 교수님 찾아가는 연구실이 자꾸 헷갈려. 개설목록 강의실 코드와 계획서에 적힌 연구실을 각각 알려줘.",
+    "student_id": null,
+    "gold_sql": null,
+    "gold_answer": [
+      {
+        "room_code": "B05",
+        "professor_office": "전자정보대학관 708호"
+      }
+    ],
+    "ordered": false,
+    "tags": [
+      "student_life",
+      "자료 연결"
+    ],
+    "note": "원천 기록에서 정답 산출. 기준 SQL은 oracle 점검용.",
+    "reference_sql": "SELECT ct.room_code,s.professor_office FROM course_offerings o JOIN class_times ct ON ct.offering_id=o.offering_id JOIN time_slots t ON t.time_slot_id=ct.time_slot_id JOIN syllabi s ON s.offering_id=o.offering_id\n      WHERE o.year=2026 AND o.semester='2' AND o.campus='국제'\n          AND EXISTS (SELECT 1 FROM course_offering_categories oc JOIN departments d ON d.department_id=oc.department_id\n                      WHERE oc.offering_id=o.offering_id AND d.code='A07337') AND o.course_code='SWCON425' AND o.section='00' AND t.day='thursday';"
+  },
+  {
+    "id": "N049",
+    "question": "소프트웨어융합캡스톤디자인 03분반(SWCON401-03)은 2026년 1학기와 2학기 강의계획서에서 수업 운영 방식이 각각 어떻게 안내돼?",
+    "student_id": null,
+    "gold_sql": null,
+    "gold_answer": [
+      {
+        "semester": "1",
+        "operation_modes": "대면 + 비실시간\n비대면 수업\n(대면+contents)"
+      },
+      {
+        "semester": "2",
+        "operation_modes": "대면수업"
+      }
+    ],
+    "ordered": false,
+    "tags": [
+      "student_life",
+      "면담·수업방식"
+    ],
+    "note": "원천 기록에서 정답 산출. 기준 SQL은 oracle 점검용.",
+    "reference_sql": "SELECT o.semester,s.operation_modes FROM course_offerings o JOIN syllabi s USING(offering_id) WHERE ((o.year=2026 AND o.semester='1' AND o.campus='국제' AND o.course_code='SWCON401' AND o.section='03') OR (o.year=2026 AND o.semester='2' AND o.campus='국제' AND o.course_code='SWCON401' AND o.section='03'));"
+  },
+  {
+    "id": "N050",
+    "question": "2026년 1학기 소프트웨어융합캡스톤디자인(SWCON401) 03분반과 05분반 중, 계획서 수업방법에 개별발표 표시가 있고 팀별발표 표시는 없는 분반이 있어?",
+    "student_id": null,
+    "gold_sql": null,
+    "gold_answer": [
+      {
+        "section": "05"
+      }
+    ],
+    "ordered": false,
+    "tags": [
+      "student_life",
+      "면담·수업방식"
+    ],
+    "note": "원천 기록에서 정답 산출. 기준 SQL은 oracle 점검용.",
+    "reference_sql": "SELECT o.section FROM course_offerings o JOIN syllabi s USING(offering_id)\n      WHERE ((o.year=2026 AND o.semester='1' AND o.campus='국제' AND o.course_code='SWCON401' AND o.section='03') OR (o.year=2026 AND o.semester='1' AND o.campus='국제' AND o.course_code='SWCON401' AND o.section='05')) AND EXISTS (SELECT 1 FROM json_each(s.teaching_methods_json) j WHERE j.value='개별발표')\n      AND NOT EXISTS (SELECT 1 FROM json_each(s.teaching_methods_json) j WHERE j.value='팀별발표');"
+  },
+  {
+    "id": "N051",
+    "question": "2026년 1학기 회로와신호 00분반(SWCON254-00) 숙제 3번을 미리 챙기고 싶어. 강의계획서 비고에서 몇 주차에 공지되고 몇 주차에 제출하라고 적혀 있어?",
+    "student_id": null,
+    "gold_sql": null,
+    "gold_answer": [
+      {
+        "notice_week": 6,
+        "submission_week": 8
+      }
+    ],
+    "ordered": false,
+    "tags": [
+      "student_life",
+      "과제·프로젝트"
+    ],
+    "note": "원천 기록에서 정답 산출. 기준 SQL은 oracle 점검용.",
+    "reference_sql": "SELECT MIN(CASE WHEN w.note LIKE '%HW 3 공지%' THEN w.week END) AS notice_week, MIN(CASE WHEN w.note LIKE '%HW 3 제출%' THEN w.week END) AS submission_week FROM course_offerings o JOIN syllabi s USING(offering_id)\n          JOIN syllabus_weekly_plans w USING(syllabus_id) WHERE o.year=2026 AND o.semester='1' AND o.campus='국제' AND o.course_code='SWCON254' AND o.section='00' AND (1=1);"
+  },
+  {
+    "id": "N052",
+    "question": "2026년 2학기 로봇·비전캡스톤디자인 00분반(SWCON332-00)은 강의계획서에서 설계서와 최종 결과 보고서를 각각 몇 주차에 내?",
+    "student_id": null,
+    "gold_sql": null,
+    "gold_answer": [
+      {
+        "design_submission_week": 8,
+        "final_report_week": 15
+      }
+    ],
+    "ordered": false,
+    "tags": [
+      "student_life",
+      "과제·프로젝트"
+    ],
+    "note": "원천 기록에서 정답 산출. 기준 SQL은 oracle 점검용.",
+    "reference_sql": "SELECT MIN(CASE WHEN w.topic_content LIKE '%설계서 제출%' THEN w.week END) AS design_submission_week, MIN(CASE WHEN w.topic_content LIKE '%최종 결과 보고서 제출%' THEN w.week END) AS final_report_week FROM course_offerings o JOIN syllabi s USING(offering_id)\n          JOIN syllabus_weekly_plans w USING(syllabus_id) WHERE o.year=2026 AND o.semester='2' AND o.campus='국제' AND o.course_code='SWCON332' AND o.section='00' AND (1=1);"
+  },
+  {
+    "id": "N053",
+    "question": "2026년 2학기 소프트웨어융합캡스톤디자인(SWCON401-03)과 졸업논문(SWCON402-00)을 같이 하는데, 계획서상 캡스톤 최종 발표와 졸업논문 결과보고서 제출이 같은 주야? 과목별 해당 주차를 알려줘.",
+    "student_id": null,
+    "gold_sql": null,
+    "gold_answer": [
+      {
+        "course_code": "SWCON401",
+        "week": 16
+      },
+      {
+        "course_code": "SWCON402",
+        "week": 15
+      }
+    ],
+    "ordered": false,
+    "tags": [
+      "student_life",
+      "과제·프로젝트"
+    ],
+    "note": "원천 기록에서 정답 산출. 기준 SQL은 oracle 점검용.",
+    "reference_sql": "SELECT o.course_code, MIN(w.week) AS week FROM course_offerings o JOIN syllabi s USING(offering_id)\n      JOIN syllabus_weekly_plans w USING(syllabus_id)\n      WHERE ((o.year=2026 AND o.semester='2' AND o.campus='국제' AND o.course_code='SWCON401' AND o.section='03') AND w.topic_content LIKE '%최종 발표 진행%')\n      OR ((o.year=2026 AND o.semester='2' AND o.campus='국제' AND o.course_code='SWCON402' AND o.section='00') AND w.topic_content LIKE '%결과보고서 제출%') GROUP BY o.course_code;"
+  },
+  {
+    "id": "N054",
+    "question": "2026년 2학기 객체지향프로그래밍 01분반(CSE103-01)에서 코드 리뷰 발표평가가 있는 주차를 빼놓지 않으려고 해. 강의계획서에 발표평가가 적힌 주차와 날짜 범위를 전부 알려줘.",
+    "student_id": null,
+    "gold_sql": null,
+    "gold_answer": [
+      {
+        "week": 14,
+        "date_range": "12/1 ~ 12/7"
+      },
+      {
+        "week": 15,
+        "date_range": "12/8 ~ 12/14"
+      },
+      {
+        "week": 16,
+        "date_range": "12/15 ~ 12/21"
+      }
+    ],
+    "ordered": false,
+    "tags": [
+      "student_life",
+      "과제·프로젝트"
+    ],
+    "note": "원천 기록에서 정답 산출. 기준 SQL은 oracle 점검용.",
+    "reference_sql": "SELECT w.week,w.date_range FROM course_offerings o JOIN syllabi s USING(offering_id)\n          JOIN syllabus_weekly_plans w USING(syllabus_id) WHERE o.year=2026 AND o.semester='2' AND o.campus='국제' AND o.course_code='CSE103' AND o.section='01' AND (w.topic_content LIKE '%Code Review 발표평가%');"
+  },
+  {
+    "id": "N055",
+    "question": "2026년 1학기 강화학습 00분반(SWCON495-00)은 공휴일 때문에 대면수업을 못 하면 어떻게 진행한다고 강의계획서 운영방식에 적혀 있어?",
+    "student_id": null,
+    "gold_sql": null,
+    "gold_answer": [
+      {
+        "operation_note": "대면수업이 기본입니다.\n공휴일/명절 등으로 오프라인 수업이 불가한 경우 학칙의 범위 내에서 녹화강의 진행함"
+      }
+    ],
+    "ordered": false,
+    "tags": [
+      "student_life",
+      "면담·수업방식"
+    ],
+    "note": "원천 기록에서 정답 산출. 기준 SQL은 oracle 점검용.",
+    "reference_sql": "SELECT s.operation_note FROM course_offerings o JOIN syllabi s USING(offering_id) WHERE o.year=2026 AND o.semester='1' AND o.campus='국제' AND o.course_code='SWCON495' AND o.section='00';"
+  },
+  {
+    "id": "N056",
+    "question": "2026년 1학기 강화학습 00분반(SWCON495-00)에서 수업자료 외에 참고할 책을 찾고 있어. 계획서 교재란에 부교재로 표시된 항목의 번호와 제목을 알려줘.",
+    "student_id": null,
+    "gold_sql": null,
+    "gold_answer": [
+      {
+        "sequence": 2,
+        "title": "[부교재 1] Grokking Deep Reinforcement Learning"
+      },
+      {
+        "sequence": 3,
+        "title": "[부교재 2] Reinforcement Learning: An Introduction"
+      }
+    ],
+    "ordered": false,
+    "tags": [
+      "student_life",
+      "교재·참고자료"
+    ],
+    "note": "원천 기록에서 정답 산출. 기준 SQL은 oracle 점검용.",
+    "reference_sql": "SELECT b.sequence,b.title FROM course_offerings o JOIN syllabi s USING(offering_id)\n          JOIN syllabus_textbooks b USING(syllabus_id) WHERE o.year=2026 AND o.semester='1' AND o.campus='국제' AND o.course_code='SWCON495' AND o.section='00' AND (b.title LIKE '[부교재%');"
+  },
+  {
+    "id": "N057",
+    "question": "2026년 1학기 게임인터랙티브테크놀로지 00분반(SWCON312-00)에서 프로젝트 팀원을 언제 알아봐야 해? 계획서에 팀 구성이 처음 나오는 주차의 날짜 범위와 그 주 발표 준비 내용을 알려줘.",
+    "student_id": null,
+    "gold_sql": null,
+    "gold_answer": [
+      {
+        "date_range": "3/10 ~ 3/16",
+        "topic_content": "게임 입출력 이론: Human Factors #1\n게임 입출력 발표: 팀 구성 및 게임 입력 인터랙션 탐색"
+      }
+    ],
+    "ordered": false,
+    "tags": [
+      "student_life",
+      "과제·프로젝트"
+    ],
+    "note": "원천 기록에서 정답 산출. 기준 SQL은 oracle 점검용.",
+    "reference_sql": "SELECT w.date_range,w.topic_content FROM course_offerings o JOIN syllabi s USING(offering_id)\n          JOIN syllabus_weekly_plans w USING(syllabus_id) WHERE o.year=2026 AND o.semester='1' AND o.campus='국제' AND o.course_code='SWCON312' AND o.section='00' AND (w.week=(SELECT MIN(a.week) FROM syllabus_weekly_plans a WHERE a.syllabus_id=s.syllabus_id AND a.topic_content LIKE '%팀 구성%'));"
+  },
+  {
+    "id": "N058",
+    "question": "2026년 2학기 데이터사이언스및시각화 00분반(SWCON425-00)에서 대규모 언어 모델을 다루는 주차를 모두 알려줘. 각 주차에 기말시험도 같이 적혀 있는지 1 또는 0으로 표시해 줘.",
+    "student_id": null,
+    "gold_sql": null,
+    "gold_answer": [
+      {
+        "week": 14,
+        "final_exam_same_week": 0
+      },
+      {
+        "week": 15,
+        "final_exam_same_week": 1
+      }
+    ],
+    "ordered": false,
+    "tags": [
+      "student_life",
+      "과제·프로젝트"
+    ],
+    "note": "원천 기록에서 정답 산출. 기준 SQL은 oracle 점검용.",
+    "reference_sql": "SELECT w.week,CASE WHEN w.topic_content LIKE '%Final Exam%' THEN 1 ELSE 0 END AS final_exam_same_week FROM course_offerings o JOIN syllabi s USING(offering_id)\n          JOIN syllabus_weekly_plans w USING(syllabus_id) WHERE o.year=2026 AND o.semester='2' AND o.campus='국제' AND o.course_code='SWCON425' AND o.section='00' AND (w.topic_content LIKE '%Large Language Models%');"
+  },
+  {
+    "id": "N059",
+    "question": "2026년 2학기 소프트웨어융합학과 데이터사이언스및시각화(SWCON425-00) 교수님께 수요일에 가려고 해. 개설목록에 수요일 정규수업이 있는지 1 또는 0으로, 강의계획서의 면담 안내는 그대로 알려줘.",
+    "student_id": null,
+    "gold_sql": null,
+    "gold_answer": [
+      {
+        "wednesday_class": 0,
+        "consultation_time": "Wednesday 3-5 pm & By appointment"
+      }
+    ],
+    "ordered": false,
+    "tags": [
+      "student_life",
+      "자료 연결"
+    ],
+    "note": "원천 기록에서 정답 산출. 기준 SQL은 oracle 점검용.",
+    "reference_sql": "SELECT CASE WHEN EXISTS(SELECT 1 FROM class_times ct JOIN time_slots t USING(time_slot_id)\n      WHERE ct.offering_id=o.offering_id AND t.day='wednesday') THEN 1 ELSE 0 END AS wednesday_class,s.consultation_time FROM course_offerings o JOIN syllabi s USING(offering_id) WHERE o.year=2026 AND o.semester='2' AND o.campus='국제' AND o.course_code='SWCON425' AND o.section='00' AND o.year=2026 AND o.semester='2' AND o.campus='국제'\n          AND EXISTS (SELECT 1 FROM course_offering_categories oc JOIN departments d ON d.department_id=oc.department_id\n                      WHERE oc.offering_id=o.offering_id AND d.code='A07337');"
+  },
+  {
+    "id": "N060",
+    "question": "2026년 2학기 컴퓨터공학과 이산구조 00분반(CSE201-00) 월요일 수업 끝나고 질문하려고 해. 정규 수업 종료 시각과 강의계획서의 면담 안내를 같이 알려줘.",
+    "student_id": null,
+    "gold_sql": null,
+    "gold_answer": [
+      {
+        "end_time": "16:15",
+        "consultation_time": "매 수업이 끝난 후, 혹은 필요시 이메일을 통해 개별 면담 일정 문의 해주세요."
+      }
+    ],
+    "ordered": false,
+    "tags": [
+      "student_life",
+      "자료 연결"
+    ],
+    "note": "원천 기록에서 정답 산출. 기준 SQL은 oracle 점검용.",
+    "reference_sql": "SELECT t.end_time,s.consultation_time FROM course_offerings o JOIN class_times ct ON ct.offering_id=o.offering_id JOIN time_slots t ON t.time_slot_id=ct.time_slot_id\n      JOIN syllabi s ON s.offering_id=o.offering_id WHERE o.year=2026 AND o.semester='2' AND o.campus='국제'\n          AND EXISTS (SELECT 1 FROM course_offering_categories oc JOIN departments d ON d.department_id=oc.department_id\n                      WHERE oc.offering_id=o.offering_id AND d.code='A10627') AND o.course_code='CSE201' AND o.section='00' AND t.day='monday';"
+  }
+]
