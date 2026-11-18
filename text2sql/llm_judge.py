@@ -281,9 +281,13 @@ def main() -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument("--run", required=True, help="results/ 아래 폴더 이름")
     ap.add_argument("--force", action="store_true", help="이전 판정을 무시하고 전부 다시 채점")
+    ap.add_argument("--judge-model", default=None, help=".env 의 CHATKHU_JUDGE_MODEL 대신 쓸 judge 모델")
     args = ap.parse_args()
 
-    llm, model = make_judge_llm()
+    settings = Settings()
+    if args.judge_model:
+        settings = replace(settings, judge_model=args.judge_model)
+    llm, model = make_judge_llm(settings)
     s = run_judge(RESULTS_DIR / args.run, llm, model, force=args.force)
     o = s["overall"]
     print(f"\nexecution strict {_pct(o['exec_strict'], o['n'])} | relaxed {_pct(o['exec_relaxed'], o['n'])}"

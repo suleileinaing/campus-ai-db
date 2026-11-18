@@ -26,10 +26,20 @@ python -m text2sql.cli --show-prompt
 python -m text2sql.cli "2026년 2학기 월요일 13:30에 시작하는 수업"
 python -m text2sql.cli --student-id 202210001 "내가 이수한 학점은?"
 python -m text2sql.cli --student-id 202210001
+python -m text2sql.cli --debug "..."          # 자연어 답변과 함께 SQL·결과 표도 출력
 
 # 평가 (크레딧 절약: --limit 3 으로 먼저 확인)
 python -m text2sql.evaluate --gold text2sql/gold/gold_questions.json --run-name fewshot
 python -m text2sql.evaluate --gold text2sql/gold/gold_questions.json --no-fewshot --run-name zeroshot
+
+# 모델 바꿔 가며 비교 (.env 를 고치지 않고 --model 로 지정, --run-name 을 비우면 모델 이름으로 폴더 생성)
+python -m text2sql.evaluate --gold text2sql/gold/gold_questions.json --model <모델명> --limit 3
+```
+
+PowerShell 에서 여러 모델을 차례로 돌리기:
+
+```powershell
+foreach ($m in "모델A", "모델B") { python -m text2sql.evaluate --gold text2sql/gold/gold_questions.json --no-fewshot --model $m --llm-judge --judge-model 모델C }
 ```
 
 ## 개인화 질의셋으로 평가 (공식: v2, 16문항)
@@ -98,12 +108,14 @@ python -m text2sql.evaluate --gold ... --llm-judge       # 평가 직후 바로 
 ```
 
 - 결과: `judge_summary.md`(두 기준 정답률, 일치표, 유형별, 기준이 갈린 문항), `judge_compare.csv`(문항별 나란히 비교), `judge.jsonl`(judge 원문 포함)
-- judge 모델은 `.env` 의 `CHATKHU_JUDGE_MODEL`(비우면 `CHATKHU_MODEL`), temperature 0. 생성 모델과 같은 모델이면 자기 답에 후한 경향이 있을 수 있다.
+- judge 모델은 `.env` 의 `CHATKHU_JUDGE_MODEL`(비우면 `CHATKHU_MODEL`), temperature 0. `--judge-model` 로 덮어쓸 수 있다. 생성 모델과 같은 모델이면 자기 답에 후한 경향이 있을 수 있다.
 - SQL 실행 실패 문항은 judge 를 부르지 않고 0. 중간에 끊기면 다시 실행할 때 판정 안 된 문항만 채점한다(`--force` 로 전부 다시).
 
 ## 개인정보 처리
 
 - LLM 에는 스키마, 코드성 컬럼의 값 형식, 질문, 로그인 학생 ID, SQL 오류 메시지만 보낸다. **조회 결과 행은 보내지 않는다.**
+  - 자연어 답변(`cli`)도 같은 원칙을 따른다. LLM 은 SQL 과 함께 값 자리만 비운 답변 틀(`ANSWER: 담당 교수님은 {professor_name} 교수님이에요.`)을 내고, 값은 `answer.py` 가 로컬에서 채운다.
+  - 대화형 모드는 앞 턴의 질문과 모델 응답(SQL·답변 틀)만 다음 턴에 넘긴다.
   - 예외: 평가용 `llm_judge` 는 채점을 위해 정답·예측 결과 행을 보낸다. 실제 학생 데이터가 든 DB 로는 돌리지 말고 가상 학생(fixture) 질의셋에만 쓴다.
 - `students`, `enrollments` 를 읽는 쿼리는 로그인 학생 ID 가 있어야 하고, 다른 학생 ID 가 들어 있으면 거부한다. 이는 1차 방어선일 뿐이며 실제 서비스에선 백엔드 인가(README 다음 단계 7)가 필요하다.
 

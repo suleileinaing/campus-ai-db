@@ -14,6 +14,7 @@ import sqlite3
 from dataclasses import dataclass
 from pathlib import Path
 
+from .answer import ANSWER_TOKEN
 from .config import CURRENT_TERM, DATABASE_PATH, SAMPLE_QUERIES_PATH
 
 # (table, column) — 개인 식별 정보가 아닌 코드성 컬럼만. DB 에 없는 컬럼은 건너뛴다.
@@ -43,6 +44,7 @@ VALUE_HINT_COLUMNS = [
 SKIP_TABLES = {"sqlite_sequence", "sqlite_stat1", "sqlite_stat4", "syllabus_chunks"}
 
 REFUSE_TOKEN = "REFUSE"
+CLARIFY_TOKEN = "CLARIFY"
 
 
 @dataclass
@@ -175,6 +177,25 @@ OUTPUT_FORMAT = f"""\
 """
 
 
+MULTITURN_RULES = f"""\
+대화:
+- 앞선 질문과 네가 낸 SQL 이 대화로 함께 주어질 수 있다. '그 교수님', '방금 과목'처럼 앞을 가리키는 말은 이전 질문과 SQL 을 보고 풀어서, 이번 질문에 답하는 SQL 하나를 새로 만든다.
+- 이전 조회 결과 값은 주어지지 않는다. 앞 턴의 값이 필요하면 이전 SQL 을 서브쿼리나 CTE 로 다시 쓴다.
+- 답을 하나로 정하는 데 필요한 정보(예: 분반)가 빠져 있어 추측해야 한다면 SQL 대신 코드블록 없이 '{CLARIFY_TOKEN}: 되물을 질문' 한 줄만 출력한다.
+"""
+
+
+ANSWER_RULES = f"""\
+답변 틀:
+- SQL 코드블록 다음 줄에 사용자에게 보여 줄 한국어 답변 틀을 '{ANSWER_TOKEN}: ...' 한 줄로 출력한다. (위 출력 형식의 '설명 금지'에서 이 한 줄만 예외)
+- 조회 결과는 너에게 보이지 않는다. 값을 짐작해 쓰지 말고, SELECT 한 컬럼 이름을 {{컬럼}} 자리로 넣는다.
+- 여러 행을 나열할 부분은 [[ ]] 로 감싼다. 행 수는 {{count}} 로 쓴다.
+  예: {ANSWER_TOKEN}: 담당 교수님은 {{professor_name}} 교수님이에요.
+  예: {ANSWER_TOKEN}: 같은 학기에 맡은 다른 과목은 [[{{course_code}}-{{section}}]]로 {{count}}개예요.
+- 존댓말로 한두 문장만 쓴다.
+"""
+
+
 def load_sample_queries(path: Path = SAMPLE_QUERIES_PATH) -> list[FewShotExample]:
     """sample_queries.sql 의 '-- N. 제목' 블록을 예시로 파싱한다."""
     if not path.exists():
@@ -233,7 +254,11 @@ class PromptBuilder:
         db_path: Path = DATABASE_PATH,
         current_term: str = CURRENT_TERM,
         exclude_titles: list[str] | None = None,
+        multiturn: bool = False,
+        answer_template: bool = False,
     ):
+        self.multiturn = multiturn
+        self.answer_template = answer_template
         self.db_path = db_path
         self.schema = load_schema(db_path)
         self.value_hints = extract_value_hints(db_path)
@@ -252,6 +277,10 @@ class PromptBuilder:
             "\n## 도메인 규칙\n" + self.rules,
             "\n## " + OUTPUT_FORMAT,
         ]
+        if self.multiturn:
+            parts.append("\n## " + MULTITURN_RULES)
+        if self.answer_template:
+            parts.append("\n## " + ANSWER_RULES)
         if self.fewshot:
             shots = "\n\n".join(f"질문: {e.title}\n```sql\n{e.sql}\n```" for e in self.fewshot)
             parts.append("\n## 예시\n" + shots)

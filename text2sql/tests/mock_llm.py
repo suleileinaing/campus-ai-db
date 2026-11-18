@@ -8,7 +8,7 @@ from ..chatkhu_client import LLMResponse
 
 
 def _last_question(messages: list[dict]) -> str:
-    for m in messages:
+    for m in reversed(messages):  # 다중턴이면 앞 턴 질문도 들어 있으므로 마지막 질문을 쓴다
         if m["role"] == "user" and "질문:" in m["content"]:
             return m["content"].split("질문:", 1)[1].strip()
     return ""
@@ -25,6 +25,8 @@ class OracleLLM:
         sql = self.answers.get(q)
         if q in self.answers and sql is None:  # 거부가 정답인 문항
             return LLMResponse(text="REFUSE: 다른 학생 정보", model="oracle")
+        if sql and sql.startswith("CLARIFY"):  # 되묻는 것이 정답인 턴
+            return LLMResponse(text=sql, model="oracle")
         return LLMResponse(text=f"```sql\n{sql or 'SELECT 1'}\n```", model="oracle")
 
 

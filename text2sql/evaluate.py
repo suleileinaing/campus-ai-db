@@ -14,6 +14,7 @@ import csv
 import json
 import time
 from collections import Counter, defaultdict
+from dataclasses import replace
 from datetime import datetime
 from pathlib import Path
 
@@ -240,9 +241,15 @@ def main() -> None:
     ap.add_argument("--limit", type=int, default=None, help="앞에서부터 N개만(크레딧 절약용)")
     ap.add_argument("--oracle", action="store_true", help="API 없이 gold SQL 을 예측으로 사용해 파이프라인 점검")
     ap.add_argument("--llm-judge", action="store_true", help="평가 후 ChatKHU 로 의미 기준 채점(llm_judge)도 실행")
+    ap.add_argument("--model", default=None, help=".env 의 CHATKHU_MODEL 대신 쓸 생성 모델")
+    ap.add_argument("--judge-model", default=None, help=".env 의 CHATKHU_JUDGE_MODEL 대신 쓸 judge 모델")
     args = ap.parse_args()
 
     settings = Settings()
+    if args.model:
+        settings = replace(settings, model=args.model)
+    if args.judge_model:
+        settings = replace(settings, judge_model=args.judge_model)
     items = load_gold(args.gold)[: args.limit]
     executor = SQLExecutor(row_limit=settings.row_limit, timeout_sec=settings.query_timeout_sec)
     prompt = PromptBuilder(

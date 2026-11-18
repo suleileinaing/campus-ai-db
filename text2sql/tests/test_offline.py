@@ -8,6 +8,7 @@ import tempfile
 import unittest
 from pathlib import Path
 
+from text2sql.answer import render_answer
 from text2sql.compare import compare_results, gold_is_ordered
 from text2sql.config import PROJECT_DIR, TEXT2SQL_DIR
 from text2sql.evaluate import evaluate
@@ -282,3 +283,49 @@ class TestLLMJudge(unittest.TestCase):
                 self.assertEqual([r["agreement"] for r in csv.DictReader(f)], ["both_correct", "llm_only", "both_wrong"])
             s2 = run_judge(out, ScriptedLLM([]), "m")  # 이미 판정된 문항은 다시 부르지 않음
             self.assertEqual(s2["overall"], s["overall"])
+
+
+class TestAnswer(unittest.TestCase):
+    """LLM 의 답변 틀에 결과를 로컬에서 채운다(결과 행은 LLM 에 보내지 않음)."""
+
+    def test_single_row(self):
+        self.assertEqual(render_answer("담당 교수님은 {professor_name} 교수님이에요.", ["professor_name"], [("김휘용",)]),
+                         "담당 교수님은 김휘용 교수님이에요.")
+
+    def test_repeat_rows_and_count(self):
+        rows = [("CSE406", "06"), ("CSE495", "02")]
+        self.assertEqual(render_answer("[[{course_code}-{section}]]로 {count}개예요.", ["course_code", "section"], rows),
+                         "CSE406-06, CSE495-02로 2개예요.")
+
+    def test_multi_row_column_joined_and_float(self):
+        self.assertEqual(render_answer("{credits}학점", ["credits"], [(3.0,), (3.0,), (2.0,)]), "3, 2학점")
+
+    def test_fallbacks(self):
+        self.assertEqual(render_answer("{x}", ["a"], []), "조건에 맞는 결과가 없어요.")
+        self.assertEqual(render_answer("{없는컬럼}", ["a"], [(1,)]), "결과는 1이에요.")
+        self.assertEqual(render_answer(None, ["a", "b"], [(1, 2)]), "결과 1건이에요.\n- a: 1 / b: 2")
+
+    def test_long_list_truncated(self):
+        out = render_answer("[[{n}]]", ["n"], [(i,) for i in range(25)])
+        self.assertTrue(out.endswith("외 5건"))
+
+    def test_pipeline_answer(self):
+        reply = "```sql\nSELECT 'CSE' AS code, 3 AS credits\n```\nANSWER: {code} 과목은 {credits}학점이에요."
+        prompt = PromptBuilder(use_fewshot=False, answer_template=True)
+        out = Text2SQL(ScriptedLLM([reply]), prompt, SQLExecutor()).ask("질문")
+        self.assertTrue(out.result.ok)
+        self.assertEqual(out.answer, "CSE 과목은 3학점이에요.")
+        self.assertIn("ANSWER:", prompt.system_prompt())
+        self.assertNotIn("ANSWER:", PromptBuilder(use_fewshot=False).system_prompt())  # 평가용 프롬프트는 그대로
+
+    def test_template_kept_across_repair(self):
+        replies = ["```sql\nSELECT nope FROM nowhere\n```\nANSWER: 값은 {v}예요.", "```sql\nSELECT 7 AS v\n```"]
+        out = Text2SQL(ScriptedLLM(replies), PromptBuilder(use_fewshot=False), SQLExecutor()).ask("질문")
+        self.assertEqual(len(out.attempts), 2)
+        self.assertEqual(out.answer, "값은 7예요.")
+
+    def test_clarify_and_refuse_answers(self):
+        out = Text2SQL(ScriptedLLM(["CLARIFY: 몇 분반인가요?"]), PromptBuilder(use_fewshot=False), SQLExecutor()).ask("질문")
+        self.assertEqual(out.answer, "몇 분반인가요?")
+        out = Text2SQL(ScriptedLLM(["REFUSE: 타인 정보"]), PromptBuilder(use_fewshot=False), SQLExecutor()).ask("질문")
+        self.assertIn("처리할 수 없어요", out.answer)

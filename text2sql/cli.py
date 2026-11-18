@@ -4,12 +4,14 @@
   python -m text2sql.cli --show-prompt
   python -m text2sql.cli "2026년 2학기 월요일 13:30에 시작하는 수업 알려줘"
   python -m text2sql.cli --student-id 202210001 "내가 지금까지 이수한 학점은?"
-  python -m text2sql.cli --student-id 202210001          # 대화형
+  python -m text2sql.cli --student-id 202210001          # 대화형(앞 대화를 기억, 'reset' 으로 초기화)
+  python -m text2sql.cli --debug "..."                   # 자연어 답변과 함께 SQL·결과 표도 출력
 """
 
 from __future__ import annotations
 
 import argparse
+from dataclasses import replace
 
 from .config import Settings
 from .executor import SQLExecutor
@@ -17,7 +19,10 @@ from .pipeline import Text2SQL
 from .prompt import PromptBuilder
 
 
-def print_output(out) -> None:
+def print_output(out, debug: bool = False) -> None:
+    print(f"\n{out.answer}")
+    if not debug:
+        return
     for i, a in enumerate(out.attempts, 1):
         status = "OK" if a.ok else f"실패({a.error_kind}): {a.error}"
         print(f"\n[시도 {i}] {status}\n{a.sql}")
@@ -39,10 +44,15 @@ def main() -> None:
     ap.add_argument("--list-models", action="store_true")
     ap.add_argument("--show-prompt", action="store_true")
     ap.add_argument("--no-fewshot", action="store_true")
+    ap.add_argument("--model", default=None, help=".env 의 CHATKHU_MODEL 대신 쓸 모델")
+    ap.add_argument("--debug", action="store_true", help="SQL·시도 기록·결과 표도 출력")
     args = ap.parse_args()
 
     settings = Settings()
-    prompt = PromptBuilder(use_fewshot=not args.no_fewshot)
+    if args.model:
+        settings = replace(settings, model=args.model)
+    interactive = not args.question
+    prompt = PromptBuilder(use_fewshot=not args.no_fewshot, multiturn=interactive, answer_template=True)
     if args.show_prompt:
         print(prompt.system_prompt())
         print(f"\n(약 {len(prompt.system_prompt())}자)")
@@ -57,8 +67,9 @@ def main() -> None:
     engine = Text2SQL(llm, prompt, SQLExecutor(row_limit=settings.row_limit,
                       timeout_sec=settings.query_timeout_sec), settings.max_repair_attempts)
     if args.question:
-        print_output(engine.ask(args.question, args.student_id))
+        print_output(engine.ask(args.question, args.student_id), args.debug)
         return
+    history: list[dict] = []  # 앞 턴의 질문과 모델 응답(결과 행은 넣지 않음)
     while True:
         try:
             q = input("\n질문> ").strip()
@@ -66,7 +77,14 @@ def main() -> None:
             break
         if q in {"", "exit", "quit"}:
             break
-        print_output(engine.ask(q, args.student_id))
+        if q == "reset":
+            history.clear()
+            print("대화를 처음부터 시작해요.")
+            continue
+        out = engine.ask(q, args.student_id, history)
+        print_output(out, args.debug)
+        history.append({"role": "user", "content": prompt.user_prompt(q, args.student_id)})
+        history.append({"role": "assistant", "content": out.attempts[-1].raw_response if out.attempts else ""})
 
 
 if __name__ == "__main__":
