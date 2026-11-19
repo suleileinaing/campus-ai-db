@@ -1,0 +1,103 @@
+{
+  "overall": {
+    "n": 60,
+    "exec_ok": 59,
+    "first_try_exec_ok": 59,
+    "strict": 43,
+    "relaxed": 49,
+    "subset": 49
+  },
+  "by_tag": {
+    "student_life": {
+      "n": 60,
+      "exec_ok": 59,
+      "first_try_exec_ok": 59,
+      "strict": 43,
+      "relaxed": 49,
+      "subset": 49
+    },
+    "강의계획서": {
+      "n": 10,
+      "exec_ok": 10,
+      "first_try_exec_ok": 10,
+      "strict": 9,
+      "relaxed": 10,
+      "subset": 10
+    },
+    "과제·프로젝트": {
+      "n": 6,
+      "exec_ok": 5,
+      "first_try_exec_ok": 5,
+      "strict": 1,
+      "relaxed": 2,
+      "subset": 2
+    },
+    "교재·참고자료": {
+      "n": 4,
+      "exec_ok": 4,
+      "first_try_exec_ok": 4,
+      "strict": 4,
+      "relaxed": 4,
+      "subset": 4
+    },
+    "면담·수업방식": {
+      "n": 5,
+      "exec_ok": 5,
+      "first_try_exec_ok": 5,
+      "strict": 3,
+      "relaxed": 5,
+      "subset": 5
+    },
+    "수강 요건": {
+      "n": 4,
+      "exec_ok": 4,
+      "first_try_exec_ok": 4,
+      "strict": 3,
+      "relaxed": 3,
+      "subset": 3
+    },
+    "수강신청": {
+      "n": 9,
+      "exec_ok": 9,
+      "first_try_exec_ok": 9,
+      "strict": 5,
+      "relaxed": 6,
+      "subset": 6
+    },
+    "시간표": {
+      "n": 8,
+      "exec_ok": 8,
+      "first_try_exec_ok": 8,
+      "strict": 6,
+      "relaxed": 6,
+      "subset": 6
+    },
+    "시간표·강의실": {
+      "n": 8,
+      "exec_ok": 8,
+      "first_try_exec_ok": 8,
+      "strict": 7,
+      "relaxed": 7,
+      "subset": 7
+    },
+    "자료 연결": {
+      "n": 6,
+      "exec_ok": 6,
+      "first_try_exec_ok": 6,
+      "strict": 5,
+      "relaxed": 6,
+      "subset": 6
+    }
+  },
+  "diagnosis": {
+    "correct": 43,
+    "value_mismatch": 7,
+    "row_count_mismatch": 3,
+    "correct_extra_columns": 6,
+    "exec_fail:guard": 1
+  },
+  "gold_invalid": [],
+  "avg_tokens": 5302.6,
+  "total_tokens": 318154,
+  "avg_latency_sec": 6.03
+}
