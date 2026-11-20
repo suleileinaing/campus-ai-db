@@ -40,9 +40,15 @@ class TestGuard(unittest.TestCase):
 
     def test_write_and_multi_statement_rejected(self):
         self.assertRejected("UPDATE courses SET credits = 0")
+        self.assertRejected("REPLACE INTO courses(course_code, department_id, current_name, credits) VALUES ('X', 1, 'X', 1)")
         self.assertRejected("SELECT 1; DROP TABLE courses")
         self.assertRejected("PRAGMA table_info(courses)")
         self.assertRejected("ATTACH DATABASE 'x.db' AS x")
+
+    def test_replace_text_function_ok(self):
+        r = self.ex.run("SELECT replace('a b', ' ', '') AS normalized")
+        self.assertTrue(r.ok, r.error)
+        self.assertEqual(r.rows, [("ab",)])
 
     def test_semicolon_inside_string_ok(self):
         self.assertTrue(self.ex.run("SELECT 'a;b' AS v").ok)
@@ -112,6 +118,75 @@ class TestPipeline(unittest.TestCase):
         text = PromptBuilder().system_prompt()
         self.assertFalse([n for n in names if n in text])
 
+    def test_bilingual_text_search_is_disabled_by_default(self):
+        question = "2026년 1학기 SWCON254-00 숙제 3번은 언제 공지되고 제출돼?"
+        text = PromptBuilder(use_fewshot=False).system_prompt(question)
+        self.assertNotIn("HW 3 공지", text)
+
+    def test_bilingual_text_search_includes_hw_wording(self):
+        question = "2026년 1학기 SWCON254-00 숙제 3번은 언제 공지되고 제출돼?"
+        text = PromptBuilder(use_fewshot=False, bilingual_text_search=True).system_prompt(
+            question,
+            include_bilingual_text=True,
+        )
+        self.assertIn("HW 3 공지", text)
+        self.assertIn("HW 3 제출", text)
+
+    def test_bilingual_text_search_includes_large_language_models(self):
+        question = "2026년 2학기 SWCON425-00 대규모 언어 모델을 다루는 주차를 알려줘."
+        text = PromptBuilder(use_fewshot=False, bilingual_text_search=True).system_prompt(
+            question,
+            include_bilingual_text=True,
+        )
+        self.assertIn("Building Large Language Models", text)
+        self.assertIn("Large Language Models in Practice", text)
+
+    def test_bilingual_text_search_is_used_on_first_call_for_text_question(self):
+        question = "2026년 2학기 SWCON425-00 대규모 언어 모델을 다루는 주차를 알려줘."
+        llm = ScriptedLLM(["```sql\nSELECT 14 AS week UNION ALL SELECT 15\n```"])
+        prompt = PromptBuilder(use_fewshot=False, bilingual_text_search=True)
+        out = Text2SQL(llm, prompt, SQLExecutor()).ask(question)
+        self.assertEqual(len(out.attempts), 1)
+        self.assertTrue(out.bilingual_text_search_used)
+        self.assertFalse(out.bilingual_text_search_retry_used)
+        self.assertEqual(out.result.rows, [(14,), (15,)])
+
+    def test_bilingual_text_search_does_not_touch_nonempty_structured_question(self):
+        question = "2026년 2학기 SWCON425-00의 학점을 알려줘."
+        llm = ScriptedLLM(["```sql\nSELECT 14 AS week\n```"])
+        prompt = PromptBuilder(use_fewshot=False, bilingual_text_search=True)
+        out = Text2SQL(llm, prompt, SQLExecutor()).ask(question)
+        self.assertEqual(len(out.attempts), 1)
+        self.assertFalse(out.bilingual_text_search_used)
+        self.assertFalse(out.bilingual_text_search_retry_used)
+        self.assertEqual(out.result.rows, [(14,)])
+
+    def test_bilingual_text_search_retries_empty_unrecognized_question(self):
+        question = "2026년 1학기 SWCON254-00 정보를 알려줘."
+        llm = ScriptedLLM([
+            "```sql\nSELECT week FROM syllabus_weekly_plans WHERE 1 = 0\n```",
+            "```sql\nSELECT 6 AS notice_week, 8 AS submission_week\n```",
+        ])
+        prompt = PromptBuilder(use_fewshot=False, bilingual_text_search=True)
+        out = Text2SQL(llm, prompt, SQLExecutor()).ask(question)
+        self.assertEqual(len(out.attempts), 2)
+        self.assertFalse(out.bilingual_text_search_used)
+        self.assertTrue(out.bilingual_text_search_retry_used)
+        self.assertEqual(out.result.rows, [(6, 8)])
+
+    def test_bilingual_text_search_retries_all_null_unrecognized_question(self):
+        question = "2026년 1학기 SWCON254-00 정보를 알려줘."
+        llm = ScriptedLLM([
+            "```sql\nSELECT NULL AS value\n```",
+            "```sql\nSELECT 'found' AS value\n```",
+        ])
+        prompt = PromptBuilder(use_fewshot=False, bilingual_text_search=True)
+        out = Text2SQL(llm, prompt, SQLExecutor()).ask(question)
+        self.assertEqual(len(out.attempts), 2)
+        self.assertFalse(out.bilingual_text_search_used)
+        self.assertTrue(out.bilingual_text_search_retry_used)
+        self.assertEqual(out.result.rows, [("found",)])
+
     def test_repair_loop(self):
         answers = {i.question: i.gold_sql for i in self.items if "course_name" in i.gold_sql}
         q = next(iter(answers))
@@ -134,7 +209,12 @@ class TestPipeline(unittest.TestCase):
             self.assertTrue((Path(d) / "summary.md").exists())
             lines = (Path(d) / "results.jsonl").read_text(encoding="utf-8").splitlines()
             self.assertEqual(len(lines), len(self.items))
-            json.loads(lines[0])
+            self.assertFalse(json.loads(lines[0])["bilingual_text_search_used"])
+            self.assertFalse(json.loads(lines[0])["bilingual_text_search_retry_used"])
+            with (Path(d) / "results.csv").open(encoding="utf-8-sig", newline="") as f:
+                self.assertIn("bilingual_text_search_used", next(csv.reader(f)))
+            self.assertEqual(s["bilingual_text_search_used"], 0)
+            self.assertEqual(s["bilingual_text_search_retry_used"], 0)
 
     def test_csv_template_loads(self):
         items = load_gold(TEXT2SQL_DIR / "gold" / "TEMPLATE.csv")

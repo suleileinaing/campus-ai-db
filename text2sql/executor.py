@@ -69,7 +69,13 @@ def check_statement(sql: str) -> str:
         raise GuardError("여러 개의 SQL 문은 허용되지 않습니다.")
     if not re.match(r"^\s*(WITH|SELECT)\b", bare, flags=re.I):
         raise GuardError("SELECT 또는 WITH 로 시작하는 조회문만 허용됩니다.")
-    if re.search(r"\b(INSERT|UPDATE|DELETE|DROP|ALTER|CREATE|REPLACE|ATTACH|DETACH|PRAGMA|VACUUM)\b", bare, re.I):
+    blocked_command = re.search(
+        r"\b(INSERT|UPDATE|DELETE|DROP|ALTER|CREATE|ATTACH|DETACH|PRAGMA|VACUUM)\b",
+        bare,
+        re.I,
+    )
+    replace_statement = re.search(r"\bREPLACE\s+INTO\b", bare, re.I)
+    if blocked_command or replace_statement:
         raise GuardError("데이터를 변경하거나 DB 설정을 바꾸는 구문은 허용되지 않습니다.")
     return cleaned
 

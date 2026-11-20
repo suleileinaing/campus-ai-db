@@ -5,6 +5,7 @@ TEXT2SQL_DB_PATH 만 바꾸면 그 DB 에 맞는 프롬프트가 만들어진다
 
 개인정보 보호: 학생 이름, 수강 이력 행 등 실제 데이터 행은 프롬프트에 넣지 않는다.
 값 형식 힌트는 개인을 식별할 수 없는 코드성 컬럼의 DISTINCT 값만 사용한다.
+bilingual-text-search 를 켠 경우 질문에 명시된 강좌의 비개인 강의계획서 텍스트만 추가한다.
 """
 
 from __future__ import annotations
@@ -46,6 +47,12 @@ SKIP_TABLES = {"sqlite_sequence", "sqlite_stat1", "sqlite_stat4", "syllabus_chun
 
 REFUSE_TOKEN = "REFUSE"
 
+_TEXT_SEARCH_CUES = (
+    "강의계획서", "주차", "주차별", "교재", "참고서", "면담", "수업방식", "수업 방식",
+    "운영방식", "운영 방식", "수업방법", "수업 방법", "공지", "제출", "숙제", "과제",
+    "발표", "시험", "중간고사", "기말고사", "내용", "주제", "준비", "llm", "언어 모델",
+)
+
 
 @dataclass
 class FewShotExample:
@@ -62,6 +69,115 @@ def _table_columns(conn: sqlite3.Connection) -> dict[str, set[str]]:
     for (name,) in conn.execute("SELECT name FROM sqlite_master WHERE type IN ('table','view')"):
         out[name] = {r[1] for r in conn.execute(f'PRAGMA table_info("{name}")')}
     return out
+
+
+def _compact_text(value: object, max_chars: int = 500) -> str:
+    text = re.sub(r"\s+", " ", str(value or "")).strip()
+    return text if len(text) <= max_chars else text[: max_chars - 1] + "…"
+
+
+def extract_bilingual_text_context(
+    question: str,
+    db_path: Path = DATABASE_PATH,
+    current_term: str = CURRENT_TERM,
+    max_offerings: int = 4,
+    require_text_cue: bool = True,
+) -> str:
+    """질문에 명시된 강좌의 실제 강의계획서 텍스트를 작게 묶어 반환한다.
+
+    한국어 질문과 DB 원문(HW, Large Language Models 등)의 표현 차이를 모델이
+    직접 확인하게 한다. 학생·수강정보는 읽지 않으며, 강좌 식별자가 없거나 텍스트
+    검색 성격이 아닌 질문에는 아무 내용도 추가하지 않는다.
+    """
+    lowered = question.lower()
+    if require_text_cue and not any(cue in lowered for cue in _TEXT_SEARCH_CUES):
+        return ""
+
+    pair_matches = re.findall(r"\b([A-Z]{2,}\d+[A-Z0-9]*)-(\d{2})\b", question.upper())
+    codes = sorted(set(re.findall(r"\b[A-Z]{2,}\d+[A-Z0-9]*\b", question.upper())))
+    if not codes:
+        return ""
+
+    year_match = re.search(r"(20\d{2})\s*(?:학년도|년)", question)
+    semester_match = re.search(r"([12])\s*학기", question)
+    current_year, _, current_semester = current_term.partition("-")
+    year = int(year_match.group(1)) if year_match else int(current_year)
+    semester = semester_match.group(1) if semester_match else current_semester
+
+    clauses: list[str] = []
+    params: list[object] = [year, semester]
+    paired_codes = {code for code, _ in pair_matches}
+    for code, section in pair_matches:
+        clauses.append("(o.course_code = ? AND o.section = ?)")
+        params.extend((code, section))
+    for code in codes:
+        if code not in paired_codes:
+            clauses.append("o.course_code = ?")
+            params.append(code)
+    if not clauses:
+        return ""
+
+    conn = _connect_ro(db_path)
+    try:
+        offerings = conn.execute(
+            "SELECT o.offering_id, o.year, o.semester, o.course_code, o.section, o.course_name, "
+            "s.syllabus_id, s.operation_modes, s.operation_note, s.consultation_time, "
+            "s.assignments, s.course_notices "
+            "FROM course_offerings AS o "
+            "JOIN syllabi AS s ON s.offering_id = o.offering_id "
+            "WHERE o.year = ? AND o.semester = ? AND (" + " OR ".join(clauses) + ") "
+            "ORDER BY o.course_code, o.section LIMIT ?",
+            (*params, max_offerings),
+        ).fetchall()
+
+        blocks: list[str] = []
+        for offering in offerings:
+            (offering_id, offer_year, offer_semester, code, section, name, syllabus_id,
+             operation_modes, operation_note, consultation_time, assignments, course_notices) = offering
+            lines = [f"- {offer_year}년 {offer_semester}학기 {code}-{section} {name}"]
+
+            for label, value in (
+                ("수업 운영방식", operation_modes),
+                ("운영 안내", operation_note),
+                ("면담 안내", consultation_time),
+                ("과제 안내", assignments),
+                ("수업 공지", course_notices),
+            ):
+                if value:
+                    lines.append(f"  - {label}: {_compact_text(value)}")
+
+            textbooks = conn.execute(
+                "SELECT sequence, title, author, publisher, publication_year, isbn, note "
+                "FROM syllabus_textbooks WHERE syllabus_id = ? ORDER BY sequence",
+                (syllabus_id,),
+            ).fetchall()
+            for sequence, title, author, publisher, publication_year, isbn, note in textbooks:
+                values = [
+                    f"제목={_compact_text(title)}" if title else "",
+                    f"저자={_compact_text(author)}" if author else "",
+                    f"출판사={_compact_text(publisher)}" if publisher else "",
+                    f"연도={_compact_text(publication_year)}" if publication_year else "",
+                    f"ISBN={_compact_text(isbn)}" if isbn else "",
+                    f"비고={_compact_text(note)}" if note else "",
+                ]
+                lines.append(f"  - 교재 {sequence}: " + "; ".join(v for v in values if v))
+
+            weekly = conn.execute(
+                "SELECT week, date_range, topic_content, note "
+                "FROM syllabus_weekly_plans WHERE syllabus_id = ? ORDER BY week",
+                (syllabus_id,),
+            ).fetchall()
+            for week, date_range, topic_content, note in weekly:
+                values = [
+                    f"기간={_compact_text(date_range)}" if date_range else "",
+                    f"내용={_compact_text(topic_content)}" if topic_content else "",
+                    f"비고={_compact_text(note)}" if note else "",
+                ]
+                lines.append(f"  - {week}주차: " + "; ".join(v for v in values if v))
+            blocks.append("\n".join(lines))
+        return "\n".join(blocks)
+    finally:
+        conn.close()
 
 
 def load_schema(db_path: Path = DATABASE_PATH) -> str:
@@ -347,6 +463,7 @@ class PromptBuilder:
         exclude_titles: list[str] | None = None,
         sample_queries_path: Path = SAMPLE_QUERIES_PATH,
         fewshot_selection: str = "fixed",
+        bilingual_text_search: bool = False,
     ):
         if fewshot_selection not in {"fixed", "relevant"}:
             raise ValueError("fewshot_selection 은 'fixed' 또는 'relevant' 이어야 합니다.")
@@ -354,6 +471,8 @@ class PromptBuilder:
         self.sample_queries_path = sample_queries_path
         self.fewshot_selection = fewshot_selection
         self.max_fewshot = max_fewshot
+        self.bilingual_text_search = bilingual_text_search
+        self.current_term = current_term
         self.schema = load_schema(db_path)
         self.value_hints = extract_value_hints(db_path)
         self.rules = build_domain_rules(db_path, current_term)
@@ -380,7 +499,12 @@ class PromptBuilder:
         limit = self.max_fewshot or len(ranked)
         return [example for _, example in ranked[:limit]]
 
-    def system_prompt(self, question: str | None = None) -> str:
+    def system_prompt(
+        self,
+        question: str | None = None,
+        include_bilingual_text: bool = False,
+        force_bilingual_text: bool = False,
+    ) -> str:
         parts = [
             "너는 경희대학교 소프트웨어융합대학 학사 데이터용 SQLite Text2SQL 변환기다.",
             "사용자의 한국어 질문을 아래 스키마에 대해 실행 가능한 SQLite 쿼리로 바꾼다.",
@@ -389,6 +513,20 @@ class PromptBuilder:
             "\n## 도메인 규칙\n" + self.rules,
             "\n## " + OUTPUT_FORMAT,
         ]
+        if self.bilingual_text_search and include_bilingual_text and question:
+            text_context = extract_bilingual_text_context(
+                question,
+                db_path=self.db_path,
+                current_term=self.current_term,
+                require_text_cue=not force_bilingual_text,
+            )
+            if text_context:
+                parts.append(
+                    "\n## 질문과 관련된 실제 강의계획서 텍스트\n"
+                    "아래 내용은 DB에 저장된 원문이다. 한국어 질문과 영어·약어 표현이 달라도 "
+                    "원문을 근거로 SQL 조건을 작성한다. 최종 출력은 반드시 SQL 하나만 반환한다.\n"
+                    + text_context
+                )
         selected = self.fewshot_for(question) if question is not None else self.fewshot
         if selected:
             shots = "\n\n".join(f"질문: {e.title}\n```sql\n{e.sql}\n```" for e in selected)

@@ -94,6 +94,8 @@ def evaluate(
                 "exec_error_kind": res.error_kind if res and not res.ok else None,
                 "total_tokens": out.total_tokens,
                 "latency_sec": round(sum(a.latency_sec for a in out.attempts), 2),
+                "bilingual_text_search_used": out.bilingual_text_search_used,
+                "bilingual_text_search_retry_used": out.bilingual_text_search_retry_used,
                 "fewshot_titles": out.fewshot_titles,
                 "pred_columns": res.columns if res else [],
                 "pred_rows": [list(r) for r in res.rows] if res else [],
@@ -139,7 +141,8 @@ def write_outputs(
 
     csv_cols = ["id", "question", "student_id", "tags", "strict", "relaxed", "subset", "diagnosis", "missing_columns",
                 "n_attempts", "first_try_exec_ok", "exec_error", "gold_sql", "pred_sql",
-                "total_tokens", "latency_sec", "fewshot_titles"]
+                "total_tokens", "latency_sec", "bilingual_text_search_used",
+                "bilingual_text_search_retry_used", "fewshot_titles"]
     with (out_dir / f"results{suffix}.csv").open("w", encoding="utf-8-sig", newline="") as f:
         w = csv.DictWriter(f, fieldnames=csv_cols, extrasaction="ignore")
         w.writeheader()
@@ -190,6 +193,10 @@ def summarize(records: list[dict]) -> dict:
         "avg_tokens": round(sum(toks) / len(toks), 1) if toks else 0,
         "total_tokens": total_tokens,
         "avg_latency_sec": round(sum(lats) / len(lats), 2) if lats else 0,
+        "bilingual_text_search_used": sum(bool(r.get("bilingual_text_search_used")) for r in records),
+        "bilingual_text_search_retry_used": sum(
+            bool(r.get("bilingual_text_search_retry_used")) for r in records
+        ),
     }
 
 
@@ -205,6 +212,8 @@ def render_summary(s: dict, records: list[dict]) -> str:
         f"| 정답률 relaxed | {_pct(o['relaxed'], o['n'])} |",
         f"| 정답률 subset (정답 일부 컬럼 누락 허용) | {_pct(o['subset'], o['n'])} |",
         f"| 평균 토큰 | {s['avg_tokens']} |",
+        f"| Bilingual text 사전 적용 | {_pct(s['bilingual_text_search_used'], o['n'])} |",
+        f"| Bilingual text 재시도 | {_pct(s['bilingual_text_search_retry_used'], o['n'])} |",
         f"| 총 토큰 | {s['total_tokens']} |",
         f"| 평균 응답시간(초) | {s['avg_latency_sec']} |", "",
         "## 유형별", "", "| 태그 | n | strict | relaxed | subset | 실행 성공 |", "|---|---|---|---|---|---|",
@@ -257,6 +266,8 @@ def main() -> None:
                     help="few-shot 예시 SQL 파일")
     ap.add_argument("--fewshot-selection", choices=("fixed", "relevant"), default="fixed",
                     help="fixed: 파일 앞에서 K개, relevant: 문항별 관련도 상위 K개")
+    ap.add_argument("--bilingual-text-search", action="store_true",
+                    help="첫 결과가 0행/NULL이면 실제 강의계획서 텍스트를 추가해 한 번 재시도")
     ap.add_argument("--exclude-fewshot", action="append", default=[], metavar="TITLE",
                     help="평가 문항과 겹치는 few-shot 예시 제목(sample_queries.sql 의 '-- N.' 뒤 제목). 여러 번 지정 가능")
     ap.add_argument("--limit", type=int, default=None, help="앞에서부터 N개만(크레딧 절약용)")
@@ -274,6 +285,7 @@ def main() -> None:
         max_fewshot=args.max_fewshot,
         sample_queries_path=Path(args.fewshot_file),
         fewshot_selection=args.fewshot_selection,
+        bilingual_text_search=args.bilingual_text_search,
     )
     if args.oracle:
         from .tests.mock_llm import OracleLLM
@@ -305,6 +317,7 @@ def main() -> None:
         "candidate_pool_size": len(prompt.candidate_fewshot),
         "fewshot_titles": [e.title for e in prompt.fewshot] if args.fewshot_selection == "fixed" else [],
         "excluded_fewshot": prompt.excluded_fewshot,
+        "bilingual_text_search": args.bilingual_text_search,
         "temperature": settings.temperature, "max_repairs": settings.max_repair_attempts,
         "gold": str(args.gold), "n_items": len(items),
     }, ensure_ascii=False, indent=2), encoding="utf-8")
