@@ -1,0 +1,21 @@
+{
+  "model": "gemini-4-argon",
+  "fewshot": false,
+  "gold": "text2sql/gold/실행평가_100문항.json",
+  "n_items": 11,
+  "answers": true,
+  "ids": [
+    "J029",
+    "J030",
+    "J031",
+    "J032",
+    "J033",
+    "J073",
+    "J075",
+    "J077",
+    "J079",
+    "J086",
+    "J087"
+  ],
+  "note": "NULL 처리 규칙 추가 후 answers100 에서 NULL 문제로 탈락한 11문항 재실행"
+}

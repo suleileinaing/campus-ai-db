@@ -1,0 +1,18 @@
+# /etc/systemd/system/campus-ai.service  (VM 이 켜지면 자동 실행, 죽으면 다시 실행)
+[Unit]
+Description=경희 Campus AI web demo
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+User=ubuntu
+WorkingDirectory=/home/ubuntu/campus-ai-db
+Environment=PYTHONIOENCODING=utf-8
+Environment=WEB_DAILY_LIMIT=300
+Environment=WEB_IP_DAILY_LIMIT=40
+ExecStart=/home/ubuntu/campus-ai-db/.venv/bin/python -m text2sql.web.server --host 0.0.0.0 --port 8000
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target

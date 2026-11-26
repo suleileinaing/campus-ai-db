@@ -1,0 +1,296 @@
+{
+  "judge_model": "gpt-5.6-luna",
+  "overall": {
+    "n": 15,
+    "passed": 8,
+    "logic": 8,
+    "extra_condition": 0,
+    "scope_violation": 0,
+    "exec_strict": 11,
+    "lucky": 4
+  },
+  "skipped": {},
+  "judge_failed": [],
+  "by_tag": {
+    "arithmetic_reasoning": {
+      "n": 1,
+      "passed": 0,
+      "logic": 0,
+      "extra_condition": 0,
+      "scope_violation": 0,
+      "exec_strict": 0,
+      "lucky": 0
+    },
+    "assignment_gap": {
+      "n": 1,
+      "passed": 1,
+      "logic": 1,
+      "extra_condition": 0,
+      "scope_violation": 0,
+      "exec_strict": 1,
+      "lucky": 0
+    },
+    "classification_aggregation": {
+      "n": 1,
+      "passed": 0,
+      "logic": 0,
+      "extra_condition": 0,
+      "scope_violation": 0,
+      "exec_strict": 1,
+      "lucky": 1
+    },
+    "cross_rule_reasoning": {
+      "n": 1,
+      "passed": 0,
+      "logic": 0,
+      "extra_condition": 0,
+      "scope_violation": 0,
+      "exec_strict": 0,
+      "lucky": 0
+    },
+    "department_required_load": {
+      "n": 1,
+      "passed": 0,
+      "logic": 0,
+      "extra_condition": 0,
+      "scope_violation": 0,
+      "exec_strict": 1,
+      "lucky": 1
+    },
+    "distribution_rule_application": {
+      "n": 1,
+      "passed": 0,
+      "logic": 0,
+      "extra_condition": 0,
+      "scope_violation": 0,
+      "exec_strict": 0,
+      "lucky": 0
+    },
+    "exam_change": {
+      "n": 1,
+      "passed": 1,
+      "logic": 1,
+      "extra_condition": 0,
+      "scope_violation": 0,
+      "exec_strict": 1,
+      "lucky": 0
+    },
+    "fixture_earned": {
+      "n": 1,
+      "passed": 1,
+      "logic": 1,
+      "extra_condition": 0,
+      "scope_violation": 0,
+      "exec_strict": 1,
+      "lucky": 0
+    },
+    "fixture_personalized": {
+      "n": 1,
+      "passed": 1,
+      "logic": 1,
+      "extra_condition": 0,
+      "scope_violation": 0,
+      "exec_strict": 1,
+      "lucky": 0
+    },
+    "general_cohort_difference": {
+      "n": 1,
+      "passed": 0,
+      "logic": 0,
+      "extra_condition": 0,
+      "scope_violation": 0,
+      "exec_strict": 0,
+      "lucky": 0
+    },
+    "general_cohort_rule": {
+      "n": 1,
+      "passed": 0,
+      "logic": 0,
+      "extra_condition": 0,
+      "scope_violation": 0,
+      "exec_strict": 1,
+      "lucky": 1
+    },
+    "multi_document_multi_hop": {
+      "n": 1,
+      "passed": 1,
+      "logic": 1,
+      "extra_condition": 0,
+      "scope_violation": 0,
+      "exec_strict": 1,
+      "lucky": 0
+    },
+    "multi_document_multi_hop_reasoning": {
+      "n": 1,
+      "passed": 1,
+      "logic": 1,
+      "extra_condition": 0,
+      "scope_violation": 0,
+      "exec_strict": 1,
+      "lucky": 0
+    },
+    "multi_document_reasoning": {
+      "n": 2,
+      "passed": 2,
+      "logic": 2,
+      "extra_condition": 0,
+      "scope_violation": 0,
+      "exec_strict": 2,
+      "lucky": 0
+    },
+    "multi_hop": {
+      "n": 2,
+      "passed": 2,
+      "logic": 2,
+      "extra_condition": 0,
+      "scope_violation": 0,
+      "exec_strict": 1,
+      "lucky": 0
+    },
+    "multi_hop_aggregation": {
+      "n": 1,
+      "passed": 0,
+      "logic": 0,
+      "extra_condition": 0,
+      "scope_violation": 0,
+      "exec_strict": 1,
+      "lucky": 1
+    },
+    "official_public_facts": {
+      "n": 12,
+      "passed": 7,
+      "logic": 7,
+      "extra_condition": 0,
+      "scope_violation": 0,
+      "exec_strict": 10,
+      "lucky": 4
+    },
+    "official_rule": {
+      "n": 1,
+      "passed": 0,
+      "logic": 0,
+      "extra_condition": 0,
+      "scope_violation": 0,
+      "exec_strict": 1,
+      "lucky": 1
+    },
+    "official_rule_with_hypothetical_inputs": {
+      "n": 2,
+      "passed": 0,
+      "logic": 0,
+      "extra_condition": 0,
+      "scope_violation": 0,
+      "exec_strict": 0,
+      "lucky": 0
+    },
+    "prof_credit_load": {
+      "n": 1,
+      "passed": 0,
+      "logic": 0,
+      "extra_condition": 0,
+      "scope_violation": 0,
+      "exec_strict": 1,
+      "lucky": 1
+    },
+    "prof_future_other": {
+      "n": 1,
+      "passed": 1,
+      "logic": 1,
+      "extra_condition": 0,
+      "scope_violation": 0,
+      "exec_strict": 1,
+      "lucky": 0
+    },
+    "prof_other_industry": {
+      "n": 1,
+      "passed": 1,
+      "logic": 1,
+      "extra_condition": 0,
+      "scope_violation": 0,
+      "exec_strict": 1,
+      "lucky": 0
+    },
+    "professor_assessment_filter": {
+      "n": 1,
+      "passed": 1,
+      "logic": 1,
+      "extra_condition": 0,
+      "scope_violation": 0,
+      "exec_strict": 1,
+      "lucky": 0
+    },
+    "professor_required_credit_chain": {
+      "n": 1,
+      "passed": 1,
+      "logic": 1,
+      "extra_condition": 0,
+      "scope_violation": 0,
+      "exec_strict": 0,
+      "lucky": 0
+    },
+    "rule_reasoning": {
+      "n": 1,
+      "passed": 0,
+      "logic": 0,
+      "extra_condition": 0,
+      "scope_violation": 0,
+      "exec_strict": 0,
+      "lucky": 0
+    },
+    "schedule_overlap": {
+      "n": 1,
+      "passed": 1,
+      "logic": 1,
+      "extra_condition": 0,
+      "scope_violation": 0,
+      "exec_strict": 1,
+      "lucky": 0
+    },
+    "simulated_student_fixture": {
+      "n": 1,
+      "passed": 1,
+      "logic": 1,
+      "extra_condition": 0,
+      "scope_violation": 0,
+      "exec_strict": 1,
+      "lucky": 0
+    },
+    "single_document": {
+      "n": 1,
+      "passed": 0,
+      "logic": 0,
+      "extra_condition": 0,
+      "scope_violation": 0,
+      "exec_strict": 1,
+      "lucky": 1
+    },
+    "teacher_credits": {
+      "n": 1,
+      "passed": 0,
+      "logic": 0,
+      "extra_condition": 0,
+      "scope_violation": 0,
+      "exec_strict": 1,
+      "lucky": 1
+    },
+    "temporal_reasoning": {
+      "n": 1,
+      "passed": 1,
+      "logic": 1,
+      "extra_condition": 0,
+      "scope_violation": 0,
+      "exec_strict": 1,
+      "lucky": 0
+    },
+    "weighted_exam_score": {
+      "n": 1,
+      "passed": 0,
+      "logic": 0,
+      "extra_condition": 0,
+      "scope_violation": 0,
+      "exec_strict": 0,
+      "lucky": 0
+    }
+  },
+  "judge_tokens": 24745
+}

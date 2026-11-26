@@ -9,7 +9,7 @@ from .chatkhu_client import LLMClient
 from .executor import ExecutionResult, SQLExecutor, extract_sql
 import re
 
-from .prompt import CLARIFY_TOKEN, REFUSE_TOKEN, PromptBuilder
+from .prompt import CLARIFY_TOKEN, REFUSE_TOKEN, SEARCH_TOKEN, PromptBuilder
 
 
 @dataclass
@@ -32,6 +32,10 @@ class Text2SQLOutput:
     result: ExecutionResult | None
     attempts: list[Attempt] = field(default_factory=list)
     answer: str | None = None  # 사용자에게 보여 줄 자연어 답변(값은 로컬에서 채움)
+    route: str = "sql"  # sql / search(강의계획서 본문 검색) / refused / clarify
+    sources: list[str] = field(default_factory=list)  # 본문 검색 답변의 근거 과목(과목코드-분반)
+    extra_tokens: int = 0  # 본문 검색 답변 생성에 쓴 토큰
+    snippets: dict[str, list[str]] = field(default_factory=dict)  # 근거 과목별 강의계획서 발췌(공개 정보, 화면 강조용)
 
     @property
     def first_try_ok(self) -> bool:
@@ -39,7 +43,7 @@ class Text2SQLOutput:
 
     @property
     def total_tokens(self) -> int:
-        return sum(a.prompt_tokens + a.completion_tokens for a in self.attempts)
+        return sum(a.prompt_tokens + a.completion_tokens for a in self.attempts) + self.extra_tokens
 
     def to_dict(self) -> dict:
         d = asdict(self)
@@ -53,11 +57,13 @@ class Text2SQLOutput:
 
 
 class Text2SQL:
-    def __init__(self, llm: LLMClient, prompt: PromptBuilder, executor: SQLExecutor, max_repairs: int = 2):
+    def __init__(self, llm: LLMClient, prompt: PromptBuilder, executor: SQLExecutor, max_repairs: int = 2,
+                 retriever=None):
         self.llm = llm
         self.prompt = prompt
         self.executor = executor
         self.max_repairs = max_repairs
+        self.retriever = retriever  # syllabus_rag.SyllabusRetriever (없으면 본문 검색 질문에 안내만)
         self._system = prompt.system_prompt()
 
     def ask(self, question: str, student_id: int | None = None, history: list[dict] | None = None) -> Text2SQLOutput:
@@ -76,8 +82,12 @@ class Text2SQL:
             template = tmpl or template  # 수정 응답에 틀이 없으면 앞 시도의 틀을 쓴다
             refused = re.search(rf"^\s*{REFUSE_TOKEN}\s*:?(.*)$", body, flags=re.M)
             clarify = None if refused else re.search(rf"^\s*{CLARIFY_TOKEN}\s*:?(.*)$", body, flags=re.M)
-            sql = None if refused or clarify else extract_sql(body)
-            if clarify:
+            search = None if refused or clarify else re.search(
+                rf"^\s*{SEARCH_TOKEN}\s*:\s*(?:\[(.*?)\])?\s*(.*)$", body, flags=re.M)
+            sql = None if refused or clarify or search else extract_sql(body)
+            if search:
+                result = ExecutionResult(ok=False, error=f"본문 검색: {search.group(2).strip()}", error_kind="search")
+            elif clarify:
                 result = ExecutionResult(ok=False, error=f"모델이 되물음: {clarify.group(1).strip()}", error_kind="clarify")
             elif refused:
                 reason = refused.group(1).strip() or "거부"
@@ -93,13 +103,34 @@ class Text2SQL:
                 completion_tokens=resp.completion_tokens, latency_sec=resp.latency_sec,
             ))
             out.final_sql, out.result = sql, result
-            if result.ok or result.error_kind in ("refused", "clarify"):
+            if result.ok or result.error_kind in ("refused", "clarify", "search"):
                 break  # 모델이 스스로 거부하거나 되물은 경우는 다시 시도하지 않는다
             # 오류 메시지만 되돌려 준다(결과 행은 LLM 에 보내지 않음)
             messages.append({"role": "assistant", "content": resp.text})
             messages.append({"role": "user", "content": self.prompt.repair_prompt(sql or "(없음)", result.error or "")})
+        if out.result is not None and out.result.error_kind == "search":
+            self._search_answer(out, question, search)
+            return out
+        out.route = {"refused": "refused", "guard": "refused", "clarify": "clarify"}.get(
+            out.result.error_kind if out.result else None, "sql")
         out.answer = self._answer(out.result, template)
         return out
+
+    def _search_answer(self, out: Text2SQLOutput, question: str, m: re.Match) -> None:
+        """강의계획서 본문 검색으로 답한다. 학생 개인정보는 쓰지 않고 공개 강의계획서 조각만 LLM 에 보낸다."""
+        out.route = "search"
+        if self.retriever is None:
+            out.answer = "강의계획서 본문 검색은 아직 준비되지 않았어요. 평가 비율·시간표·담당 교수처럼 정리된 정보는 물어볼 수 있어요."
+            return
+        courses = [c.strip() for c in (m.group(1) or "").split(",") if c.strip()]
+        query = m.group(2).strip() or question
+        hits = self.retriever.search(query, courses)
+        out.answer, resp = self.retriever.answer(question, hits)
+        out.sources = list(dict.fromkeys(f"{h.course_code}-{h.section}" for h in hits))
+        for h in hits:
+            out.snippets.setdefault(f"{h.course_code}-{h.section}", []).append(h.content)
+        if resp is not None:
+            out.extra_tokens = resp.prompt_tokens + resp.completion_tokens
 
     @staticmethod
     def _answer(result: ExecutionResult | None, template: str | None) -> str:

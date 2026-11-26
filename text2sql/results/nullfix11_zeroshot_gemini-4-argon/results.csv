@@ -1,0 +1,187 @@
+﻿id,question,student_id,tags,strict,relaxed,subset,diagnosis,missing_columns,n_attempts,first_try_exec_ok,exec_error,gold_sql,pred_sql,total_tokens,latency_sec
+J029,"2025학년도 1학기 EE211-02(확률및랜덤변수)와 2025학년도 1학기 CSE438-00(최신기술콜로키움1)의 중간·기말 비율 합계를 각각 구하고, 두 번째 합계에서 첫 번째 합계를 뺀 차이도 알려줘.",,"multi_document_reasoning,combined_exam_gap,official_public_facts",True,True,True,correct,,1,True,,,"WITH first_course AS (
+    SELECT s.midterm_percentage + s.final_exam_percentage AS exam_sum
+    FROM course_offerings co
+    JOIN syllabi s ON s.offering_id = co.offering_id
+    WHERE co.year = 2025 AND co.semester = '1'
+      AND co.course_code = 'EE211' AND co.section = '02'
+),
+second_course AS (
+    SELECT s.midterm_percentage + s.final_exam_percentage AS exam_sum
+    FROM course_offerings co
+    JOIN syllabi s ON s.offering_id = co.offering_id
+    WHERE co.year = 2025 AND co.semester = '1'
+      AND co.course_code = 'CSE438' AND co.section = '00'
+)
+SELECT
+    f.exam_sum AS first_exam_sum,
+    s.exam_sum AS second_exam_sum,
+    s.exam_sum - f.exam_sum AS difference
+FROM first_course f
+CROSS JOIN second_course s;",4879,7.21
+J030,"2026학년도 2학기 AI3003-00(자연언어학습)와 2025학년도 1학기 CSE428-00(컴퓨터그래픽스)의 중간·기말 비율 합계를 각각 구하고, 두 번째 합계에서 첫 번째 합계를 뺀 차이도 알려줘.",,"multi_document_reasoning,combined_exam_gap,official_public_facts",True,True,True,correct,,1,True,,,"WITH c1 AS (
+    SELECT s.midterm_percentage + s.final_exam_percentage AS sum1
+    FROM course_offerings co
+    JOIN syllabi s ON s.offering_id = co.offering_id
+    WHERE co.year = 2026 AND co.semester = '2' AND co.course_code = 'AI3003' AND co.section = '00'
+),
+c2 AS (
+    SELECT s.midterm_percentage + s.final_exam_percentage AS sum2
+    FROM course_offerings co
+    JOIN syllabi s ON s.offering_id = co.offering_id
+    WHERE co.year = 2025 AND co.semester = '1' AND co.course_code = 'CSE428' AND co.section = '00'
+)
+SELECT c1.sum1, c2.sum2, c2.sum2 - c1.sum1 AS diff
+FROM c1
+CROSS JOIN c2;",4825,9.64
+J031,"2025학년도 1학기 CSE496-06(연구연수활동1(컴퓨터공학))와 2025학년도 1학기 CSE304-00(알고리즘)의 중간·기말 비율 합계를 각각 구하고, 두 번째 합계에서 첫 번째 합계를 뺀 차이도 알려줘.",,"multi_document_reasoning,combined_exam_gap,official_public_facts",True,True,True,correct,,1,True,,,"WITH a AS (
+  SELECT s.midterm_percentage + s.final_exam_percentage AS exam_sum
+  FROM course_offerings co
+  JOIN syllabi s ON s.offering_id = co.offering_id
+  WHERE co.year = 2025 AND co.semester = '1'
+    AND co.course_code = 'CSE496' AND co.section = '06'
+),
+b AS (
+  SELECT s.midterm_percentage + s.final_exam_percentage AS exam_sum
+  FROM course_offerings co
+  JOIN syllabi s ON s.offering_id = co.offering_id
+  WHERE co.year = 2025 AND co.semester = '1'
+    AND co.course_code = 'CSE304' AND co.section = '00'
+)
+SELECT
+  a.exam_sum AS first_exam_sum,
+  b.exam_sum AS second_exam_sum,
+  b.exam_sum - a.exam_sum AS diff
+FROM a CROSS JOIN b;",4861,7.16
+J032,"2025학년도 1학기 CSE405-00(졸업프로젝트)와 2026학년도 1학기 IE419-00(서비스데이터사이언스)의 중간·기말 비율 합계를 각각 구하고, 두 번째 합계에서 첫 번째 합계를 뺀 차이도 알려줘.",,"multi_document_reasoning,combined_exam_gap,official_public_facts",True,True,True,correct,,1,True,,,"WITH c1 AS (
+    SELECT s.midterm_percentage + s.final_exam_percentage AS sum1
+    FROM course_offerings co
+    JOIN syllabi s ON co.offering_id = s.offering_id
+    WHERE co.year = 2025
+      AND co.semester = '1'
+      AND co.course_code = 'CSE405'
+      AND co.section = '00'
+),
+c2 AS (
+    SELECT s.midterm_percentage + s.final_exam_percentage AS sum2
+    FROM course_offerings co
+    JOIN syllabi s ON co.offering_id = s.offering_id
+    WHERE co.year = 2026
+      AND co.semester = '1'
+      AND co.course_code = 'IE419'
+      AND co.section = '00'
+)
+SELECT
+    c1.sum1,
+    c2.sum2,
+    c2.sum2 - c1.sum1 AS diff
+FROM c1
+CROSS JOIN c2;",4839,9.01
+J033,2026학년도 2학기 EE209-02(논리회로)와 2026학년도 1학기 CSE204-01(자료구조) 중 중간고사 비율이 더 큰 강좌의 과목코드·연도·학기·분반·비율을 알려줘. 같으면 둘 다 알려줘.,,"multi_document_reasoning,midterm_max,official_public_facts",True,True,True,correct,,1,True,,,"WITH target AS (
+    SELECT
+        co.course_code,
+        co.year,
+        co.semester,
+        co.section,
+        s.midterm_percentage
+    FROM course_offerings AS co
+    JOIN syllabi AS s ON s.offering_id = co.offering_id
+    WHERE (co.year = 2026 AND co.semester = '2' AND co.course_code = 'EE209' AND co.section = '02')
+       OR (co.year = 2026 AND co.semester = '1' AND co.course_code = 'CSE204' AND co.section = '01')
+)
+SELECT
+    course_code,
+    year,
+    semester,
+    section,
+    midterm_percentage
+FROM target
+WHERE midterm_percentage = (SELECT MAX(midterm_percentage) FROM target)
+ORDER BY year, semester, course_code, section;",4787,7.29
+J073,"다음 세 강좌 중 중간·기말 비율 합계가 70% 이상인 강좌의 과목코드·연도·학기·분반·합계를 알려줘: 2025학년도 1학기 CSE406-01(캡스톤디자인), 2026학년도 1학기 AI4003-00(졸업논문(인공지능)), 2025학년도 1학기 CSE405-00(졸업프로젝트).",,"multi_document_reasoning,exam_threshold_set,official_public_facts",True,True,True,correct,,1,True,,,"SELECT
+    co.course_code,
+    co.year,
+    co.semester,
+    co.section,
+    (s.midterm_percentage + s.final_exam_percentage) AS exam_total_percentage
+FROM course_offerings AS co
+JOIN syllabi AS s ON co.offering_id = s.offering_id
+WHERE (
+    (co.year = 2025 AND co.semester = '1' AND co.course_code = 'CSE406' AND co.section = '01')
+    OR (co.year = 2026 AND co.semester = '1' AND co.course_code = 'AI4003' AND co.section = '00')
+    OR (co.year = 2025 AND co.semester = '1' AND co.course_code = 'CSE405' AND co.section = '00')
+)
+AND (s.midterm_percentage + s.final_exam_percentage) >= 70;",4845,8.89
+J075,"다음 세 강좌 중 중간·기말 비율 합계가 70% 이상인 강좌의 과목코드·연도·학기·분반·합계를 알려줘: 2026학년도 1학기 IE419-00(서비스데이터사이언스), 2025학년도 2학기 CSE497-02(연구연수활동2(컴퓨터공학)), 2026학년도 1학기 EE209-01(논리회로).",,"multi_document_reasoning,exam_threshold_set,official_public_facts",True,True,True,correct,,1,True,,,"SELECT
+  co.course_code,
+  co.year,
+  co.semester,
+  co.section,
+  (s.midterm_percentage + s.final_exam_percentage) AS exam_total_percentage
+FROM course_offerings AS co
+JOIN syllabi AS s
+  ON s.offering_id = co.offering_id
+WHERE (
+    (co.year = 2026 AND co.semester = '1' AND co.course_code = 'IE419' AND co.section = '00')
+    OR (co.year = 2025 AND co.semester = '2' AND co.course_code = 'CSE497' AND co.section = '02')
+    OR (co.year = 2026 AND co.semester = '1' AND co.course_code = 'EE209' AND co.section = '01')
+  )
+  AND (s.midterm_percentage + s.final_exam_percentage) >= 70
+ORDER BY co.year, co.semester, co.course_code, co.section;",4867,6.81
+J077,"다음 세 강좌 중 중간·기말 비율 합계가 70% 이상인 강좌의 과목코드·연도·학기·분반·합계를 알려줘: 2025학년도 2학기 CSE302-01(컴퓨터네트워크), 2026학년도 1학기 SWCON321-02(데이터분석캡스톤디자인), 2026학년도 2학기 CSE406-16(캡스톤디자인).",,"multi_document_reasoning,exam_threshold_set,official_public_facts",True,True,True,correct,,1,True,,,"SELECT
+  co.course_code,
+  co.year,
+  co.semester,
+  co.section,
+  (s.midterm_percentage + s.final_exam_percentage) AS exam_total_percentage
+FROM course_offerings AS co
+JOIN syllabi AS s
+  ON co.offering_id = s.offering_id
+WHERE
+  (
+    (co.year = 2025 AND co.semester = '2' AND co.course_code = 'CSE302' AND co.section = '01')
+    OR (co.year = 2026 AND co.semester = '1' AND co.course_code = 'SWCON321' AND co.section = '02')
+    OR (co.year = 2026 AND co.semester = '2' AND co.course_code = 'CSE406' AND co.section = '16')
+  )
+  AND (s.midterm_percentage + s.final_exam_percentage) >= 70
+ORDER BY
+  co.year,
+  co.semester,
+  co.course_code,
+  co.section;",4879,10.14
+J079,"다음 세 강좌 중 중간·기말 비율 합계가 70% 이상인 강좌의 과목코드·연도·학기·분반·합계를 알려줘: 2025학년도 1학기 CSE327-00(소프트웨어공학), 2025학년도 1학기 CSE496-06(연구연수활동1(컴퓨터공학)), 2025학년도 1학기 CSE304-00(알고리즘).",,"multi_document_reasoning,exam_threshold_set,official_public_facts",True,True,True,correct,,1,True,,,"SELECT co.course_code, co.year, co.semester, co.section,
+       (s.midterm_percentage + s.final_exam_percentage) AS exam_total
+FROM course_offerings co
+JOIN syllabi s ON s.offering_id = co.offering_id
+WHERE co.year = 2025 AND co.semester = '1'
+  AND (
+    (co.course_code = 'CSE327' AND co.section = '00')
+    OR (co.course_code = 'CSE496' AND co.section = '06')
+    OR (co.course_code = 'CSE304' AND co.section = '00')
+  )
+  AND (s.midterm_percentage + s.final_exam_percentage) >= 70
+ORDER BY exam_total DESC, co.course_code, co.section",4808,6.48
+J086,"2026학년도 1학기 CSE438-00(최신기술콜로키움1)에서 중간고사 80점, 기말고사 90점(각 100점 만점)을 받았다고 가정하면 두 시험이 최종 100점에 기여하는 점수 합은? 다른 항목과 추가 보정은 제외해줘.",,"arithmetic_reasoning,weighted_exam_score,official_rule_with_hypothetical_inputs",False,True,True,correct_extra_columns,,1,True,,,"SELECT 
+    co.course_code,
+    co.section,
+    co.course_name,
+    s.midterm_percentage,
+    s.final_exam_percentage,
+    (80.0 * s.midterm_percentage / 100.0) + (90.0 * s.final_exam_percentage / 100.0) AS exam_contribution_score
+FROM course_offerings co
+JOIN syllabi s ON co.offering_id = s.offering_id
+WHERE co.year = 2026
+  AND co.semester = '1'
+  AND co.course_code = 'CSE438'
+  AND co.section = '00';",4763,11.26
+J087,"2025학년도 2학기 AI4007-00(독립심화학습(인공지능)2)에서 중간고사 80점, 기말고사 90점(각 100점 만점)을 받았다고 가정하면 두 시험이 최종 100점에 기여하는 점수 합은? 다른 항목과 추가 보정은 제외해줘.",,"arithmetic_reasoning,weighted_exam_score,official_rule_with_hypothetical_inputs",False,True,True,correct_extra_columns,,1,True,,,"SELECT
+  s.midterm_percentage,
+  s.final_exam_percentage,
+  ROUND((80 * s.midterm_percentage + 90 * s.final_exam_percentage) / 100.0, 2) AS expected_score
+FROM course_offerings AS co
+JOIN syllabi AS s
+  ON s.offering_id = co.offering_id
+WHERE co.year = 2025
+  AND co.semester = '2'
+  AND co.course_code = 'AI4007'
+  AND co.section = '00'",4711,10.75

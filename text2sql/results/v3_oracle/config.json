@@ -1,0 +1,9 @@
+{
+  "model": "oracle",
+  "fewshot": true,
+  "n_fewshot": 11,
+  "temperature": null,
+  "max_repairs": 2,
+  "gold": "text2sql/gold/personal_gold_v3.csv",
+  "n_items": 34
+}

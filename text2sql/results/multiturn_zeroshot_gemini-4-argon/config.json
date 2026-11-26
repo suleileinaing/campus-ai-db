@@ -1,0 +1,11 @@
+{
+  "model": "gemini-4-argon",
+  "fewshot": false,
+  "n_fewshot": 0,
+  "temperature": null,
+  "max_repairs": 2,
+  "gold": "text2sql/gold/다중턴_12대화_36턴.json",
+  "n_conversations": 12,
+  "n_turns": 36,
+  "history": "앞 턴의 질문 + 모델의 실제 최종 응답(결과 행 제외)"
+}

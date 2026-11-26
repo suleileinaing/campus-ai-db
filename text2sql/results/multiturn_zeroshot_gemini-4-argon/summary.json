@@ -1,0 +1,93 @@
+{
+  "overall": {
+    "n": 36,
+    "exec_ok": 34,
+    "first_try_exec_ok": 34,
+    "strict": 12,
+    "relaxed": 33,
+    "subset": 33
+  },
+  "by_tag": {
+    "answer": {
+      "n": 34,
+      "exec_ok": 34,
+      "first_try_exec_ok": 34,
+      "strict": 10,
+      "relaxed": 31,
+      "subset": 31
+    },
+    "clarification_then_reference": {
+      "n": 6,
+      "exec_ok": 4,
+      "first_try_exec_ok": 4,
+      "strict": 5,
+      "relaxed": 5,
+      "subset": 5
+    },
+    "clarify": {
+      "n": 2,
+      "exec_ok": 0,
+      "first_try_exec_ok": 0,
+      "strict": 2,
+      "relaxed": 2,
+      "subset": 2
+    },
+    "cohort_reference_and_rule_comparison": {
+      "n": 6,
+      "exec_ok": 6,
+      "first_try_exec_ok": 6,
+      "strict": 3,
+      "relaxed": 6,
+      "subset": 6
+    },
+    "course_reference_and_arithmetic": {
+      "n": 12,
+      "exec_ok": 12,
+      "first_try_exec_ok": 12,
+      "strict": 0,
+      "relaxed": 12,
+      "subset": 12
+    },
+    "professor_reference_and_filter": {
+      "n": 12,
+      "exec_ok": 12,
+      "first_try_exec_ok": 12,
+      "strict": 4,
+      "relaxed": 10,
+      "subset": 10
+    },
+    "turn1": {
+      "n": 12,
+      "exec_ok": 10,
+      "first_try_exec_ok": 10,
+      "strict": 5,
+      "relaxed": 12,
+      "subset": 12
+    },
+    "turn2": {
+      "n": 12,
+      "exec_ok": 12,
+      "first_try_exec_ok": 12,
+      "strict": 4,
+      "relaxed": 11,
+      "subset": 11
+    },
+    "turn3": {
+      "n": 12,
+      "exec_ok": 12,
+      "first_try_exec_ok": 12,
+      "strict": 3,
+      "relaxed": 10,
+      "subset": 10
+    }
+  },
+  "diagnosis": {
+    "correct_extra_columns": 21,
+    "correct": 10,
+    "row_count_mismatch": 3,
+    "correct_clarify": 2
+  },
+  "gold_invalid": [],
+  "avg_tokens": 4681.8,
+  "avg_latency_sec": 126.08
+}

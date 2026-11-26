@@ -1,0 +1,34 @@
+{
+  "overall": {
+    "n": 34,
+    "exec_ok": 34,
+    "first_try_exec_ok": 34,
+    "strict": 34,
+    "relaxed": 34,
+    "subset": 34
+  },
+  "by_tag": {
+    "개인화": {
+      "n": 24,
+      "exec_ok": 24,
+      "first_try_exec_ok": 24,
+      "strict": 24,
+      "relaxed": 24,
+      "subset": 24
+    },
+    "공통": {
+      "n": 10,
+      "exec_ok": 10,
+      "first_try_exec_ok": 10,
+      "strict": 10,
+      "relaxed": 10,
+      "subset": 10
+    }
+  },
+  "diagnosis": {
+    "correct": 34
+  },
+  "gold_invalid": [],
+  "avg_tokens": 0,
+  "avg_latency_sec": 0
+}

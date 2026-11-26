@@ -111,12 +111,40 @@ python -m text2sql.evaluate --gold ... --llm-judge       # 평가 직후 바로 
 - judge 모델은 `.env` 의 `CHATKHU_JUDGE_MODEL`(비우면 `CHATKHU_MODEL`), temperature 0. `--judge-model` 로 덮어쓸 수 있다. 생성 모델과 같은 모델이면 자기 답에 후한 경향이 있을 수 있다.
 - SQL 실행 실패 문항은 judge 를 부르지 않고 0. 중간에 끊기면 다시 실행할 때 판정 안 된 문항만 채점한다(`--force` 로 전부 다시).
 
+### SQL 논리 채점 (`sql_judge.py`)
+
+결과 표만 비교하면 테스트 DB 에서 우연히 결과가 같은 틀린 SQL(조건 누락 등)을 정답으로 처리한다.
+`sql_judge` 는 [질문 + 관련 테이블 스키마 + 정답 SQL + 모델 SQL + 로그인 학번] 을 보내
+`logic`(논리 일치), `extra_condition`(질문에 없는 조건), `scope_ok`(본인 학번 범위) 를 판정받는다.
+정답 SQL 은 `gold_sql`, 없으면 `reference_sql` 을 쓴다(예전 결과는 `config.json` 의 gold 파일에서 채움).
+
+```bash
+python -m text2sql.sql_judge --run exec15_zeroshot_gemini-4-argon   # 기존 결과를 채점(SQL 생성은 다시 안 함)
+```
+
+- 결과: `sql_judge_summary.md`(통과율, 우연히 맞은 문항, 범위 위반, 질문에 없는 조건), `sql_judge.csv`, `sql_judge.jsonl`
+
+### 자연어 답변 채점 (`answer_judge.py`)
+
+챗봇이 사용자에게 보여 준 최종 답변을 정확성·충실성·완결성·자연스러움 1~5점으로 매긴다.
+SQL·테이블/컬럼 이름·채우지 못한 `{틀}` 노출은 LLM 없이 로컬 규칙으로 검사한다.
+통과 = 정확성·충실성·완결성 모두 4점 이상 + 노출 없음. 답변이 필요하므로 `--answers` 로 다시 생성해야 한다.
+
+```bash
+python -m text2sql.evaluate --gold text2sql/gold/실행평가_15문항.json --no-fewshot --model gemini-4-argon \
+    --judge-model claude-sonnet-5-5 --answers --answer-judge --sql-judge --run-name answers15_argon
+python -m text2sql.answer_judge --run answers15_argon                # 이미 생성한 결과만 다시 채점
+```
+
+- 결과: `answer_judge_summary.md`(통과율, 항목별 평균, SQL 은 맞았는데 답변이 탈락한 문항, 노출), `answer_judge.csv`, `answer_judge.jsonl`
+- `--answers` 는 서비스(`cli`)와 같은 프롬프트(답변 틀 규칙 포함)로 생성하므로 SQL 정답률이 기존 결과와 조금 다를 수 있다.
+
 ## 개인정보 처리
 
 - LLM 에는 스키마, 코드성 컬럼의 값 형식, 질문, 로그인 학생 ID, SQL 오류 메시지만 보낸다. **조회 결과 행은 보내지 않는다.**
   - 자연어 답변(`cli`)도 같은 원칙을 따른다. LLM 은 SQL 과 함께 값 자리만 비운 답변 틀(`ANSWER: 담당 교수님은 {professor_name} 교수님이에요.`)을 내고, 값은 `answer.py` 가 로컬에서 채운다.
   - 대화형 모드는 앞 턴의 질문과 모델 응답(SQL·답변 틀)만 다음 턴에 넘긴다.
-  - 예외: 평가용 `llm_judge` 는 채점을 위해 정답·예측 결과 행을 보낸다. 실제 학생 데이터가 든 DB 로는 돌리지 말고 가상 학생(fixture) 질의셋에만 쓴다.
+  - 예외: 평가용 `llm_judge`·`answer_judge` 는 채점을 위해 정답·예측 결과 행을 보낸다. 실제 학생 데이터가 든 DB 로는 돌리지 말고 가상 학생(fixture) 질의셋에만 쓴다.
 - `students`, `enrollments` 를 읽는 쿼리는 로그인 학생 ID 가 있어야 하고, 다른 학생 ID 가 들어 있으면 거부한다. 이는 1차 방어선일 뿐이며 실제 서비스에선 백엔드 인가(README 다음 단계 7)가 필요하다.
 
 ## 팀과 정할 것
@@ -124,3 +152,33 @@ python -m text2sql.evaluate --gold ... --llm-judge       # 평가 직후 바로 
 - "이번 학기" 기준은 `.env` 의 `TEXT2SQL_CURRENT_TERM`(기본 2026-2)으로 바꾼다.
 - 스키마와 규칙은 연결한 DB 에 맞춰 자동으로 바뀐다(`academic_calendar`, `is_retake` 등은 있을 때만 프롬프트에 들어감).
 - gold 질의가 나오면 오답 유형을 보고 `build_domain_rules` 를 보강한다. 이때 규칙을 특정 gold 문항 정답에 맞춰 쓰면 평가가 부풀려지므로, 일반 규칙으로만 추가한다.
+
+## 웹 데모 (`web/`)
+
+```bash
+python -m text2sql.web.server            # http://127.0.0.1:8000  (--port, --no-rag, --session-min)
+```
+
+- 표준 라이브러리 `http.server` 만 사용합니다(추가 설치 없음). 화면은 `web/static/` 의 HTML/CSS/JS.
+- 조회 결과 행은 브라우저로만 보내고 LLM 에는 보내지 않습니다.
+- **로그인은 데모용**: DB 에 비밀번호가 없어 학번만 맞으면 통과합니다. 실서비스는 학교 인증이 필요합니다.
+- 세션 만료 시 서버가 401 `{expired: true}` 를 보내고 대화 기록을 지우며, 화면은 개인 답변을 지우고 재로그인을 안내합니다.
+- '멈추기'는 브라우저 요청만 끊습니다. 이미 보낸 LLM 호출은 서버에서 끝까지 진행됩니다(크레딧 차감).
+
+### RCP(학생 클라우드) VM 배포
+
+```bash
+# VM(Ubuntu 22.04) 안에서
+sudo apt update && sudo apt install -y python3-venv git
+git clone https://github.com/suleileinaing/campus-ai-db.git && cd campus-ai-db
+python3 -m venv .venv && .venv/bin/pip install -r text2sql/requirements.txt
+nano text2sql/.env                      # API 키 등 .env 내용을 붙여 넣기(깃에 올리지 않음)
+# rag_index 는 깃에 없으므로 내 PC 에서 scp 로 복사: text2sql/rag_index/syllabus_2026-2.sqlite
+sudo cp text2sql/web/deploy/campus-ai.service /etc/systemd/system/
+sudo systemctl daemon-reload && sudo systemctl enable --now campus-ai
+curl -s localhost:8000/api/status       # {"rag": true, ...} 이면 성공
+```
+
+- 외부 주소는 RCP 콘솔의 **App routing** 에서 서브도메인을 등록해 연결합니다(포트 8000).
+- 하루 질문 한도: 전체 `WEB_DAILY_LIMIT`(기본 300), 접속 주소당 `WEB_IP_DAILY_LIMIT`(기본 40). 넘으면 429 와 안내 문구.
+- 로그 보기: `journalctl -u campus-ai -f`

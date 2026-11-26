@@ -45,6 +45,7 @@ SKIP_TABLES = {"sqlite_sequence", "sqlite_stat1", "sqlite_stat4", "syllabus_chun
 
 REFUSE_TOKEN = "REFUSE"
 CLARIFY_TOKEN = "CLARIFY"
+SEARCH_TOKEN = "SEARCH"
 
 
 @dataclass
@@ -129,6 +130,9 @@ def build_domain_rules(db_path: Path = DATABASE_PATH, current_term: str = CURREN
         "- 교수는 course_offerings → offering_professors → professors 로 조인한다(팀티칭이면 여러 명).",
         "- 강의계획서 정보(평가비율, 교재, 주차별 계획)는 course_offerings → syllabi(offering_id) → "
         "syllabus_textbooks / syllabus_weekly_plans(syllabus_id) 로 조인한다.",
+        "- NULL 은 '정보 없음'이다(예: 강의계획서에 중간고사 비율이 안 적힘). COALESCE·IFNULL 로 0 이나 다른 값으로 "
+        "바꾸지 말고 NULL 그대로 계산·비교한다. 그러면 비율 조건(>= 30 등)에서 정보 없는 강좌는 빠지고, "
+        "NULL 이 섞인 계산 결과는 NULL 로 남는다. 질문이 '없으면 0으로' 처럼 직접 정할 때만 바꾼다.",
         "- 학생에게 적용되는 졸업요건은 students 와 graduation_requirements 를 department_id, track 이 같고 "
         "cohort_start <= admission_year AND (cohort_end IS NULL OR cohort_end >= admission_year) 로 매칭한다.",
         "- 이수구분별 최소학점은 requirement_categories, 지정 필수과목은 requirement_courses, "
@@ -196,6 +200,18 @@ ANSWER_RULES = f"""\
 """
 
 
+def search_rules(current_term: str = CURRENT_TERM) -> str:
+    return f"""강의계획서 본문 검색:
+- 강의계획서에 글로 적힌 내용(수업 진행 방식, 팀 프로젝트 여부, 과제 내용, 주차별 주제, 상담 시간, 준비물·참고자료, 수업 분위기 등)을 묻는 질문은 SQL 대신 코드블록 없이 '{SEARCH_TOKEN}: [과목] 찾을 내용' 한 줄만 출력한다.
+  [과목] 에는 질문에 나온 과목코드(분반 포함 가능) 또는 과목명을 쉼표로 넣고, 특정 과목이 없으면 [] 로 비운다.
+  예: {SEARCH_TOKEN}: [CSE406] 팀 프로젝트 진행 방식
+  예: {SEARCH_TOKEN}: [캡스톤디자인] 교수님 상담 시간
+  예: {SEARCH_TOKEN}: [] 파이썬 실습 위주로 진행하는 수업
+- 숫자·조건으로 답할 수 있는 질문(평가 비율, 시험 유무, 학점, 영어강좌 여부, 산학필수, 시간표, 담당 교수, 개설 여부, 졸업요건, 학생 본인 정보)은 검색하지 말고 SQL 로 답한다.
+- 본문 검색은 {current_term} 학기 강의계획서만 가능하다. 다른 학기 강의계획서 내용을 물으면 SQL 로 답할 수 있는 부분만 SQL 로 답한다.
+"""
+
+
 def load_sample_queries(path: Path = SAMPLE_QUERIES_PATH) -> list[FewShotExample]:
     """sample_queries.sql 의 '-- N. 제목' 블록을 예시로 파싱한다."""
     if not path.exists():
@@ -256,7 +272,10 @@ class PromptBuilder:
         exclude_titles: list[str] | None = None,
         multiturn: bool = False,
         answer_template: bool = False,
+        search: bool = False,
     ):
+        self.search = search
+        self.current_term = current_term
         self.multiturn = multiturn
         self.answer_template = answer_template
         self.db_path = db_path
@@ -281,6 +300,8 @@ class PromptBuilder:
             parts.append("\n## " + MULTITURN_RULES)
         if self.answer_template:
             parts.append("\n## " + ANSWER_RULES)
+        if self.search:
+            parts.append("\n## " + search_rules(self.current_term))
         if self.fewshot:
             shots = "\n\n".join(f"질문: {e.title}\n```sql\n{e.sql}\n```" for e in self.fewshot)
             parts.append("\n## 예시\n" + shots)

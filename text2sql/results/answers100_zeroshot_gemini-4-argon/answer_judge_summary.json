@@ -1,0 +1,594 @@
+{
+  "judge_model": "gpt-5.6-luna",
+  "overall": {
+    "n": 100,
+    "scored": 100,
+    "passed": 100,
+    "leak": 0,
+    "exec_strict": 91,
+    "avg": {
+      "correctness": 5.0,
+      "faithfulness": 5.0,
+      "completeness": 5.0,
+      "fluency": 5.0
+    }
+  },
+  "no_answer": [],
+  "judge_failed": [],
+  "gen_api_error": [],
+  "by_tag": {
+    "arithmetic_reasoning": {
+      "n": 4,
+      "scored": 4,
+      "passed": 4,
+      "leak": 0,
+      "exec_strict": 0,
+      "avg": {
+        "correctness": 5.0,
+        "faithfulness": 5.0,
+        "completeness": 5.0,
+        "fluency": 5.0
+      }
+    },
+    "assignment_gap": {
+      "n": 4,
+      "scored": 4,
+      "passed": 4,
+      "leak": 0,
+      "exec_strict": 4,
+      "avg": {
+        "correctness": 5.0,
+        "faithfulness": 5.0,
+        "completeness": 5.0,
+        "fluency": 5.0
+      }
+    },
+    "assignment_min": {
+      "n": 4,
+      "scored": 4,
+      "passed": 4,
+      "leak": 0,
+      "exec_strict": 4,
+      "avg": {
+        "correctness": 5.0,
+        "faithfulness": 5.0,
+        "completeness": 5.0,
+        "fluency": 5.0
+      }
+    },
+    "assignment_ranking": {
+      "n": 4,
+      "scored": 4,
+      "passed": 4,
+      "leak": 0,
+      "exec_strict": 4,
+      "avg": {
+        "correctness": 5.0,
+        "faithfulness": 5.0,
+        "completeness": 5.0,
+        "fluency": 5.0
+      }
+    },
+    "attendance_gap": {
+      "n": 4,
+      "scored": 4,
+      "passed": 4,
+      "leak": 0,
+      "exec_strict": 4,
+      "avg": {
+        "correctness": 5.0,
+        "faithfulness": 5.0,
+        "completeness": 5.0,
+        "fluency": 5.0
+      }
+    },
+    "classification_aggregation": {
+      "n": 4,
+      "scored": 4,
+      "passed": 4,
+      "leak": 0,
+      "exec_strict": 4,
+      "avg": {
+        "correctness": 5.0,
+        "faithfulness": 5.0,
+        "completeness": 5.0,
+        "fluency": 5.0
+      }
+    },
+    "combined_exam_gap": {
+      "n": 4,
+      "scored": 4,
+      "passed": 4,
+      "leak": 0,
+      "exec_strict": 4,
+      "avg": {
+        "correctness": 5.0,
+        "faithfulness": 5.0,
+        "completeness": 5.0,
+        "fluency": 5.0
+      }
+    },
+    "common_instructor": {
+      "n": 4,
+      "scored": 4,
+      "passed": 4,
+      "leak": 0,
+      "exec_strict": 4,
+      "avg": {
+        "correctness": 5.0,
+        "faithfulness": 5.0,
+        "completeness": 5.0,
+        "fluency": 5.0
+      }
+    },
+    "cross_rule_reasoning": {
+      "n": 1,
+      "scored": 1,
+      "passed": 1,
+      "leak": 0,
+      "exec_strict": 0,
+      "avg": {
+        "correctness": 5.0,
+        "faithfulness": 5.0,
+        "completeness": 5.0,
+        "fluency": 5.0
+      }
+    },
+    "department_required_load": {
+      "n": 4,
+      "scored": 4,
+      "passed": 4,
+      "leak": 0,
+      "exec_strict": 4,
+      "avg": {
+        "correctness": 5.0,
+        "faithfulness": 5.0,
+        "completeness": 5.0,
+        "fluency": 5.0
+      }
+    },
+    "distribution_rule_application": {
+      "n": 3,
+      "scored": 3,
+      "passed": 3,
+      "leak": 0,
+      "exec_strict": 0,
+      "avg": {
+        "correctness": 5.0,
+        "faithfulness": 5.0,
+        "completeness": 5.0,
+        "fluency": 5.0
+      }
+    },
+    "english_industry": {
+      "n": 4,
+      "scored": 4,
+      "passed": 4,
+      "leak": 0,
+      "exec_strict": 4,
+      "avg": {
+        "correctness": 5.0,
+        "faithfulness": 5.0,
+        "completeness": 5.0,
+        "fluency": 5.0
+      }
+    },
+    "exam_change": {
+      "n": 4,
+      "scored": 4,
+      "passed": 4,
+      "leak": 0,
+      "exec_strict": 4,
+      "avg": {
+        "correctness": 5.0,
+        "faithfulness": 5.0,
+        "completeness": 5.0,
+        "fluency": 5.0
+      }
+    },
+    "exam_threshold_set": {
+      "n": 4,
+      "scored": 4,
+      "passed": 4,
+      "leak": 0,
+      "exec_strict": 4,
+      "avg": {
+        "correctness": 5.0,
+        "faithfulness": 5.0,
+        "completeness": 5.0,
+        "fluency": 5.0
+      }
+    },
+    "fixture_earned": {
+      "n": 2,
+      "scored": 2,
+      "passed": 2,
+      "leak": 0,
+      "exec_strict": 2,
+      "avg": {
+        "correctness": 5.0,
+        "faithfulness": 5.0,
+        "completeness": 5.0,
+        "fluency": 5.0
+      }
+    },
+    "fixture_personalized": {
+      "n": 6,
+      "scored": 6,
+      "passed": 6,
+      "leak": 0,
+      "exec_strict": 6,
+      "avg": {
+        "correctness": 5.0,
+        "faithfulness": 5.0,
+        "completeness": 5.0,
+        "fluency": 5.0
+      }
+    },
+    "fixture_retake": {
+      "n": 2,
+      "scored": 2,
+      "passed": 2,
+      "leak": 0,
+      "exec_strict": 2,
+      "avg": {
+        "correctness": 5.0,
+        "faithfulness": 5.0,
+        "completeness": 5.0,
+        "fluency": 5.0
+      }
+    },
+    "fixture_status": {
+      "n": 2,
+      "scored": 2,
+      "passed": 2,
+      "leak": 0,
+      "exec_strict": 2,
+      "avg": {
+        "correctness": 5.0,
+        "faithfulness": 5.0,
+        "completeness": 5.0,
+        "fluency": 5.0
+      }
+    },
+    "general_cohort_difference": {
+      "n": 1,
+      "scored": 1,
+      "passed": 1,
+      "leak": 0,
+      "exec_strict": 0,
+      "avg": {
+        "correctness": 5.0,
+        "faithfulness": 5.0,
+        "completeness": 5.0,
+        "fluency": 5.0
+      }
+    },
+    "general_cohort_rule": {
+      "n": 2,
+      "scored": 2,
+      "passed": 2,
+      "leak": 0,
+      "exec_strict": 2,
+      "avg": {
+        "correctness": 5.0,
+        "faithfulness": 5.0,
+        "completeness": 5.0,
+        "fluency": 5.0
+      }
+    },
+    "midterm_max": {
+      "n": 4,
+      "scored": 4,
+      "passed": 4,
+      "leak": 0,
+      "exec_strict": 4,
+      "avg": {
+        "correctness": 5.0,
+        "faithfulness": 5.0,
+        "completeness": 5.0,
+        "fluency": 5.0
+      }
+    },
+    "multi_document_multi_hop": {
+      "n": 8,
+      "scored": 8,
+      "passed": 8,
+      "leak": 0,
+      "exec_strict": 8,
+      "avg": {
+        "correctness": 5.0,
+        "faithfulness": 5.0,
+        "completeness": 5.0,
+        "fluency": 5.0
+      }
+    },
+    "multi_document_multi_hop_reasoning": {
+      "n": 8,
+      "scored": 8,
+      "passed": 8,
+      "leak": 0,
+      "exec_strict": 7,
+      "avg": {
+        "correctness": 5.0,
+        "faithfulness": 5.0,
+        "completeness": 5.0,
+        "fluency": 5.0
+      }
+    },
+    "multi_document_reasoning": {
+      "n": 32,
+      "scored": 32,
+      "passed": 32,
+      "leak": 0,
+      "exec_strict": 32,
+      "avg": {
+        "correctness": 5.0,
+        "faithfulness": 5.0,
+        "completeness": 5.0,
+        "fluency": 5.0
+      }
+    },
+    "multi_hop": {
+      "n": 16,
+      "scored": 16,
+      "passed": 16,
+      "leak": 0,
+      "exec_strict": 16,
+      "avg": {
+        "correctness": 5.0,
+        "faithfulness": 5.0,
+        "completeness": 5.0,
+        "fluency": 5.0
+      }
+    },
+    "multi_hop_aggregation": {
+      "n": 4,
+      "scored": 4,
+      "passed": 4,
+      "leak": 0,
+      "exec_strict": 4,
+      "avg": {
+        "correctness": 5.0,
+        "faithfulness": 5.0,
+        "completeness": 5.0,
+        "fluency": 5.0
+      }
+    },
+    "official_public_facts": {
+      "n": 87,
+      "scored": 87,
+      "passed": 87,
+      "leak": 0,
+      "exec_strict": 85,
+      "avg": {
+        "correctness": 5.0,
+        "faithfulness": 5.0,
+        "completeness": 5.0,
+        "fluency": 5.0
+      }
+    },
+    "official_rule": {
+      "n": 2,
+      "scored": 2,
+      "passed": 2,
+      "leak": 0,
+      "exec_strict": 2,
+      "avg": {
+        "correctness": 5.0,
+        "faithfulness": 5.0,
+        "completeness": 5.0,
+        "fluency": 5.0
+      }
+    },
+    "official_rule_with_hypothetical_inputs": {
+      "n": 7,
+      "scored": 7,
+      "passed": 7,
+      "leak": 0,
+      "exec_strict": 0,
+      "avg": {
+        "correctness": 5.0,
+        "faithfulness": 5.0,
+        "completeness": 5.0,
+        "fluency": 5.0
+      }
+    },
+    "prof_credit_load": {
+      "n": 4,
+      "scored": 4,
+      "passed": 4,
+      "leak": 0,
+      "exec_strict": 4,
+      "avg": {
+        "correctness": 5.0,
+        "faithfulness": 5.0,
+        "completeness": 5.0,
+        "fluency": 5.0
+      }
+    },
+    "prof_future_other": {
+      "n": 4,
+      "scored": 4,
+      "passed": 4,
+      "leak": 0,
+      "exec_strict": 4,
+      "avg": {
+        "correctness": 5.0,
+        "faithfulness": 5.0,
+        "completeness": 5.0,
+        "fluency": 5.0
+      }
+    },
+    "prof_other_3credit": {
+      "n": 4,
+      "scored": 4,
+      "passed": 4,
+      "leak": 0,
+      "exec_strict": 4,
+      "avg": {
+        "correctness": 5.0,
+        "faithfulness": 5.0,
+        "completeness": 5.0,
+        "fluency": 5.0
+      }
+    },
+    "prof_other_industry": {
+      "n": 4,
+      "scored": 4,
+      "passed": 4,
+      "leak": 0,
+      "exec_strict": 4,
+      "avg": {
+        "correctness": 5.0,
+        "faithfulness": 5.0,
+        "completeness": 5.0,
+        "fluency": 5.0
+      }
+    },
+    "prof_other_required": {
+      "n": 4,
+      "scored": 4,
+      "passed": 4,
+      "leak": 0,
+      "exec_strict": 4,
+      "avg": {
+        "correctness": 5.0,
+        "faithfulness": 5.0,
+        "completeness": 5.0,
+        "fluency": 5.0
+      }
+    },
+    "professor_assessment_filter": {
+      "n": 4,
+      "scored": 4,
+      "passed": 4,
+      "leak": 0,
+      "exec_strict": 4,
+      "avg": {
+        "correctness": 5.0,
+        "faithfulness": 5.0,
+        "completeness": 5.0,
+        "fluency": 5.0
+      }
+    },
+    "professor_assessment_ranking": {
+      "n": 4,
+      "scored": 4,
+      "passed": 4,
+      "leak": 0,
+      "exec_strict": 3,
+      "avg": {
+        "correctness": 5.0,
+        "faithfulness": 5.0,
+        "completeness": 5.0,
+        "fluency": 5.0
+      }
+    },
+    "professor_required_credit_chain": {
+      "n": 4,
+      "scored": 4,
+      "passed": 4,
+      "leak": 0,
+      "exec_strict": 4,
+      "avg": {
+        "correctness": 5.0,
+        "faithfulness": 5.0,
+        "completeness": 5.0,
+        "fluency": 5.0
+      }
+    },
+    "rule_reasoning": {
+      "n": 3,
+      "scored": 3,
+      "passed": 3,
+      "leak": 0,
+      "exec_strict": 0,
+      "avg": {
+        "correctness": 5.0,
+        "faithfulness": 5.0,
+        "completeness": 5.0,
+        "fluency": 5.0
+      }
+    },
+    "schedule_overlap": {
+      "n": 4,
+      "scored": 4,
+      "passed": 4,
+      "leak": 0,
+      "exec_strict": 4,
+      "avg": {
+        "correctness": 5.0,
+        "faithfulness": 5.0,
+        "completeness": 5.0,
+        "fluency": 5.0
+      }
+    },
+    "simulated_student_fixture": {
+      "n": 6,
+      "scored": 6,
+      "passed": 6,
+      "leak": 0,
+      "exec_strict": 6,
+      "avg": {
+        "correctness": 5.0,
+        "faithfulness": 5.0,
+        "completeness": 5.0,
+        "fluency": 5.0
+      }
+    },
+    "single_document": {
+      "n": 8,
+      "scored": 8,
+      "passed": 8,
+      "leak": 0,
+      "exec_strict": 8,
+      "avg": {
+        "correctness": 5.0,
+        "faithfulness": 5.0,
+        "completeness": 5.0,
+        "fluency": 5.0
+      }
+    },
+    "teacher_credits": {
+      "n": 4,
+      "scored": 4,
+      "passed": 4,
+      "leak": 0,
+      "exec_strict": 4,
+      "avg": {
+        "correctness": 5.0,
+        "faithfulness": 5.0,
+        "completeness": 5.0,
+        "fluency": 5.0
+      }
+    },
+    "temporal_reasoning": {
+      "n": 4,
+      "scored": 4,
+      "passed": 4,
+      "leak": 0,
+      "exec_strict": 4,
+      "avg": {
+        "correctness": 5.0,
+        "faithfulness": 5.0,
+        "completeness": 5.0,
+        "fluency": 5.0
+      }
+    },
+    "weighted_exam_score": {
+      "n": 4,
+      "scored": 4,
+      "passed": 4,
+      "leak": 0,
+      "exec_strict": 0,
+      "avg": {
+        "correctness": 5.0,
+        "faithfulness": 5.0,
+        "completeness": 5.0,
+        "fluency": 5.0
+      }
+    }
+  },
+  "judge_tokens": 73869
+}

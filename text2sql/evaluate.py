@@ -60,7 +60,8 @@ def score_record(rec: dict, gold_rows, gold_columns, pred_rows, ordered: bool) -
                pred_row_count=cmp.pred_row_count)
 
 
-def evaluate(items: list[GoldItem], engine: Text2SQL, executor: SQLExecutor, out_dir: Path) -> dict:
+def evaluate(items: list[GoldItem], engine: Text2SQL, executor: SQLExecutor, out_dir: Path,
+             save_answers: bool = False) -> dict:
     out_dir.mkdir(parents=True, exist_ok=True)
     records = []
     for idx, item in enumerate(items, 1):
@@ -75,7 +76,7 @@ def evaluate(items: list[GoldItem], engine: Text2SQL, executor: SQLExecutor, out
 
         rec = {
             "id": item.id, "question": item.question, "student_id": item.student_id,
-            "tags": item.tags, "gold_sql": item.gold_sql, "ordered": ordered,
+            "tags": item.tags, "gold_sql": item.gold_sql, "reference_sql": item.reference_sql, "ordered": ordered,
             "gold_error": gold_err, "api_error": api_error,
             "expect_refusal": item.expect_refusal, "gold_warnings": gold_warnings(item), "note": item.note,
         }
@@ -94,6 +95,8 @@ def evaluate(items: list[GoldItem], engine: Text2SQL, executor: SQLExecutor, out
                 "pred_rows": [list(r) for r in res.rows] if res else [],
                 "attempts": [a.__dict__ for a in out.attempts],
             })
+            if save_answers:  # 자연어 답변 채점(answer_judge)용
+                rec["answer"] = out.answer
         if gold_rows is not None:
             rec["gold_columns"] = gold_columns
             rec["gold_rows"] = [list(r) for r in gold_rows]
@@ -241,9 +244,14 @@ def main() -> None:
     ap.add_argument("--limit", type=int, default=None, help="앞에서부터 N개만(크레딧 절약용)")
     ap.add_argument("--oracle", action="store_true", help="API 없이 gold SQL 을 예측으로 사용해 파이프라인 점검")
     ap.add_argument("--llm-judge", action="store_true", help="평가 후 ChatKHU 로 의미 기준 채점(llm_judge)도 실행")
+    ap.add_argument("--answers", action="store_true", help="답변 틀도 생성해 자연어 답변을 results 에 저장(서비스와 같은 프롬프트)")
+    ap.add_argument("--answer-judge", action="store_true", help="평가 후 자연어 답변 채점(answer_judge)도 실행. --answers 필요")
+    ap.add_argument("--sql-judge", action="store_true", help="평가 후 SQL 논리 채점(sql_judge)도 실행")
     ap.add_argument("--model", default=None, help=".env 의 CHATKHU_MODEL 대신 쓸 생성 모델")
     ap.add_argument("--judge-model", default=None, help=".env 의 CHATKHU_JUDGE_MODEL 대신 쓸 judge 모델")
     args = ap.parse_args()
+    if args.answer_judge and not args.answers:
+        ap.error("--answer-judge 는 --answers 와 같이 써야 합니다.")
 
     settings = Settings()
     if args.model:
@@ -257,6 +265,7 @@ def main() -> None:
         exclude_sqls=[s for i in items for s in (i.gold_sql, i.reference_sql) if s],
         exclude_titles=args.exclude_fewshot,
         max_fewshot=args.max_fewshot,
+        answer_template=args.answers,
     )
     if args.oracle:
         from .tests.mock_llm import OracleLLM
@@ -276,10 +285,10 @@ def main() -> None:
         "model": model_name, "fewshot": not args.no_fewshot, "n_fewshot": len(prompt.fewshot),
         "fewshot_titles": [e.title for e in prompt.fewshot], "excluded_fewshot": prompt.excluded_fewshot,
         "temperature": settings.temperature, "max_repairs": settings.max_repair_attempts,
-        "gold": str(args.gold), "n_items": len(items),
+        "gold": str(args.gold), "n_items": len(items), "answers": args.answers,
     }, ensure_ascii=False, indent=2), encoding="utf-8")
 
-    s = evaluate(items, engine, executor, out_dir)
+    s = evaluate(items, engine, executor, out_dir, save_answers=args.answers)
     o = s["overall"]
     print(f"\nstrict {_pct(o['strict'], o['n'])} | relaxed {_pct(o['relaxed'], o['n'])} | subset {_pct(o['subset'], o['n'])} → {out_dir}")
 
@@ -289,6 +298,17 @@ def main() -> None:
         j = run_judge(out_dir, judge_llm, judge_model)["overall"]
         print(f"\nexecution strict {_pct(j['exec_strict'], j['n'])} | relaxed {_pct(j['exec_relaxed'], j['n'])}"
               f" | LLM judge {_pct(j['llm'], j['n'])} → {out_dir / 'judge_summary.md'}")
+    if args.answer_judge or args.sql_judge:
+        from .llm_judge import make_judge_llm
+        judge_llm, judge_model = make_judge_llm(settings)
+    if args.sql_judge:
+        from .sql_judge import run_sql_judge
+        q = run_sql_judge(out_dir, judge_llm, judge_model)["overall"]
+        print(f"\nSQL 논리 통과 {_pct(q['passed'], q['n'])} | 우연히 맞음 {q['lucky']} → {out_dir / 'sql_judge_summary.md'}")
+    if args.answer_judge:
+        from .answer_judge import run_answer_judge
+        a = run_answer_judge(out_dir, judge_llm, judge_model)["overall"]
+        print(f"\n답변 통과 {_pct(a['passed'], a['n'])} → {out_dir / 'answer_judge_summary.md'}")
 
 
 if __name__ == "__main__":

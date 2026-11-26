@@ -1,0 +1,83 @@
+{
+  "overall": {
+    "n": 11,
+    "exec_ok": 11,
+    "first_try_exec_ok": 11,
+    "strict": 9,
+    "relaxed": 11,
+    "subset": 11
+  },
+  "by_tag": {
+    "arithmetic_reasoning": {
+      "n": 2,
+      "exec_ok": 2,
+      "first_try_exec_ok": 2,
+      "strict": 0,
+      "relaxed": 2,
+      "subset": 2
+    },
+    "combined_exam_gap": {
+      "n": 4,
+      "exec_ok": 4,
+      "first_try_exec_ok": 4,
+      "strict": 4,
+      "relaxed": 4,
+      "subset": 4
+    },
+    "exam_threshold_set": {
+      "n": 4,
+      "exec_ok": 4,
+      "first_try_exec_ok": 4,
+      "strict": 4,
+      "relaxed": 4,
+      "subset": 4
+    },
+    "midterm_max": {
+      "n": 1,
+      "exec_ok": 1,
+      "first_try_exec_ok": 1,
+      "strict": 1,
+      "relaxed": 1,
+      "subset": 1
+    },
+    "multi_document_reasoning": {
+      "n": 9,
+      "exec_ok": 9,
+      "first_try_exec_ok": 9,
+      "strict": 9,
+      "relaxed": 9,
+      "subset": 9
+    },
+    "official_public_facts": {
+      "n": 9,
+      "exec_ok": 9,
+      "first_try_exec_ok": 9,
+      "strict": 9,
+      "relaxed": 9,
+      "subset": 9
+    },
+    "official_rule_with_hypothetical_inputs": {
+      "n": 2,
+      "exec_ok": 2,
+      "first_try_exec_ok": 2,
+      "strict": 0,
+      "relaxed": 2,
+      "subset": 2
+    },
+    "weighted_exam_score": {
+      "n": 2,
+      "exec_ok": 2,
+      "first_try_exec_ok": 2,
+      "strict": 0,
+      "relaxed": 2,
+      "subset": 2
+    }
+  },
+  "diagnosis": {
+    "correct": 9,
+    "correct_extra_columns": 2
+  },
+  "gold_invalid": [],
+  "avg_tokens": 4824.0,
+  "avg_latency_sec": 8.6
+}

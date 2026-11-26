@@ -1,0 +1,36 @@
+{
+  "conversations": 12,
+  "all_turns_strict": 3,
+  "all_turns_relaxed": 10,
+  "by_turn": {
+    "1": {
+      "n": 12,
+      "strict": 5,
+      "relaxed": 12
+    },
+    "2": {
+      "n": 12,
+      "strict": 4,
+      "relaxed": 11
+    },
+    "3": {
+      "n": 12,
+      "strict": 3,
+      "relaxed": 10
+    }
+  },
+  "per_conversation": {
+    "D01": "△△△",
+    "D02": "△△△",
+    "D03": "OXX",
+    "D04": "OOO",
+    "D05": "△△△",
+    "D06": "△△△",
+    "D07": "△△△",
+    "D08": "△△△",
+    "D09": "OOO",
+    "D10": "△△△",
+    "D11": "OOX",
+    "D12": "OOO"
+  }
+}

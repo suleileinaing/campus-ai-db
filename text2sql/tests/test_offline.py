@@ -9,6 +9,9 @@ import unittest
 from pathlib import Path
 
 from text2sql.answer import render_answer
+from text2sql.answer_judge import find_leaks, judge_answer, parse_scores, run_answer_judge
+from text2sql.sql_judge import backfill_reference_sql, judge_sql, parse_sql_verdict, relevant_schema, run_sql_judge
+from text2sql.sql_judge import build_messages as build_sql_messages, constant_notes, is_pass as is_sql_pass
 from text2sql.compare import compare_results, gold_is_ordered
 from text2sql.config import PROJECT_DIR, TEXT2SQL_DIR
 from text2sql.evaluate import evaluate
@@ -285,6 +288,191 @@ class TestLLMJudge(unittest.TestCase):
             self.assertEqual(s2["overall"], s["overall"])
 
 
+class TestAnswerJudge(unittest.TestCase):
+    @staticmethod
+    def rec(id_, answer, strict=True, **kw):
+        return {"id": id_, "question": f"{id_} 학점은?", "tags": ["t"], "strict": strict, "relaxed": strict,
+                "exec_ok": True, "gold_columns": ["credits"], "gold_rows": [[3.0]],
+                "pred_columns": ["credits"], "pred_rows": [[3.0]], "answer": answer, **kw}
+
+    def test_find_leaks(self):
+        self.assertEqual(find_leaks("3학점이에요."), [])
+        leaks = find_leaks("결과 1건이에요.\n- course_code: CSE / {credits}")
+        self.assertIn("이름:course_code", leaks)
+        self.assertIn("틀:{credits}", leaks)
+        self.assertIn("SQL:SELECT", find_leaks("SELECT 1 을 실행했어요"))
+        self.assertEqual(find_leaks("snake_case_word 는 스키마에 없음"), [])
+
+    def test_parse_scores(self):
+        ok = '{"correctness": 5, "faithfulness": "4", "completeness": 4, "fluency": 3, "reason": "좋음"}'
+        self.assertEqual(parse_scores(json.loads(ok))["faithfulness"], 4)
+        for bad in ('{"correctness": 6, "faithfulness": 4, "completeness": 4, "fluency": 3}',
+                    '{"correctness": 4.5, "faithfulness": 4, "completeness": 4, "fluency": 3}',
+                    '{"correctness": 4}'):
+            with self.assertRaises(ValueError):
+                parse_scores(json.loads(bad))
+
+    def test_judge_answer_pass_fail_and_skip(self):
+        good = '{"correctness": 5, "faithfulness": 5, "completeness": 4, "fluency": 5, "reason": "정확"}'
+        r = judge_answer(ScriptedLLM(["형식 틀림", good]), self.rec("a", "3학점이에요."))
+        self.assertEqual((r["status"], r["passed"], r["correctness"]), ("judged", True, 5))
+        r = judge_answer(ScriptedLLM([good]), self.rec("b", "credits_total 아니고 {credits}학점"))
+        self.assertFalse(r["passed"])  # 점수는 높아도 내부 노출이면 탈락
+        r = judge_answer(ScriptedLLM([]), self.rec("c", None))
+        self.assertEqual(r["status"], "skipped:no_answer")
+
+    def test_run_answer_judge_and_resume(self):
+        recs = [self.rec("a", "3학점이에요."), self.rec("b", "2학점이에요.", strict=False), self.rec("c", None)]
+        replies = ['{"correctness": 5, "faithfulness": 5, "completeness": 5, "fluency": 5, "reason": "정확"}',
+                   '{"correctness": 1, "faithfulness": 5, "completeness": 5, "fluency": 5, "reason": "값이 다름"}']
+        with tempfile.TemporaryDirectory() as d:
+            out = Path(d)
+            (out / "results.jsonl").write_text("\n".join(json.dumps(r, ensure_ascii=False) for r in recs), encoding="utf-8")
+            s = run_answer_judge(out, ScriptedLLM(replies), "m")
+            self.assertEqual((s["overall"]["n"], s["overall"]["passed"], s["no_answer"]), (2, 1, ["c"]))
+            self.assertEqual(s["overall"]["avg"]["correctness"], 3.0)
+            self.assertIn("값이 다름", (out / "answer_judge.csv").read_text(encoding="utf-8-sig"))
+            s2 = run_answer_judge(out, ScriptedLLM([]), "m")  # 이미 판정된 문항은 다시 부르지 않음
+            self.assertEqual(s2["overall"], s["overall"])
+
+    def test_evaluate_saves_answer(self):
+        items = load_gold(TEAM_GOLD_V2)[12:13]
+        reply = "```sql\nSELECT status FROM students WHERE student_id = 202210029\n```\nANSWER: 학적 상태는 {status}이에요."
+        engine = Text2SQL(ScriptedLLM([reply]), PromptBuilder(use_fewshot=False, answer_template=True), SQLExecutor())
+        with tempfile.TemporaryDirectory() as d:
+            evaluate(items, engine, SQLExecutor(), Path(d), save_answers=True)
+            rec = json.loads((Path(d) / "results.jsonl").read_text(encoding="utf-8").splitlines()[0])
+        self.assertTrue(rec["answer"].startswith("학적 상태는 "))
+        self.assertIn("reference_sql", rec)
+
+
+class TestSQLJudge(unittest.TestCase):
+    @staticmethod
+    def rec(id_, pred_sql, strict=True, **kw):
+        return {"id": id_, "question": "내 2024-1 수강 과목 수는?", "tags": ["t"], "student_id": 202210001,
+                "strict": strict, "relaxed": strict, "diagnosis": "correct", "exec_ok": True,
+                "gold_sql": "SELECT COUNT(*) FROM enrollments WHERE student_id = 202210001 AND year = 2024",
+                "pred_sql": pred_sql, **kw}
+
+    def test_relevant_schema_only_used_tables(self):
+        s = relevant_schema("SELECT * FROM enrollments e JOIN course_offerings o USING (offering_id)")
+        self.assertIn("CREATE TABLE enrollments", s)
+        self.assertIn("CREATE TABLE course_offerings", s)
+        self.assertNotIn("CREATE TABLE professors", s)
+
+    def test_constant_notes(self):
+        consts = {"course_offerings": [("campus", "국제")]}
+        self.assertIn("course_offerings.campus = '국제'",
+                      constant_notes("SELECT 1 FROM course_offerings o WHERE o.campus = '국제'", consts=consts))
+        self.assertEqual(constant_notes("SELECT 1 FROM course_offerings", consts=consts), "")  # 조건에 안 쓰면 안 알림
+        msg = build_sql_messages(self.rec("a", "SELECT COUNT(*) FROM enrollments WHERE student_id = 202210001"))[1]["content"]
+        self.assertEqual(msg.count("정답 SQL:"), 1)
+
+    def test_parse_and_pass(self):
+        v = parse_sql_verdict({"logic": "1", "extra_condition": 0, "scope_ok": "null", "reason": "같음"})
+        self.assertEqual((v["logic"], v["extra_condition"], v["scope_ok"]), (1, 0, None))
+        self.assertTrue(is_sql_pass(v))
+        self.assertFalse(is_sql_pass({**v, "scope_ok": 0}))
+        self.assertFalse(is_sql_pass({**v, "extra_condition": 1}))
+        with self.assertRaises(ValueError):
+            parse_sql_verdict({"logic": 2, "extra_condition": 0})
+
+    def test_skips(self):
+        self.assertEqual(judge_sql(ScriptedLLM([]), self.rec("a", None))["status"], "skipped:no_pred_sql")
+        self.assertEqual(judge_sql(ScriptedLLM([]), self.rec("b", "SELECT 1", gold_sql=None))["status"], "skipped:no_reference")
+        self.assertEqual(judge_sql(ScriptedLLM([]), self.rec("c", "SELECT 1", expect_refusal=True))["status"], "skipped:refusal")
+
+    def test_run_sql_judge_lucky_and_scope(self):
+        recs = [
+            self.rec("a", "SELECT COUNT(*) FROM enrollments WHERE student_id = 202210001"),  # 학기 조건 누락인데 결과는 같음
+            self.rec("b", "SELECT COUNT(*) FROM enrollments WHERE student_id = 202210001 OR 1=1", strict=False),
+            self.rec("c", "SELECT COUNT(*) FROM enrollments WHERE student_id = 202210001 AND year = 2024"),
+        ]
+        replies = ['{"logic": 0, "extra_condition": 0, "scope_ok": 1, "reason": "학기 조건 누락"}',
+                   '{"logic": 0, "extra_condition": 0, "scope_ok": 0, "reason": "OR 1=1 로 전체 학생"}',
+                   '{"logic": 1, "extra_condition": 0, "scope_ok": 1, "reason": "같음"}']
+        with tempfile.TemporaryDirectory() as d:
+            out = Path(d)
+            (out / "results.jsonl").write_text("\n".join(json.dumps(r, ensure_ascii=False) for r in recs), encoding="utf-8")
+            s = run_sql_judge(out, ScriptedLLM(replies), "m")
+            o = s["overall"]
+            self.assertEqual((o["n"], o["passed"], o["lucky"], o["scope_violation"]), (3, 1, 1, 1))
+            md = (out / "sql_judge_summary.md").read_text(encoding="utf-8")
+            self.assertIn("우연히 맞음", md)
+            self.assertIn("본인 학번 범위 위반", md)
+
+    def test_backfill_reference_sql_from_gold(self):
+        items = load_gold(TEXT2SQL_DIR / "gold" / "실행평가_15문항.json")[:1]
+        recs = [{"id": items[0].id, "gold_sql": None}]
+        with tempfile.TemporaryDirectory() as d:
+            (Path(d) / "config.json").write_text(json.dumps({"gold": "text2sql/gold/실행평가_15문항.json"}), encoding="utf-8")
+            backfill_reference_sql(recs, Path(d))
+        self.assertEqual(recs[0]["reference_sql"], items[0].reference_sql)
+
+
+class TestSearchRoute(unittest.TestCase):
+    """숫자·조건 질문은 SQL, 강의계획서 본문 질문은 SEARCH → 검색(RAG)."""
+
+    class FakeRetriever:
+        def __init__(self):
+            self.calls = []
+
+        def search(self, query, courses):
+            from text2sql.syllabus_rag import Hit
+            self.calls.append((query, courses))
+            return [Hit(0.7, "CSE406", "07", "캡스톤디자인", "[CSE406-07] 캡스톤디자인\n팀 프로젝트로 진행")]
+
+        def answer(self, question, hits):
+            from text2sql.chatkhu_client import LLMResponse
+            return "네, CSE406-07은 팀 프로젝트로 진행해요.", LLMResponse(text="", model="m", prompt_tokens=100, completion_tokens=20)
+
+    def test_search_line_routes_to_retriever(self):
+        r = self.FakeRetriever()
+        prompt = PromptBuilder(use_fewshot=False, answer_template=True, search=True)
+        out = Text2SQL(ScriptedLLM(["SEARCH: [CSE406, 캡스톤디자인] 팀 프로젝트 진행 방식"]), prompt, SQLExecutor(),
+                       retriever=r).ask("캡스톤디자인 팀플이야?")
+        self.assertEqual(out.route, "search")
+        self.assertEqual(r.calls, [("팀 프로젝트 진행 방식", ["CSE406", "캡스톤디자인"])])
+        self.assertEqual(out.sources, ["CSE406-07"])
+        self.assertIn("팀 프로젝트", out.answer)
+        self.assertEqual(out.total_tokens, 120)
+        self.assertEqual(len(out.attempts), 1)  # 검색은 SQL 수정 루프를 돌지 않음
+
+    def test_sql_question_stays_sql(self):
+        r = self.FakeRetriever()
+        reply = "```sql\nSELECT 30 AS midterm_percentage\n```\nANSWER: 중간고사 비율은 {midterm_percentage}%예요."
+        out = Text2SQL(ScriptedLLM([reply]), PromptBuilder(use_fewshot=False, answer_template=True, search=True),
+                       SQLExecutor(), retriever=r).ask("중간고사 비율은?")
+        self.assertEqual((out.route, out.answer, r.calls), ("sql", "중간고사 비율은 30%예요.", []))
+
+    def test_search_without_retriever_and_empty_courses(self):
+        out = Text2SQL(ScriptedLLM(["SEARCH: [] 파이썬 실습"]), PromptBuilder(use_fewshot=False), SQLExecutor()).ask("q")
+        self.assertEqual(out.route, "search")
+        self.assertIn("준비되지 않았어요", out.answer)
+        r = self.FakeRetriever()
+        Text2SQL(ScriptedLLM(["SEARCH: [] 파이썬 실습"]), PromptBuilder(use_fewshot=False), SQLExecutor(),
+                 retriever=r).ask("q")
+        self.assertEqual(r.calls, [("파이썬 실습", [])])
+
+    def test_prompt_rules_only_when_enabled(self):
+        self.assertIn("SEARCH:", PromptBuilder(use_fewshot=False, search=True).system_prompt())
+        self.assertNotIn("SEARCH:", PromptBuilder(use_fewshot=False).system_prompt())  # 평가 프롬프트는 그대로
+
+    def test_matches_course(self):
+        from text2sql.syllabus_rag import matches_course
+        self.assertTrue(matches_course("cse406", "CSE406", "07", "캡스톤디자인"))
+        self.assertTrue(matches_course("CSE406-07", "CSE406", "07", "캡스톤디자인"))
+        self.assertFalse(matches_course("CSE406-08", "CSE406", "07", "캡스톤디자인"))
+        self.assertTrue(matches_course("캡스톤 디자인", "SWCON401", "00", "소프트웨어융합캡스톤디자인"))
+        self.assertFalse(matches_course("딥러닝", "CSE406", "07", "캡스톤디자인"))
+
+    def test_chunk_split_limit(self):
+        from text2sql.syllabus_rag import _split
+        parts = _split("가" * 1000 + "\n짧은 줄\n" + "나" * 50, 300)
+        self.assertTrue(all(len(p) <= 300 for p in parts))
+        self.assertEqual("".join(p.replace("\n", "") for p in parts), "가" * 1000 + "짧은 줄" + "나" * 50)
+
+
 class TestAnswer(unittest.TestCase):
     """LLM 의 답변 틀에 결과를 로컬에서 채운다(결과 행은 LLM 에 보내지 않음)."""
 
@@ -303,7 +491,30 @@ class TestAnswer(unittest.TestCase):
     def test_fallbacks(self):
         self.assertEqual(render_answer("{x}", ["a"], []), "조건에 맞는 결과가 없어요.")
         self.assertEqual(render_answer("{없는컬럼}", ["a"], [(1,)]), "결과는 1이에요.")
-        self.assertEqual(render_answer(None, ["a", "b"], [(1, 2)]), "결과 1건이에요.\n- a: 1 / b: 2")
+        self.assertEqual(render_answer(None, ["a", "b"], [(1, 2)]), "결과 1건이에요.\n- 1 / 2")  # 모르는 이름은 숨김
+
+    def test_alias_typo_still_fills(self):
+        # J098: 모델이 'AS credit_shortfall' 을 'AScredit_shortfall' 로 써서 틀을 못 채우던 문제
+        cols = ["required_credits", "AScredit_shortfall", "is_satisfied"]
+        out = render_answer("필요 {required_credits}학점, 부족 {credit_shortfall}학점, 충족 {is_satisfied}",
+                            cols, [(9, 3, 0)])
+        self.assertEqual(out, "필요 9학점, 부족 3학점, 충족 0")
+        self.assertEqual(render_answer("{Professor_Name}", ["professor_name"], [("김",)]), "김")
+        # 후보가 둘 이상이면 추측하지 않고 기본 문장으로
+        self.assertNotIn("{", render_answer("{name}", ["professor_name", "course_name"], [("김", "캡스톤")]))
+
+    def test_codes_shown_in_korean(self):
+        self.assertEqual(render_answer("{course_name}({english_type})", ["course_name", "english_type"],
+                                       [("고급딥러닝", "PARTIAL")]), "고급딥러닝(영어 일부 강의)")
+        self.assertEqual(render_answer("{english_label}, {day}", ["english_label", "day"], [("NONE", "monday")]),
+                         "해당 없음, 월요일")
+        self.assertEqual(render_answer("{grade}", ["grade"], [("NONE",)]), "NONE")  # 뜻을 모르는 컬럼은 그대로
+
+    def test_default_answer_hides_column_names(self):
+        out = render_answer(None, ["required_credits", "per_area_min_credits", "AScredit_shortfall", "학점"],
+                            [(9, 3, 3, 3)])
+        self.assertEqual(out, "결과 1건이에요.\n- 필요 학점: 9 / 영역당 최소 학점: 3 / 3 / 학점: 3")
+        self.assertEqual(find_leaks(out), [])
 
     def test_long_list_truncated(self):
         out = render_answer("[[{n}]]", ["n"], [(i,) for i in range(25)])
