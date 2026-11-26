@@ -47,11 +47,14 @@ IP_DAILY_LIMIT = int(os.environ.get("WEB_IP_DAILY_LIMIT", "40"))  # 접속 주�
 
 
 class App:
-    def __init__(self, use_rag: bool = True, session_sec: int = SESSION_SEC):
+    def __init__(self, use_rag: bool = True, session_sec: int = SESSION_SEC, model: str | None = None):
         from ..chatkhu_client import ChatKHUClient
         from ..syllabus_rag import SyllabusRetriever
 
         settings = Settings()
+        if model:  # .env 의 CHATKHU_MODEL 대신 쓸 모델
+            from dataclasses import replace
+            settings = replace(settings, model=model)
         self.settings = settings
         use_rag = use_rag and SyllabusRetriever.exists()
         self.prompt = PromptBuilder(use_fewshot=True, multiturn=True, answer_template=True, search=use_rag)
@@ -185,6 +188,28 @@ class App:
         with self.lock:
             self.histories.pop((conversation_id or "default")[:64], None)
 
+    # ---- 조건 변경 카드의 선택지 ----
+    @staticmethod
+    def conditions() -> dict:
+        sem_label = {"1": "{y}-1학기", "2": "{y}-2학기", "summer": "{y} 여름학기", "winter": "{y} 겨울학기"}
+        order = {"winter": 4, "2": 3, "summer": 2, "1": 1}
+        conn = sqlite3.connect(f"file:{DATABASE_PATH}?mode=ro", uri=True)
+        try:
+            terms = sorted(conn.execute("SELECT DISTINCT year, semester FROM course_offerings").fetchall(),
+                           key=lambda t: (t[0], order.get(t[1], 0)), reverse=True)
+            depts = [r[0] for r in conn.execute(
+                "SELECT DISTINCT name FROM departments WHERE name LIKE '%학과' OR name LIKE '%학부' ORDER BY name")]
+            cats = [r[0] for r in conn.execute(
+                "SELECT category_name FROM course_categories WHERE category_name NOT LIKE '미확인%'")]
+        finally:
+            conn.close()
+        cy, _, cs = CURRENT_TERM.partition("-")
+        return {
+            "current": sem_label.get(cs, "{y}-" + cs).format(y=cy),
+            "terms": [sem_label.get(sm, "{y}-" + sm).format(y=y) for y, sm in terms[:12]],
+            "departments": depts, "categories": cats,
+        }
+
     # ---- 강의계획서 원문 ----
     @staticmethod
     def syllabus(code: str, section: str, term: str = CURRENT_TERM) -> dict:
@@ -278,15 +303,19 @@ def make_handler(app: App):
                 self._json(e.status, {"error": e.message, **e.extra})
             except (BrokenPipeError, ConnectionResetError):
                 pass  # 사용자가 답변을 멈추면 연결이 끊긴다
-            except Exception:
+            except Exception as e:
                 traceback.print_exc()
-                self._json(502, {"error": "결과를 불러오지 못했어요. 잠시 뒤 다시 시도해 주세요.", "retry": True})
+                # 오류 종류(클래스 이름)만 붙인다. 메시지에는 키·경로가 들어갈 수 있어 보내지 않는다.
+                self._json(502, {"error": "결과를 불러오지 못했어요. 잠시 뒤 다시 시도해 주세요.", "retry": True,
+                                 "detail": type(e).__name__})
 
         def do_GET(self):
             u = urlparse(self.path)
             if u.path == "/api/syllabus":
                 q = parse_qs(u.query)
                 return self._handle(lambda: app.syllabus(q.get("code", [""])[0], q.get("section", [""])[0]))
+            if u.path == "/api/conditions":
+                return self._handle(app.conditions)
             if u.path == "/api/status":
                 return self._handle(lambda: {"rag": app.use_rag, "term": CURRENT_TERM, "model": app.settings.model})
             if u.path.startswith("/api/"):
@@ -313,9 +342,10 @@ def main() -> None:
     ap.add_argument("--host", default="127.0.0.1")
     ap.add_argument("--port", type=int, default=8000)
     ap.add_argument("--no-rag", action="store_true")
+    ap.add_argument("--model", default=None, help=".env 의 CHATKHU_MODEL 대신 쓸 모델(예: gpt-5.6-luna)")
     ap.add_argument("--session-min", type=float, default=SESSION_SEC / 60, help="로그인 유지 시간(분)")
     args = ap.parse_args()
-    app = App(use_rag=not args.no_rag, session_sec=int(args.session_min * 60))
+    app = App(use_rag=not args.no_rag, session_sec=int(args.session_min * 60), model=args.model)
     server = ThreadingHTTPServer((args.host, args.port), make_handler(app))
     print(f"경희 Campus AI - http://{args.host}:{args.port}  (RAG {'켜짐' if app.use_rag else '꺼짐'}, "
           f"로그인 {args.session_min:g}분, 하루 한도 전체 {DAILY_LIMIT or '없음'} / IP당 {IP_DAILY_LIMIT or '없음'})")

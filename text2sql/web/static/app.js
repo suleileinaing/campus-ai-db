@@ -319,6 +319,8 @@ document.addEventListener("click", (e) => {
     input.focus();
     return;
   }
+  const condBtn = t.closest("[data-cond]");
+  if (condBtn && !state.busy) return openConditionCard(condBtn.closest("[data-q]").dataset.q);
   const chip = t.closest("[data-ask]");
   if (chip && !state.busy) {
     if ($("app").hidden) showApp();
@@ -359,8 +361,13 @@ function renderAnswer(d, q) {
   if (d.table) rows.push(tableRows(d.table));
 
   if (d.kind === "empty") {
-    // 04-2 결과 0건
-    rows.push(`<div class="row"><button class="btn-outline" data-edit>${ico("icon-filter.svg", 16)}조건 변경</button></div>`);
+    // 04-2 결과 0건: 질문에서 읽은 조건을 보여 주고, 조건 변경 카드(04-2b)를 열 수 있게 한다
+    const c = detectConditions(q);
+    const tags = [c.term, c.dept, c.cat].filter(Boolean);
+    if (tags.length) rows.push(`<div class="row"><span class="row-label light">조회 조건</span>${tags.map((t) => `<span class="cond-tag">${esc(t)}</span>`).join("")}</div>`);
+    const cur = condOptions?.current;
+    const quick = cur && c.term && c.term !== cur ? `<button class="chip" data-ask="${esc(cur)}로 다시 찾아줘">${esc(cur)}로 보기</button>` : "";
+    rows.push(`<div class="row"><button class="btn-outline" data-cond>${ico("icon-filter.svg", 16)}조건 변경</button>${quick}</div>`);
   } else if (d.kind === "error") {
     bubbleCls = "error";
     rows.push(`<div class="row"><button class="btn-outline" data-retry>${ico("icon-retry.svg", 16)}같은 질문 다시 시도</button></div>`);
@@ -393,6 +400,82 @@ function renderAnswer(d, q) {
     rows.push(`<div class="status">${img("icon-lock.svg", 13)}본인 정보 · 학번 ${esc(d.student_id)} 기준</div>`);
   }
   addBot(`<div class="bubble ${bubbleCls}">${md(d.answer)}</div>`, rows, { q, cls: botCls });
+}
+
+/* ---------- 04-2b 조건 변경 카드 ---------- */
+let condOptions = null;
+api("/api/conditions").then((o) => { condOptions = o; }).catch(() => {});
+
+/** 질문 글에서 학기·학과·이수구분을 읽는다(없으면 null). */
+function detectConditions(q) {
+  const o = condOptions || { current: "", departments: [], categories: [] };
+  let term = null;
+  let m;
+  if ((m = q.match(/(20\d{2})\s*(?:년\s*)?[-.]?\s*([12])\s*학기/)) || (m = q.match(/(20\d{2})\s*[-.]\s*([12])(?!\d)/))) term = `${m[1]}-${m[2]}학기`;
+  else if ((m = q.match(/(20\d{2})\s*년?\s*(여름|겨울)/))) term = `${m[1]} ${m[2]}학기`;
+  else if (/(이번|현재)\s*학기/.test(q)) term = o.current || null;
+  const pick = (list) => list.filter((x) => q.replace(/\s/g, "").includes(x.replace(/\s/g, ""))).sort((a, b) => b.length - a.length)[0] || null;
+  return { term, dept: pick(o.departments), cat: pick(o.categories) };
+}
+
+function openConditionCard(q) {
+  if (!condOptions) return;
+  const o = condOptions;
+  const c = detectConditions(q);
+  const uniq = (xs, n) => [...new Set(xs.filter(Boolean))].slice(0, n);
+  const rows = [
+    ["term", "학기", uniq([o.current, c.term, ...o.terms.filter((t) => /-[12]학기$/.test(t))], 4), c.term],
+    ["dept", "학과", uniq([c.dept, "컴퓨터공학과", "소프트웨어융합학과", "인공지능학과"], 3), c.dept],
+    ["cat", "이수구분", uniq([c.cat, "전공필수", "전공선택", "전공기초"], 3), c.cat],
+  ];
+  // 처음 선택: 학과·이수구분은 앞 질문 그대로, 학기는 현재 학기를 제안(질문 학기가 현재 학기가 아니면)
+  const initial = { term: c.term && c.term !== o.current ? o.current : c.term, dept: c.dept, cat: c.cat };
+  const card = `<div class="row"><div class="cond-card" data-orig='${esc(JSON.stringify(c))}'>
+    <b>조회 조건 바꾸기</b>
+    <p>학과·이수구분은 앞 질문 조건을 그대로 유지해요. 바꿀 항목만 골라 주세요.</p>
+    ${rows.map(([key, label, opts]) => `<div class="cond-row" data-key="${key}"><span>${label}</span>${opts.map((v) =>
+      `<button class="chip ${v === initial[key] ? "sel" : ""}" data-opt="${esc(v)}">${esc(v)}</button>`).join("")}</div>`).join("")}
+    <div class="cond-actions"><button class="btn-solid" data-cond-go>이 조건으로 다시 찾기</button>
+      <button class="btn-outline" data-cond-cancel>취소</button></div></div></div>`;
+  const m = addBot(`<div class="bubble">어떤 조건을 바꿀까요? 바꿀 항목을 고른 뒤 다시 찾아볼게요.</div>`, [card], { q });
+  syncCondCard(m.nextElementSibling.querySelector(".cond-card"));
+}
+
+/** 바뀐 항목만 모아 다시 물을 문장을 만든다. 바뀐 게 없으면 버튼을 끈다. */
+function condChanges(card) {
+  const orig = JSON.parse(card.dataset.orig);
+  const out = [];
+  card.querySelectorAll(".cond-row").forEach((r) => {
+    const sel = r.querySelector(".chip.sel")?.dataset.opt || null;
+    if (sel && sel !== orig[r.dataset.key]) out.push(sel);
+  });
+  return out;
+}
+function syncCondCard(card) { card.querySelector("[data-cond-go]").disabled = condChanges(card).length === 0; }
+
+document.addEventListener("click", (e) => {
+  const card = e.target.closest(".cond-card");
+  if (!card) return;
+  const opt = e.target.closest("[data-opt]");
+  if (opt) {
+    const was = opt.classList.contains("sel");
+    opt.parentElement.querySelectorAll(".chip").forEach((c) => c.classList.remove("sel"));
+    if (!was) opt.classList.add("sel");
+    return syncCondCard(card);
+  }
+  const owner = card.closest("[data-owner]");
+  const bot = owner && document.querySelector(`.bot[data-id="${owner.dataset.owner}"]`);
+  if (e.target.closest("[data-cond-cancel]")) { if (bot) removeBot(bot); return; }
+  if (e.target.closest("[data-cond-go]") && !state.busy) {
+    const ch = condChanges(card);
+    if (!ch.length) return;
+    if (bot) removeBot(bot);
+    ask(`${ch.join(", ")}(으)로 다시 찾아줘`.replace(/(학기|학과|학부)\(으\)로/g, "$1로").replace(/(\S)\(으\)로/g, (m0, ch1) => ch1 + (hasBatchim(ch1) ? "으로" : "로")));
+  }
+});
+function hasBatchim(ch) {
+  const code = ch.charCodeAt(0) - 0xac00;
+  return code >= 0 && code <= 11171 && code % 28 !== 0 && code % 28 !== 8; // ㄹ 받침은 '로'
 }
 
 /* ---------- 07-1 강의계획서 원문 ---------- */

@@ -6,11 +6,13 @@ Wants=network-online.target
 
 [Service]
 User=ubuntu
+# RCP App routing 은 VM 의 80번 포트로 연결한다. 1024 미만 포트를 일반 사용자가 쓰도록 허용
+AmbientCapabilities=CAP_NET_BIND_SERVICE
 WorkingDirectory=/home/ubuntu/campus-ai-db
 Environment=PYTHONIOENCODING=utf-8
 Environment=WEB_DAILY_LIMIT=300
 Environment=WEB_IP_DAILY_LIMIT=40
-ExecStart=/home/ubuntu/campus-ai-db/.venv/bin/python -m text2sql.web.server --host 0.0.0.0 --port 8000
+ExecStart=/home/ubuntu/campus-ai-db/.venv/bin/python -m text2sql.web.server --host 0.0.0.0 --port 80 --model gpt-5.6-luna
 Restart=always
 RestartSec=5
 

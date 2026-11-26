@@ -176,9 +176,10 @@ nano text2sql/.env                      # API 키 등 .env 내용을 붙여 넣�
 # rag_index 는 깃에 없으므로 내 PC 에서 scp 로 복사: text2sql/rag_index/syllabus_2026-2.sqlite
 sudo cp text2sql/web/deploy/campus-ai.service /etc/systemd/system/
 sudo systemctl daemon-reload && sudo systemctl enable --now campus-ai
-curl -s localhost:8000/api/status       # {"rag": true, ...} 이면 성공
+curl -s localhost/api/status            # {"rag": true, ...} 이면 성공
 ```
 
-- 외부 주소는 RCP 콘솔의 **App routing** 에서 서브도메인을 등록해 연결합니다(포트 8000).
+- 외부 주소는 RCP 콘솔의 **App routing** 에서 서브도메인을 등록해 연결합니다. App routing 은 VM 의 **80번 포트**로 연결되므로 서버도 80번에서 켭니다(현재 https://campus-ai.apps.khu-return.com).
 - 하루 질문 한도: 전체 `WEB_DAILY_LIMIT`(기본 300), 접속 주소당 `WEB_IP_DAILY_LIMIT`(기본 40). 넘으면 429 와 안내 문구.
 - 로그 보기: `journalctl -u campus-ai -f`
+- 코드 갱신: `git pull && sudo systemctl restart campus-ai`
