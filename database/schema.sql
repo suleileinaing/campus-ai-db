@@ -269,6 +269,18 @@ CREATE TABLE requirement_courses (
     UNIQUE (requirement_id, course_code, category_id)
 );
 
+CREATE TABLE requirement_track_courses (
+    requirement_track_course_id INTEGER PRIMARY KEY,
+    requirement_id INTEGER NOT NULL REFERENCES graduation_requirements(requirement_id),
+    course_code TEXT NOT NULL REFERENCES courses(course_code),
+    course_type TEXT NOT NULL
+        CHECK (course_type IN ('TRACK_REQUIRED', 'TRACK_ELECTIVE')),
+    source_course_name TEXT NOT NULL,
+    source_document TEXT NOT NULL,
+    source_page INTEGER CHECK (source_page > 0),
+    UNIQUE (requirement_id, course_code, course_type)
+);
+
 CREATE TABLE requirement_others (
     requirement_other_id INTEGER PRIMARY KEY,
     requirement_id INTEGER NOT NULL REFERENCES graduation_requirements(requirement_id),
@@ -319,5 +331,8 @@ CREATE INDEX idx_general_category_members_category
     ON general_education_category_members(category_id);
 CREATE INDEX idx_requirement_courses_requirement
     ON requirement_courses(requirement_id, course_code);
+
+CREATE INDEX idx_requirement_track_courses_requirement
+    ON requirement_track_courses(requirement_id, course_type, course_code);
 CREATE INDEX idx_requirement_others_requirement
     ON requirement_others(requirement_id, type);

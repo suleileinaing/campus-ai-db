@@ -135,13 +135,45 @@ def build_domain_rules(db_path: Path = DATABASE_PATH, current_term: str = CURREN
         "NULL 이 섞인 계산 결과는 NULL 로 남는다. 질문이 '없으면 0으로' 처럼 직접 정할 때만 바꾼다.",
         "- 학생에게 적용되는 졸업요건은 students 와 graduation_requirements 를 department_id, track 이 같고 "
         "cohort_start <= admission_year AND (cohort_end IS NULL OR cohort_end >= admission_year) 로 매칭한다.",
-        "- 이수구분별 최소학점은 requirement_categories, 지정 필수과목은 requirement_courses, "
-        "기타 조건(산학필수·영어강좌 등)은 requirement_others 에 있다.",
+        "- 질문에 학번이 명시되면 현재 학기 대신 그 입학연도를 위 범위 조건에 사용한다. "
+        "예를 들어 2021~2024학번 기준은 2023학번에도 적용되며 2025학번에는 적용되지 않는다.",
+        "- 전공 트랙 목록·개수는 graduation_requirements에서 학과와 적용 학번 범위로 조회한다. "
+        "track = '공통'은 공통 졸업요건이므로 선택 가능한 트랙 조회에는 track <> '공통'을 적용한다. "
+        "공통 졸업요건을 묻는 경우에는 track = '공통' 행을 사용한다.",
+        "- 트랙 목록 조회 결과가 비어 있으면 해당 조건에서 등록된 선택 가능 트랙을 확인하지 못했다고 답한다. "
+        "추가 질문에는 DB 테이블명과 컬럼명 대신 학생이 이해할 수 있는 표현을 사용한다.",
+        "- 학과의 '전공필수 과목'처럼 범위가 모호하고 대화에서 범위가 정해지지 않았으면 "
+        "학번별 졸업 필수과목인지 특정 학기 개설과목인지 확인한다. "
+        "개설과목은 course_offering_categories의 학과·이수구분과 course_offerings의 연도·학기로 조회한다. "
+        "학번별 공통 필수과목은 해당 학번의 graduation_requirements 공통 행과 requirement_courses로 조회한다. "
+        "해당 학번의 필수과목 목록이 미등록이면 그 사실을 안내하고 과거 개설 이력으로 목록을 대신하지 않는다.",
+        "- '학과 개설목록' 또는 '학과 개설강좌'의 학과 조건은 "
+        "course_offering_categories.offering_id로 강좌에 연결한 뒤 "
+        "course_offering_categories.department_id에 적용한다. "
+        "다른 학과 소속 과목도 해당 학과 개설목록에 포함될 수 있으므로 courses.department_id로 제한하지 않는다.",
+        "- 이수구분별 최소학점은 requirement_categories.min_credits를 사용한다. "
+        "숫자 기준이 별도로 저장되지 않은 조건은 requirement_others에서 해당 type의 condition 원문을 반환한다. "
+        "설명문을 숫자 컬럼으로 취급하거나 미기재 학점을 0으로 계산하지 않는다.",
+        "- 총 졸업학점은 graduation_requirements.total_credits이다. "
+        "트랙 이수에 필요한 최소학점은 해당 학과·학번·트랙의 이수구분별 최소학점 또는 "
+        "requirement_others의 type = '트랙이수' 조건에서 확인한다. 총 졸업학점을 트랙 최소학점으로 사용하지 않는다.",
+        "- 전공선택은 requirement_categories에서 해당 이수구분의 전체 최소학점을 조회한다. "
+        "산학필수는 requirement_others의 type = '산학필수' 조건을 조회한다. "
+        "산학필수가 전공선택에 포함되는 경우 두 값을 더하지 않는다. "
+        "일반 전공선택 또는 산학필수를 제외한 전공선택을 명시적으로 묻고 두 기준을 확인할 수 있을 때만 그 차이를 계산한다.",
         "- 선수과목은 course_prerequisites 이며 학번 조건은 (cohort_start IS NULL OR cohort_start <= 입학연도) "
         "AND (cohort_end IS NULL OR cohort_end >= 입학연도) 로 건다.",
         "- 과목 이름으로 찾을 때는 course_offerings.course_name 또는 courses.current_name 에 LIKE '%이름%' 을 쓴다.",
         "- 목록 질문에는 임의로 LIMIT 을 붙이지 않는다. 순위·최근 N개처럼 질문이 개수를 정할 때만 ORDER BY 와 함께 쓴다.",
     ]
+
+    if "course_type" in cols.get("requirement_track_courses", set()):
+        rules.append(
+            "- 트랙필수·트랙선택 과목 목록은 requirement_track_courses에서 같은 requirement_id의 "
+            "course_type = 'TRACK_REQUIRED' 또는 'TRACK_ELECTIVE'를 구분해 조회한다. "
+            "학과 공통 지정 필수과목은 requirement_courses에서 조회한다. "
+            "선택 가능한 과목 전체의 학점을 합산해 최소 이수학점으로 답하지 않는다."
+        )
 
     enr = cols.get("enrollments", set())
     if "retaken" in enr:
