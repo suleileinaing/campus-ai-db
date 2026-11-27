@@ -171,6 +171,10 @@ def build_domain_rules(db_path: Path = DATABASE_PATH, current_term: str = CURREN
         rules.append(
             "- 트랙필수·트랙선택 과목 목록은 requirement_track_courses에서 같은 requirement_id의 "
             "course_type = 'TRACK_REQUIRED' 또는 'TRACK_ELECTIVE'를 구분해 조회한다. "
+            "학번별 트랙 과목을 이름으로 찾을 때는 requirement_track_courses.source_course_name과 "
+            "courses.current_name을 OR로 검색하고, 해당 교육과정의 과목명은 source_course_name으로 표시한다. "
+            "질문에서 특정 과목들이 필수인지 선택인지 비교하면 두 course_type 모두 조회하고, "
+            "답변에는 TRACK_REQUIRED를 '트랙필수', TRACK_ELECTIVE를 '트랙선택'으로 표시한다. "
             "학과 공통 지정 필수과목은 requirement_courses에서 조회한다. "
             "선택 가능한 과목 전체의 학점을 합산해 최소 이수학점으로 답하지 않는다."
         )

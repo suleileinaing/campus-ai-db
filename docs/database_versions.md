@@ -42,5 +42,12 @@ is the first version also recorded in `database/VERSION`.
 - Retained IT technical English 1–3 in the original 2020–2022 Computer Science curriculum lists. The department's transition rules permit eligible students who have not completed the series to use major electives as substitutes. The itemized historical list does not determine a student's remaining requirements under that rule.
 - Rebuilt SQLite and verified foreign keys and integrity.
 
+### DB v7 track-course follow-up
+
+- Linked Software Convergence track-required courses for the 2020–2025 cohorts using the applicable official curriculum, and kept the 2026 course links.
+- Linked 28 track electives explicitly listed in the 2020 curriculum. The 2020 robot capstone is classified as a track elective in that curriculum.
+- Added the catalog-only historical elective SWCON231 from the 2020 curriculum; no course offering was created.
+- Kept the common requirements and AI track data unchanged. Curriculum rows represent the published lists and do not encode all later substitution rules.
+
 The current version string is stored in `database/VERSION`. Future database
 updates should add a new entry here instead of rewriting this history.
